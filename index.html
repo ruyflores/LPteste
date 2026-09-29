@@ -45,7 +45,6 @@
 
   <script defer src="assets/vendor/motion.min.js"></script>
   <script defer src="assets/js/reveal.js"></script>
-  <script defer src="assets/js/scroll-video.js"></script>
   <script defer src="assets/js/script.js"></script>
 
   <!-- Dados estruturados: quem é a Avanttá e as perguntas do FAQ (mesmo texto da página) -->
@@ -228,80 +227,75 @@
   </svg>
 
   <!-- ===================== HEADER ===================== -->
+  <!-- ===================== NAVEGAÇÃO EM PÍLULAS =====================
+       A barra não recebe cliques (pointer-events: none); só as pílulas sim. -->
   <header class="header" id="topo">
     <span class="scroll-progress" aria-hidden="true"></span>
-    <div class="container header__inner">
-      <a href="#topo" class="brand" aria-label="Avanttá, voltar ao início">
-        <span class="brand__mark"><svg aria-hidden="true"><use href="#logo-mark" /></svg></span>
-        <span class="brand__name">Avanttá</span>
+    <div class="topbar">
+      <div class="topbar__left">
+        <a href="#topo" class="brand" aria-label="Avanttá, voltar ao início">
+          <span class="brand__mark"><svg aria-hidden="true"><use href="#logo-mark" /></svg></span>
+          <span class="brand__name">Avanttá</span>
+        </a>
+        <button class="menu-pill" id="menuBtn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav">
+          <span class="menu-pill__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></span>
+          <span class="menu-pill__label">Menu</span>
+        </button>
+        <p class="tags-pill"><span>Prévia grátis</span><span>Google + IA</span></p>
+      </div>
+      <a href="#contato" class="cta-pill" aria-label="Quero minha prévia grátis">
+        <span class="cta-pill__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="7" cy="7" r="2.2"/><circle cx="17" cy="7" r="2.2"/><circle cx="7" cy="17" r="2.2"/><circle cx="17" cy="17" r="2.2"/></svg></span>
+        <span class="cta-pill__label">Quero minha prévia</span>
       </a>
-
-      <nav class="nav" id="nav" aria-label="Menu principal">
-        <a href="#processo">Como funciona</a>
-        <a href="#servicos">Serviços</a>
-        <a href="#faq">Dúvidas</a>
-        <a href="#contato" class="btn btn--glass btn--sm nav__cta">Quero minha prévia</a>
-      </nav>
-
-      <button class="menu-btn" id="menuBtn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav">
-        <span></span><span></span><span></span>
-      </button>
     </div>
-  </header>
 
-  <!-- ===================== VÍDEO GUIADO PELA ROLAGEM =====================
-       Fica fixo atrás da cena de abertura e avança conforme a pessoa rola.
-       Vídeo provisório (NovaAI, recolorido para preto e vermelho). Para trocar
-       pelo vídeo da Avanttá, mude só o data-src (e o data-poster, se houver). -->
-  <div class="scroll-video" id="scrollVideo" aria-hidden="true"
-       data-src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260729_102822_0e6c87e8-c141-4744-bf32-ad30db296371.mp4"
-       data-poster="">
-    <img class="scroll-video__poster" alt="" hidden />
-    <video class="scroll-video__video" muted playsinline preload="none"></video>
-    <canvas class="scroll-video__canvas"></canvas>
-    <div class="scroll-video__tint"></div>
-    <div class="scroll-video__light"></div>
-  </div>
+    <nav class="nav" id="nav" aria-label="Menu principal">
+      <a href="#situacao">Sua situação</a>
+      <a href="#servicos">Serviços</a>
+      <a href="#processo">Como funciona</a>
+      <a href="#faq">Dúvidas</a>
+      <a href="#contato" class="btn btn--primary nav__cta">Quero minha prévia grátis</a>
+    </nav>
+  </header>
 
   <main id="conteudo">
 
-    <!-- ===================== CENA DE ABERTURA =====================
-         Hero + respiro (80vh, é ele que dá espaço para o vídeo avançar) +
-         "Sua situação", tudo em vidro por cima do vídeo. -->
-    <div class="scene" id="cena">
+    <!-- ===================== HERO COM VÍDEO =====================
+         Vídeo de fundo em loop (mudo), com o texto no rodapé do hero.
+         O vídeo só começa a baixar depois que a página carregou (script.js).
+         Provisório: vídeo do CloudFront de outra empresa. Para trocar, mude
+         o data-src. A classe vhero--invert deixa o vídeo em negativo (ele foi
+         feito para fundo branco); tire a classe se o vídeo novo já for escuro. -->
+    <section class="vhero vhero--invert" id="hero" data-hide-wa>
+      <div class="vhero__video" aria-hidden="true">
+        <video id="heroVideo" muted loop playsinline preload="none"
+               data-src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4"></video>
+        <div class="vhero__tint"></div>
+      </div>
 
-      <!-- HERO -->
-      <section class="stage stage--hero" id="hero" data-hide-wa>
-        <div class="stage__top">
-          <ul class="svc-list" aria-label="O que a Avanttá faz">
-            <li class="hero-in" style="--d:150ms">/ Site completo da empresa</li>
-            <li class="hero-in" style="--d:270ms">/ Página de vendas</li>
-            <li class="hero-in" style="--d:390ms">/ Loja virtual</li>
-          </ul>
-          <p class="stage__intro hero-in" style="--d:300ms">Seu negócio já cresceu. Sua presença na internet ainda não. A gente cria o site que faz sua empresa aparecer no Google e nas inteligências artificiais, bem na hora em que o cliente procura.</p>
-        </div>
-
-        <div class="stage__bottom">
-          <div class="stage__headline">
-            <p class="badge hero-in" style="--d:150ms">+250 sites entregues em todo o Brasil</p>
-            <h1 class="stage__title">Seu negócio merece ser <span class="hl">visto.</span></h1>
-          </div>
-
-          <div class="contact-card hero-in" style="--d:420ms">
-            <span class="contact-card__mark" aria-hidden="true"><svg><use href="#logo-mark" /></svg></span>
-            <div class="contact-card__txt">
-              <p class="contact-card__name">Fale com a Avanttá</p>
-              <p class="contact-card__role">Prévia grátis do seu site</p>
-              <a href="#contato" class="pill pill--primary">Quero minha prévia <svg class="ico" aria-hidden="true"><use href="#i-chevron" /></svg></a>
-            </div>
+      <div class="vhero__foot">
+        <div class="vhero__left">
+          <p class="vhero__sub"><span class="vhero__dot" aria-hidden="true"></span> +250 sites entregues em todo o Brasil</p>
+          <h1 class="vhero__title">Seu negócio merece<br />ser <span class="hl">visto.</span></h1>
+          <p class="vhero__desc">Seu cliente pesquisa você no celular antes de fechar. A gente cria o site que faz sua empresa aparecer no Google e nas inteligências artificiais, e te mostra a prévia antes de você pagar qualquer coisa.</p>
+          <div class="vhero__ctas">
+            <a href="#contato" class="vbtn vbtn--primary">Quero minha prévia grátis</a>
+            <a href="#processo" class="vbtn vbtn--ghost">Como funciona</a>
           </div>
         </div>
-      </section>
+        <ul class="vhero__tags" aria-label="Destaques">
+          <li>Prévia grátis</li>
+          <li>Google + IA</li>
+          <li>Entrega ágil</li>
+        </ul>
+      </div>
+    </section>
 
-      <div class="scene__spacer" aria-hidden="true"></div>
+    <div class="flow">
 
-      <!-- SUA SITUAÇÃO HOJE (sobre o vídeo) -->
-      <section class="stage stage--situation" id="situacao">
+    <!-- ===================== SUA SITUAÇÃO HOJE (sanfonado) ===================== -->
+      <section class="section situation-sec" id="situacao">
+      <div class="container">
         <div class="stage__top">
           <p class="badge reveal" data-delay="120">Sua situação hoje</p>
           <p class="stage__intro reveal" data-delay="220">Em qualquer um dos três casos, o cliente já está procurando. A pergunta é se ele vai encontrar você ou o concorrente.</p>
@@ -362,12 +356,9 @@
             </div>
           </div>
         </div>
+      </div>
       </section>
-    </div>
 
-    <!-- ===================== RESTO DA PÁGINA =====================
-         Sobe por cima do vídeo como uma cortina (fundo sólido, cantos arredondados). -->
-    <div class="flow">
 
     <!-- ===================== COMPARAÇÃO ANIMADA (dois celulares) =====================
          A mesma história nos dois sites. Cada etapa entra a cada 0,6s (Motion),

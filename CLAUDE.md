@@ -14,10 +14,10 @@ Leia este arquivo antes de mexer no projeto. Ele vale para todas as sessões.
 
 ## Estrutura da página (enxuta: só o que qualifica e converte)
 
-1. **Cena de abertura** (`#cena`), sobre o vídeo fixo guiado pela rolagem (`#scrollVideo`): hero (`#hero`) → respiro de 80vh (não remover: é o espaço do vídeo avançar) → "Sua situação" (`#situacao`, sanfonado com 3 situações num painel de vidro).
-2. **Resto da página** (`.flow`), que sobe por cima da cena como uma cortina: comparação dos celulares → serviços (4 cartões + linha de manutenção) → como funciona + o que você recebe → formulário → 5 dúvidas → rodapé.
+1. **Hero com vídeo** (`#hero`, `.vhero`): vídeo de fundo em loop (mudo) e o texto no rodapé do hero, sobre um degradê que vai para o preto. Navegação em pílulas por cima (`.topbar`): logo, pílula "Menu" (abre o menu em painel em todas as telas), pílula de destaques e pílula "Quero minha prévia".
+2. **Resto da página** (`.flow`): "Sua situação" (`#situacao`, sanfonado com 3 situações num painel de vidro) → comparação dos celulares → serviços (4 cartões + linha de manutenção) → como funciona + o que você recebe → formulário → 5 dúvidas → rodapé.
 
-Sistema visual da cena (vindo da referência NovaAI, nas cores da Avanttá): selo com filete vermelho à esquerda (`.badge`), rótulos em caixa alta espaçada, pílulas (`.pill--primary` vermelha, `.pill--glass`), painéis de vidro (`.glass-panel`), texto branco com sombra sobre o vídeo. Títulos em Bebas Neue, o resto em Inter.
+Sistema visual: selo com filete vermelho à esquerda (`.badge`), pílulas (`.pill--primary` vermelha, `.pill--glass`, `.vbtn`), painéis de vidro (`.glass-panel`), curva de animação [0.16, 1, 0.3, 1] no hero. O hero veio de uma referência em preto e branco sobre fundo branco e foi adaptado para o fundo preto da marca. Títulos em Bebas Neue, o resto em Inter.
 
 ## Objetivo da página
 
@@ -44,7 +44,6 @@ preto-e-branco.html     atalho para index.html?tema=pb (só para comparação; n
 assets/css/style.css    estilos, temas (red / mono) e responsivo
 assets/js/script.js     configuração, integrações, interface, formulário, Cal.com, animações
 assets/js/reveal.js     componente de entrada suave das seções (classe .reveal)
-assets/js/scroll-video.js vídeo do hero guiado pela rolagem (adaptado do hero NovaAI) + luz que segue o mouse
 assets/vendor/motion.min.js  Motion (animate, inView, scroll, stagger) + Lenis (rolagem suave), global window.Motion
 tools/motion-entry.js   entrada do pacote acima ("npm install && npm run vendor" gera de novo)
 assets/fonts/           Bebas Neue e Inter em woff2 (subset latin)
@@ -135,13 +134,15 @@ A checagem não pega trios de verbos e adjetivos: releia as frases novas.
 - Respeitar `prefers-reduced-motion`: sem movimento, o conteúdo só aparece (a comparação dos celulares mostra o estado final).
 - Conteúdo que troca sozinho precisa de controle: a comparação tem botões de troca e "Repetir", e troca sozinha uma única vez.
 - Transição entre seções sem bordas nem quebras: fundos em degradê que emendam, e a barra fina de progresso de leitura no menu.
-- **Vídeo do hero guiado pela rolagem** (`scroll-video.js`): só avança com a rolagem, nunca toca sozinho. Começa a carregar depois do `load` + momento livre; não carrega com `prefers-reduced-motion` nem com economia de dados. Na primeira rolagem, os quadros são fatiados uma vez (90 a até 960px no desktop, 48 a até 640px no celular, por memória) com `createImageBitmap` redimensionando fora da thread principal; até lá o vídeo avança pelo caminho de reserva (seek). O preto e branco é um filtro fixo de CSS (feito pela placa de vídeo) e a camada `.scroll-video__tint` aplica o vermelho da marca. **Não** voltar a aplicar filtro quadro a quadro no canvas: custava de 150 a 200 ms por quadro no celular e derrubava a nota para 72.
-- **Vídeo provisório:** o `data-src` aponta para o vídeo do NovaAI no CloudFront de outra empresa (pode sair do ar). Trocar pelo vídeo da Avanttá é mudar só o `data-src` (e `data-poster`, com uma imagem do primeiro quadro). O servidor precisa aceitar pedidos por partes (Range), senão o vídeo não avança.
-- **Efeitos do Não Codei em uso:** 01 cartões que empilham ("Como funciona"; o escurecimento é uma camada com `opacity`, não `filter`), 10 inércia (feito pelo Lenis na página inteira) e 12 luz que segue o mouse (sobre o vídeo do hero e nos cartões `.luz`). **Fora de propósito:** 09 cursor personalizado (atrapalha quem quer clicar e contratar), 23 painéis que expandem e 21 galeria com filtro (animam largura, não transform), 08 cubo e 02 galeria horizontal (alongam a página e não ajudam a vender), 05 máscara (anima `clip-path`). O 06 faixas chegou a ser usado com uma arte estática no hero, mas voltamos ao vídeo com a transição em cortina.
+- **Vídeo do hero** (`#heroVideo`, lógica em `script.js`): toca sozinho, mudo e em loop (exceção à regra de "nada de autoplay", pedida pelo dono). Só começa a baixar depois do `load` + momento livre, pausa fora da tela e não carrega com `prefers-reduced-motion` nem com economia de dados. No celular ocupa 80% da tela, centralizado; a partir de 768px, a tela toda. As bordas têm máscara em degradê para o vídeo se misturar ao fundo.
+- **Vídeo em negativo:** o vídeo provisório foi feito para fundo branco; a classe `vhero--invert` o deixa em negativo (o branco vira o preto da página) e `.vhero__tint` aplica o vermelho. Com um vídeo próprio já escuro, tire a classe. O vídeo está no CloudFront de outra empresa (pode sair do ar); para trocar, mude o `data-src`.
+- **O rodapé do hero só desliza** (sem sumir): o título precisa estar visível desde a primeira pintura. Quando o bloco inteiro entrava com opacidade zero, o Lighthouse às vezes não achava o maior elemento da tela e zerava a nota de Performance.
+- **Tentativas anteriores no hero** (no histórico do Git): vídeo guiado pela rolagem com cortina (`fd6634e`; não aparecia no celular, porque o iPhone não carrega vídeo que não está tocando) e arte do celular abrindo em faixas (`7e60a9b`).
+- **Efeitos do Não Codei em uso:** 01 cartões que empilham ("Como funciona"; o escurecimento é uma camada com `opacity`, não `filter`), 10 inércia (feito pelo Lenis na página inteira) e 12 luz que segue o mouse (cartões `.luz`). **Fora de propósito:** 09 cursor personalizado (atrapalha quem quer clicar e contratar), 23 painéis que expandem e 21 galeria com filtro (animam largura, não transform), 08 cubo e 02 galeria horizontal (alongam a página e não ajudam a vender), 05 máscara (anima `clip-path`). O 06 faixas chegou a ser usado com uma arte estática no hero, mas voltamos ao vídeo com a transição em cortina.
 - **Rolagem suave (Lenis)** dá a sensação de site contínuo; é desligada com `prefers-reduced-motion`. Para rolar por código, use `scrollToEl()` (funciona com e sem Lenis).
-- O texto do hero nunca depende de JS para aparecer: a entrada é CSS (`.hero-in`) e o `<h1>` não é animado (LCP).
+- O texto do hero nunca depende de JS para aparecer: as entradas são CSS, e o `<h1>` só desliza, sem mudar a opacidade (LCP).
 - O script do Cal.com só carrega quando o contato chega à agenda.
-- Nada de vídeo em autoplay. Imagens em WebP ou AVIF com `loading="lazy"` e `width`/`height` definidos.
+- Nada de vídeo em autoplay, fora o vídeo do hero (mudo, em loop, carregado depois da página). Imagens em WebP ou AVIF com `loading="lazy"` e `width`/`height` definidos.
 - Fontes em woff2 locais com `font-display: swap` e `preload` só das duas usadas acima da dobra.
 - **Zero rolagem lateral no celular** (testar em 375px).
 - O WhatsApp flutuante some quando o hero, o formulário ou a chamada final estão na tela (`data-hide-wa`).
@@ -155,7 +156,7 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 
 ## Pendências
 
-- [ ] **Vídeo próprio do hero** em preto e vermelho (MP4 hospedado no próprio site + poster do primeiro quadro), no lugar do vídeo provisório do NovaAI
+- [ ] **Vídeo próprio do hero** (MP4 hospedado no próprio site), no lugar do vídeo provisório do CloudFront de outra empresa; conferir se ainda precisa da classe `vhero--invert`
 - [ ] **Cal.com**: confirmar os identificadores das perguntas (telefone e empresa) e ajustar `CAL_PHONE_FIELDS` / `CAL_COMPANY_FIELD`
 - [ ] **Domínio**: trocar o endereço provisório da Vercel em canonical, Open Graph, JSON-LD, sitemap.xml, robots.txt e llms.txt
 - [ ] **Depoimentos reais** (destaque "Feedbacks" do Instagram) para reativar a seção Feedbacks

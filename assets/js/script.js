@@ -2,7 +2,7 @@
    AVANTTÁ | Landing Page (JS)
    1. Configuração
    2. Integrações (saveLead, trackConversion)
-   3. Interface (header, menu, WhatsApp, cards que viram)
+   3. Interface (menu, vídeo do hero, WhatsApp, sanfonado, comparação)
    4. Formulário em etapas + roteamento
    5. Cal.com (carregado só quando o lead chega na agenda)
    6. Animações (Motion + Lenis: assets/vendor/motion.min.js, assets/js/reveal.js)
@@ -109,25 +109,52 @@ $$('.js-whatsapp').forEach((a) => {
 $('#year').textContent = new Date().getFullYear();
 
 // Header muda ao rolar
+// Faixa escura atrás das pílulas depois do topo
 const header = $('.header');
-const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 20);
+const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 40);
 onScroll();
 window.addEventListener('scroll', onScroll, { passive: true });
 
-// Menu mobile
+// Menu em painel (pílula "Menu"), em todas as telas
 const menuBtn = $('#menuBtn');
 const nav = $('#nav');
 function toggleMenu(open) {
   const isOpen = open ?? !nav.classList.contains('is-open');
   nav.classList.toggle('is-open', isOpen);
-  header.classList.toggle('menu-open', isOpen);
   menuBtn.setAttribute('aria-expanded', String(isOpen));
   menuBtn.setAttribute('aria-label', isOpen ? 'Fechar menu' : 'Abrir menu');
-  document.body.style.overflow = isOpen ? 'hidden' : '';
-  if (window.lenis) (isOpen ? window.lenis.stop() : window.lenis.start());
 }
-menuBtn.addEventListener('click', () => toggleMenu());
+menuBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
 $$('a', nav).forEach((a) => a.addEventListener('click', () => toggleMenu(false)));
+document.addEventListener('click', (e) => {
+  if (nav.classList.contains('is-open') && !nav.contains(e.target)) toggleMenu(false);
+});
+
+// Vídeo do hero: toca sozinho, mudo e em loop, mas só começa a baixar
+// depois que a página carregou. Pausa quando sai da tela. Sem vídeo para
+// quem pediu movimento reduzido ou está em economia de dados.
+(function initHeroVideo() {
+  const video = $('#heroVideo');
+  if (!video) return;
+  const conn = navigator.connection || {};
+  const saveData = conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '');
+  if (reducedMotion || saveData) return;
+  const start = () => {
+    video.src = video.dataset.src;
+    video.muted = true;
+    video.addEventListener('playing', () => video.classList.add('is-playing'), { once: true });
+    const p = video.play();
+    if (p && p.catch) p.catch(() => { /* sem autoplay: fica o fundo em degradê */ });
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { const q = video.play(); if (q && q.catch) q.catch(() => {}); }
+      else video.pause();
+    }).observe(video);
+  };
+  const go = () => ('requestIdleCallback' in window ? requestIdleCallback(start, { timeout: 1500 }) : setTimeout(start, 300));
+  if (document.readyState === 'complete') go();
+  else window.addEventListener('load', go, { once: true });
+})();
+
 window.addEventListener('keydown', (e) => e.key === 'Escape' && toggleMenu(false));
 
 // WhatsApp flutuante some quando há botões importantes na tela (hero, formulário, chamada final)
