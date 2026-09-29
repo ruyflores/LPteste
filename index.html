@@ -694,8 +694,8 @@
         <ol class="steps">
           <li class="step reveal">
             <span class="step__num">01</span>
-            <h3>Você responde 4 perguntas</h3>
-            <p>Leva menos de um minuto. Com isso a gente entende o seu negócio.</p>
+            <h3>Você deixa seus contatos</h3>
+            <p>E responde 3 perguntas rápidas sobre o que precisa. Leva menos de um minuto.</p>
           </li>
           <li class="step reveal">
             <span class="step__num">02</span>
@@ -821,7 +821,7 @@
         <div class="contact__copy">
           <p class="kicker reveal">Prévia gratuita</p>
           <h2 class="display display--md">Veja o seu site <span class="hl">antes de pagar.</span></h2>
-          <p class="lead reveal">São 4 perguntas rápidas. Depois você escolhe o melhor horário para a reunião pelo Google Meet. Se fizer sentido, você já sai dela com a proposta.</p>
+          <p class="lead reveal">São 4 passos rápidos. Depois você escolhe o melhor horário para a conversa por vídeo, já com os seus dados preenchidos. Se fizer sentido, você já sai dela com a proposta.</p>
           <ul class="contact__list reveal">
             <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Prévia do seu site grátis</li>
             <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Conversa por vídeo, de onde você estiver</li>
@@ -833,27 +833,66 @@
           <!-- ---------- Formulário em etapas ---------- -->
           <form class="form" id="leadForm" novalidate>
             <div class="form__top">
-              <p class="form__step-label" id="stepLabel" aria-live="polite">Pergunta 1 de 4</p>
+              <p class="form__step-label" id="stepLabel" aria-live="polite">Passo 1 de 4 · Seus contatos</p>
               <div class="form__progress" role="progressbar" aria-label="Progresso do formulário" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1">
                 <span class="form__progress-bar" id="progressBar"></span>
               </div>
             </div>
 
-            <!-- Etapa 1 -->
+            <!-- Passo 1: contatos (salvos já aqui, para ninguém se perder no meio) -->
             <fieldset class="form__step is-active" data-step="1">
-              <legend class="form__q">Quanto você está disposto a investir para resolver esse problema? <span class="req" aria-hidden="true">*</span></legend>
+              <legend class="form__q">Para quem a gente prepara a prévia?</legend>
+              <div class="field">
+                <label for="nome">Seu nome <span class="req" aria-hidden="true">*</span></label>
+                <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Como podemos te chamar?" required aria-describedby="nome-erro" />
+                <p class="field__error" id="nome-erro">Escreva o seu nome.</p>
+              </div>
+              <div class="field">
+                <label for="empresa">Nome da empresa <span class="req" aria-hidden="true">*</span></label>
+                <input id="empresa" name="empresa" type="text" autocomplete="organization" placeholder="Ex.: Clínica Sorriso" required aria-describedby="empresa-erro" />
+                <p class="field__error" id="empresa-erro">Escreva o nome da sua empresa.</p>
+              </div>
+              <div class="field">
+                <label for="whatsapp">WhatsApp com DDD <span class="req" aria-hidden="true">*</span></label>
+                <input id="whatsapp" name="whatsapp" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(00) 00000-0000" required data-mask="phone" aria-describedby="whatsapp-erro" />
+                <p class="field__error" id="whatsapp-erro">Confira o número. Ele precisa ter o DDD, por exemplo (61) 99999-9999.</p>
+              </div>
+              <div class="field">
+                <label for="email">E-mail <span class="req" aria-hidden="true">*</span></label>
+                <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="voce@empresa.com.br" required aria-describedby="email-ajuda email-erro" />
+                <p class="field__help" id="email-ajuda">É para onde vai o link da conversa por vídeo.</p>
+                <p class="field__error" id="email-erro">Confira o e-mail. Ele precisa ser como nome@empresa.com.br.</p>
+              </div>
+              <div class="field field--check">
+                <label class="check">
+                  <input type="checkbox" id="lgpd" name="lgpd" value="sim" required aria-describedby="lgpd-erro" />
+                  <span>Aceito que a Avanttá entre em contato comigo sobre esta solicitação. <span class="req" aria-hidden="true">*</span></span>
+                </label>
+                <p class="field__error" id="lgpd-erro">Marque o aceite para a gente poder falar com você.</p>
+              </div>
+              <div class="form__actions">
+                <button type="button" class="btn btn--primary btn--lg" id="toStep2">Continuar <svg class="ico" aria-hidden="true"><use href="#i-arrow" /></svg></button>
+              </div>
+            </fieldset>
+
+            <!-- Passo 2: investimento (avança sozinho) -->
+            <fieldset class="form__step" data-step="2">
+              <legend class="form__q">Quanto você está disposto a investir para resolver isso? <span class="req" aria-hidden="true">*</span></legend>
               <div class="options" data-auto>
                 <label class="option"><input type="radio" name="investimento" value="Até R$ 800" required /><span>Até R$ 800</span></label>
                 <label class="option"><input type="radio" name="investimento" value="De R$ 800 a R$ 2.000" /><span>De R$ 800 a R$ 2.000</span></label>
                 <label class="option"><input type="radio" name="investimento" value="De R$ 2.000 a R$ 4.000" /><span>De R$ 2.000 a R$ 4.000</span></label>
-                <label class="option"><input type="radio" name="investimento" value="R$ 4.000+" /><span>R$ 4.000+</span></label>
+                <label class="option"><input type="radio" name="investimento" value="R$ 4.000+" /><span>R$ 4.000 ou mais</span></label>
               </div>
               <p class="field__error" role="alert">Escolha uma opção para continuar.</p>
+              <div class="form__actions">
+                <button type="button" class="btn btn--ghost js-prev"><svg class="ico" aria-hidden="true"><use href="#i-back" /></svg> Voltar</button>
+              </div>
             </fieldset>
 
-            <!-- Etapa 2 -->
-            <fieldset class="form__step" data-step="2">
-              <legend class="form__q">Quão urgente você quer resolver? <span class="req" aria-hidden="true">*</span></legend>
+            <!-- Passo 3: urgência (avança sozinho) -->
+            <fieldset class="form__step" data-step="3">
+              <legend class="form__q">Para quando você quer resolver? <span class="req" aria-hidden="true">*</span></legend>
               <div class="options" data-auto>
                 <label class="option"><input type="radio" name="urgencia" value="Hoje" required /><span>Hoje</span></label>
                 <label class="option"><input type="radio" name="urgencia" value="Amanhã" /><span>Amanhã</span></label>
@@ -866,68 +905,24 @@
               </div>
             </fieldset>
 
-            <!-- Etapa 3 -->
-            <fieldset class="form__step" data-step="3">
+            <!-- Passo 4: o que precisa -->
+            <fieldset class="form__step" data-step="4">
               <legend class="form__q">O que você precisa? <span class="req" aria-hidden="true">*</span></legend>
-              <div class="field field--inline">
-                <label for="link">Tem site ou Instagram? Cole aqui antes de escolher <span class="opt">(opcional)</span></label>
-                <input id="link" name="link" type="text" placeholder="@suaempresa ou suaempresa.com.br" autocomplete="url" />
-              </div>
-              <div class="options options--5" data-auto>
+              <div class="options options--5">
                 <label class="option"><input type="radio" name="servico" value="Site completo da empresa" required /><span>Site completo da empresa</span></label>
                 <label class="option"><input type="radio" name="servico" value="Página de vendas" /><span>Página de vendas</span></label>
                 <label class="option"><input type="radio" name="servico" value="Reforma do site" /><span>Reforma do site</span></label>
                 <label class="option"><input type="radio" name="servico" value="Loja virtual" /><span>Loja virtual</span></label>
-                <label class="option option--wide"><input type="radio" name="servico" value="Ainda não sei" /><span>Ainda não sei</span></label>
+                <label class="option option--wide"><input type="radio" name="servico" value="Ainda não sei" /><span>Ainda não sei, quero uma indicação</span></label>
               </div>
               <p class="field__error" role="alert">Escolha uma opção para continuar.</p>
-              <div class="form__actions">
-                <button type="button" class="btn btn--ghost js-prev"><svg class="ico" aria-hidden="true"><use href="#i-back" /></svg> Voltar</button>
-              </div>
-            </fieldset>
-
-            <!-- Etapa 4 -->
-            <fieldset class="form__step" data-step="4">
-              <legend class="form__q">Para quem a gente prepara a prévia?</legend>
               <div class="field">
-                <label for="nome">Seu nome <span class="req" aria-hidden="true">*</span></label>
-                <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Como podemos te chamar?" required />
-                <p class="field__error">Digite o seu nome.</p>
-              </div>
-              <div class="field">
-                <label for="empresa">Nome da empresa <span class="req" aria-hidden="true">*</span></label>
-                <input id="empresa" name="empresa" type="text" autocomplete="organization" placeholder="Ex.: Clínica Sorriso" required />
-                <p class="field__error">Digite o nome da empresa.</p>
-              </div>
-              <div class="field">
-                <label for="whatsapp">WhatsApp com DDD <span class="req" aria-hidden="true">*</span></label>
-                <input id="whatsapp" name="whatsapp" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(00) 00000-0000" required data-mask="phone" />
-                <p class="field__error">Confira o número. Ele precisa ter DDD.</p>
-              </div>
-              <label class="check">
-                <input type="checkbox" id="outroTelefone" aria-controls="telefoneField" aria-expanded="false" />
-                <span>Tenho outro telefone para contato</span>
-              </label>
-              <div class="field field--hidden" id="telefoneField">
-                <label for="telefone">Outro telefone</label>
-                <input id="telefone" name="telefone" type="tel" inputmode="numeric" placeholder="(00) 0000-0000" data-mask="phone" />
-                <p class="field__error">Confira o número com DDD.</p>
-              </div>
-              <div class="field">
-                <label for="email">E-mail <span class="opt">(opcional)</span></label>
-                <input id="email" name="email" type="email" autocomplete="email" placeholder="voce@empresa.com.br" />
-                <p class="field__error">Esse e-mail parece incompleto.</p>
-              </div>
-              <div class="field field--check">
-                <label class="check">
-                  <input type="checkbox" id="lgpd" name="lgpd" value="sim" required />
-                  <span>Aceito que a Avanttá entre em contato comigo sobre esta solicitação. <span class="req" aria-hidden="true">*</span></span>
-                </label>
-                <p class="field__error">Marque o aceite para a gente poder falar com você.</p>
+                <label for="link">Seu site ou Instagram atual <span class="opt">(opcional)</span></label>
+                <input id="link" name="link" type="text" placeholder="@suaempresa ou suaempresa.com.br" autocomplete="url" />
               </div>
               <div class="form__actions">
                 <button type="button" class="btn btn--ghost js-prev"><svg class="ico" aria-hidden="true"><use href="#i-back" /></svg> Voltar</button>
-                <button type="submit" class="btn btn--primary btn--lg">Continuar <svg class="ico" aria-hidden="true"><use href="#i-arrow" /></svg></button>
+                <button type="submit" class="btn btn--primary btn--lg" id="submitBtn">Ver horários para a conversa <svg class="ico" aria-hidden="true"><use href="#i-arrow" /></svg></button>
               </div>
             </fieldset>
           </form>
@@ -950,6 +945,11 @@
               <p class="cal-embed__loading">Carregando a agenda...</p>
             </div>
             <p class="panel__fallback">A agenda não abriu? <a href="https://cal.com/avantta/avantta" id="calFallback" target="_blank" rel="noopener">Abrir a agenda em outra aba</a></p>
+            <div class="panel__alt">
+              <a href="https://wa.me/5561995905615" class="btn btn--ghost" id="calWa" target="_blank" rel="noopener">
+                <svg class="ico" aria-hidden="true"><use href="#i-wa" /></svg> Prefiro falar pelo WhatsApp
+              </a>
+            </div>
           </div>
 
           <!-- ---------- Confirmação do agendamento ---------- -->

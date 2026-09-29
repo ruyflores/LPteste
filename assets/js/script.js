@@ -15,9 +15,13 @@ const CAL_LINK = 'avantta/avantta';               // evento do Cal.com (usuario/
 const CAL_ORIGIN = 'https://cal.com';
 const CAL_EMBED_SRC = 'https://app.cal.com/embed/embed.js';
 const CAL_NAMESPACE = 'avantta';
-// Identificador do campo personalizado de WhatsApp no evento do Cal.com.
-// Confira em Cal.com > Event Types > avantta > Advanced > Booking questions.
-const CAL_WHATSAPP_FIELD = 'whatsapp';
+// Perguntas do evento no Cal.com que recebem dados já preenchidos.
+// A chave é o identificador da pergunta em Cal.com > Event Types > avantta >
+// Advanced > Booking Questions. Mandar um identificador que não existe não
+// quebra nada: o Cal.com só ignora. Por isso o telefone vai nos dois nomes
+// mais comuns até você confirmar qual é o seu.
+const CAL_PHONE_FIELDS = ['attendeePhoneNumber', 'whatsapp'];
+const CAL_COMPANY_FIELD = 'empresa';
 const BRAND_RED = '#e10600';
 
 // Quem responde "Até R$ 800" vai para o WhatsApp em vez da agenda
@@ -29,31 +33,59 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 const EASE = [0.22, 1, 0.36, 1]; // curva padrão das animações
 
 /* ---------- 2. Integrações ----------
-   Pontos únicos de saída de dados. Quando o Supabase, o Pixel e o GA
-   estiverem prontos, basta completar estas duas funções. */
+   Pontos únicos de saída de dados. Hoje não existe destino externo (nem
+   planilha, nem Pixel, nem GA): as duas funções só registram no console.
+   Quando o Supabase, o Pixel e o GA estiverem prontos, é só completar aqui. */
 
 /**
- * Salva o lead. Hoje só registra no console.
- * Futuro (Supabase):
- *   const { error } = await supabase.from('leads').insert(dados);
- *   if (error) throw error;
+ * Salva o contato. É chamada duas vezes com o mesmo lead_id:
+ *   etapa "contatos"  → assim que a pessoa passa do passo 1 (ninguém se perde)
+ *   etapa "completo"  → ao terminar o formulário
+ * Futuro (Supabase): upsert pelo lead_id
+ *   await supabase.from('leads').upsert(dados, { onConflict: 'lead_id' });
  */
 async function saveLead(dados) {
-  console.info('[Avanttá] Lead recebido:', dados);
+  console.info('[Avanttá] Lead salvo:', dados);
   return { ok: true };
 }
 
 /**
- * Dispara eventos de conversão.
- *   'Lead'     → formulário enviado
- *   'Schedule' → reunião agendada no Cal.com
+ * Eventos de conversão. Cada um dispara uma vez por visita.
+ *   'Lead'     → contatos enviados (fim do passo 1)
+ *   'Schedule' → conversa agendada no Cal.com
  * Futuro:
  *   if (window.fbq) fbq('track', evento, dados);
  *   if (window.gtag) gtag('event', evento === 'Schedule' ? 'schedule_meeting' : 'generate_lead', dados);
  */
+const tracked = new Set();
 function trackConversion(evento, dados = {}) {
+  if (tracked.has(evento)) return;
+  tracked.add(evento);
   console.info('[Avanttá] Conversão:', evento, dados);
 }
+
+/* Origem da visita: capturada ao entrar e guardada durante a visita
+   (sessionStorage), para saber de qual anúncio veio cada contato. */
+const ORIGEM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid'];
+const origem = (() => {
+  const KEY = 'avantta_origem';
+  let saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) { /* sem storage */ }
+  const params = new URLSearchParams(location.search);
+  const now = {};
+  ORIGEM_KEYS.forEach((k) => { if (params.get(k)) now[k] = params.get(k); });
+  // mantém a primeira origem da visita; parâmetros novos completam o que faltar
+  const data = Object.assign(
+    { pagina_origem: location.href.split('#')[0], referrer: document.referrer || '' },
+    saved || {},
+    saved ? Object.fromEntries(Object.entries(now).filter(([k]) => !saved[k])) : now
+  );
+  ORIGEM_KEYS.forEach((k) => { if (!(k in data)) data[k] = ''; });
+  try { sessionStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* sem storage */ }
+  return data;
+})();
+
+const newId = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : `lead-${Date.now()}-${Math.random().toString(16).slice(2)}`);
 
 /* ---------- 3. Interface ---------- */
 const waLink = (msg) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
@@ -216,36 +248,39 @@ sitTabs.forEach((tab, i) => {
   }
 })();
 
-/* ---------- 4. Formulário em etapas ---------- */
+/* ---------- 4. Formulário em etapas ----------
+   Passo 1: contatos (salvos na hora) · 2: investimento · 3: urgência · 4: o que precisa */
 const form = $('#leadForm');
 const steps = $$('.form__step', form);
 const TOTAL = steps.length;
 const progress = $('.form__progress', form);
 const progressBar = $('#progressBar');
 const stepLabel = $('#stepLabel');
+const STEP_NAMES = ['Seus contatos', 'Investimento', 'Prazo', 'O que você precisa'];
+const leadId = newId();
 let current = 1;
 
 function goToStep(n) {
   current = Math.min(Math.max(n, 1), TOTAL);
   steps.forEach((s) => {
-    const active = +s.dataset.step === current;
-    s.classList.toggle('is-active', active);
+    s.classList.toggle('is-active', +s.dataset.step === current);
     s.classList.remove('has-error');
   });
   progressBar.style.transform = `scaleX(${current / TOTAL})`;
   progress.setAttribute('aria-valuenow', String(current));
-  stepLabel.textContent = current === TOTAL ? `Última etapa · ${current} de ${TOTAL}` : `Pergunta ${current} de ${TOTAL}`;
+  stepLabel.textContent = `Passo ${current} de ${TOTAL} · ${STEP_NAMES[current - 1]}`;
 
   // mantém o topo do formulário visível no celular
   const top = form.getBoundingClientRect().top;
   if (top < 0 || top > window.innerHeight * 0.6) {
     form.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
   }
-  const first = $('input:not([type=hidden])', steps[current - 1]);
-  if (first && current === TOTAL && window.matchMedia('(pointer: fine)').matches) first.focus({ preventScroll: true });
+  // leva o foco para a pergunta nova (teclado e leitor de tela)
+  const legend = $('legend', steps[current - 1]);
+  if (legend) { legend.tabIndex = -1; legend.focus({ preventScroll: true }); }
 }
 
-// Etapas 1 a 3: avança sozinho ao escolher uma opção
+// Passos 2 e 3: avança sozinho ao escolher uma opção
 $$('[data-auto]', form).forEach((group) => {
   group.addEventListener('change', (e) => {
     if (e.target.type !== 'radio') return;
@@ -255,24 +290,15 @@ $$('[data-auto]', form).forEach((group) => {
     setTimeout(() => { if (current === n) goToStep(n + 1); }, 280);
   });
 });
-
 $$('.js-prev', form).forEach((b) => b.addEventListener('click', () => goToStep(current - 1)));
 
-// Botões dos cards de serviço já deixam a etapa 3 marcada
+// Botões dos cartões de serviço já deixam o passo 4 marcado
 $$('[data-service]').forEach((btn) =>
   btn.addEventListener('click', () => {
     const radio = $(`input[name="servico"][value="${btn.dataset.service}"]`, form);
     if (radio) radio.checked = true;
   })
 );
-
-// Telefone adicional
-const outroTel = $('#outroTelefone');
-outroTel.addEventListener('change', () => {
-  $('#telefoneField').classList.toggle('is-visible', outroTel.checked);
-  outroTel.setAttribute('aria-expanded', String(outroTel.checked));
-  if (!outroTel.checked) { $('#telefone').value = ''; setError($('#telefone'), false); }
-});
 
 // Máscara (00) 00000-0000
 const onlyDigits = (v) => v.replace(/\D/g, '');
@@ -303,8 +329,7 @@ function setError(input, hasError) {
 }
 
 function validateChoice(stepEl) {
-  const radios = $$('input[type=radio]', stepEl);
-  const ok = radios.some((r) => r.checked);
+  const ok = $$('input[type=radio]', stepEl).some((r) => r.checked);
   stepEl.classList.toggle('has-error', !ok);
   return ok;
 }
@@ -313,21 +338,18 @@ function validateContact() {
   const nome = $('#nome');
   const empresa = $('#empresa');
   const whatsapp = $('#whatsapp');
-  const telefone = $('#telefone');
   const email = $('#email');
   const lgpd = $('#lgpd');
-
   const checks = [
     setError(nome, nome.value.trim().length < 2),
     setError(empresa, !empresa.value.trim()),
     setError(whatsapp, !isValidPhone(whatsapp.value)),
-    setError(telefone, outroTel.checked && telefone.value.trim() !== '' && !isValidPhone(telefone.value)),
-    setError(email, email.value.trim() !== '' && !isValidEmail(email.value.trim())),
+    setError(email, !isValidEmail(email.value.trim())),
     setError(lgpd, !lgpd.checked),
   ];
   const ok = checks.every(Boolean);
   if (!ok) {
-    const firstErr = $('.has-error input', steps[TOTAL - 1]);
+    const firstErr = $('.has-error input', steps[0]);
     if (firstErr) firstErr.focus();
   }
   return ok;
@@ -340,47 +362,44 @@ form.addEventListener('input', (e) => {
 });
 form.addEventListener('change', (e) => {
   if (e.target.id === 'lgpd' && e.target.checked) setError(e.target, false);
+  if (e.target.name === 'servico') steps[TOTAL - 1].classList.remove('has-error');
 });
-
-// Enter nos campos de texto não envia antes da hora em etapas anteriores
+// Enter no passo 1 avança; no campo do site/Instagram não envia sem querer
 form.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && e.target.id === 'link') { e.preventDefault(); }
+  if (e.key !== 'Enter' || e.target.tagName !== 'INPUT' || e.target.type === 'checkbox') return;
+  if (current === 1) { e.preventDefault(); $('#toStep2').click(); }
+  else if (e.target.id === 'link') e.preventDefault();
 });
 
-function collectData() {
+function collectData(etapa) {
   const fd = new FormData(form);
-  const params = new URLSearchParams(location.search);
+  const inv = fd.get('investimento') || '';
   return {
-    investimento: fd.get('investimento') || '',
-    urgencia: fd.get('urgencia') || '',
-    servico: fd.get('servico') || '',
-    link: (fd.get('link') || '').trim(),
+    lead_id: leadId,
+    etapa,
     nome: (fd.get('nome') || '').trim(),
     empresa: (fd.get('empresa') || '').trim(),
     whatsapp: fd.get('whatsapp') || '',
-    telefone: outroTel.checked ? (fd.get('telefone') || '') : '',
     email: (fd.get('email') || '').trim(),
     aceite_contato: $('#lgpd').checked,
-    rota: fd.get('investimento') === LOW_BUDGET ? 'whatsapp' : 'agenda',
-    utm_source: params.get('utm_source') || '',
-    utm_medium: params.get('utm_medium') || '',
-    utm_campaign: params.get('utm_campaign') || '',
-    utm_content: params.get('utm_content') || '',
-    pagina: location.href.split('#')[0],
+    investimento: inv,
+    urgencia: fd.get('urgencia') || '',
+    servico: fd.get('servico') || '',
+    link: (fd.get('link') || '').trim(),
+    rota: etapa === 'completo' ? (inv === LOW_BUDGET ? 'whatsapp' : 'agenda') : '',
+    ...origem,
     criado_em: new Date().toISOString(),
   };
 }
 
 function leadSummary(d) {
   return [
-    `Investimento: ${d.investimento}`,
-    `Urgência: ${d.urgencia}`,
-    `Preciso de: ${d.servico}`,
-    d.link && `Site ou Instagram: ${d.link}`,
     `Empresa: ${d.empresa}`,
     `WhatsApp: ${d.whatsapp}`,
-    d.telefone && `Outro telefone: ${d.telefone}`,
-    d.email && `E-mail: ${d.email}`,
+    `Investimento: ${d.investimento}`,
+    `Para quando: ${d.urgencia}`,
+    `Precisa de: ${d.servico}`,
+    d.link && `Site ou Instagram: ${d.link}`,
   ].filter(Boolean);
 }
 
@@ -393,24 +412,33 @@ function showPanel(id) {
   return panel;
 }
 
+// Passo 1 → salva os contatos e dispara o Lead (uma vez)
+$('#toStep2').addEventListener('click', async () => {
+  if (!validateContact()) return;
+  const dados = collectData('contatos');
+  goToStep(2);
+  try { await saveLead(dados); } catch (err) { console.warn('[Avanttá] Falha ao salvar o contato:', err); }
+  trackConversion('Lead', { etapa: 'contatos' });
+});
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  // confere todas as etapas; se faltar algo, volta para ela
-  for (let n = 1; n < TOTAL; n++) {
+  if (!validateContact()) return goToStep(1);
+  for (let n = 2; n <= TOTAL; n++) {
     if (!validateChoice(steps[n - 1])) { goToStep(n); steps[n - 1].classList.add('has-error'); return; }
   }
-  if (!validateContact()) return;
+  const dados = collectData('completo');
+  try { await saveLead(dados); } catch (err) { console.warn('[Avanttá] Falha ao salvar o contato:', err); }
+  trackConversion('Lead', { etapa: 'completo' }); // não duplica: já disparou no passo 1
 
-  const dados = collectData();
-  try { await saveLead(dados); } catch (err) { console.warn('[Avanttá] Falha ao salvar o lead:', err); }
-  trackConversion('Lead', { servico: dados.servico, investimento: dados.investimento });
-
+  const primeiroNome = dados.nome.split(' ')[0];
   if (dados.investimento === LOW_BUDGET) {
-    const msg = [`Oi, sou ${dados.nome} e vim pelo formulário do site da Avanttá.`, '', ...leadSummary(dados)].join('\n');
+    const msg = [`Oi, sou ${dados.nome}, da ${dados.empresa}. Vim pelo formulário do site da Avanttá.`, '', ...leadSummary(dados)].join('\n');
     $('#thanksWa').href = waLink(msg);
-    $$('[data-fill="nome"]').forEach((el) => { el.textContent = dados.nome.split(' ')[0]; });
+    $$('[data-fill="nome"]').forEach((el) => { el.textContent = primeiroNome; });
     showPanel('panelThanks');
   } else {
+    $('#calWa').href = waLink(`Oi, sou ${dados.nome}, da ${dados.empresa}. Preenchi o formulário do site da Avanttá e prefiro falar por aqui.`);
     showPanel('panelCal');
     loadCal(dados);
   }
@@ -427,16 +455,26 @@ function onBookingSuccess(payload) {
   showPanel('panelBooked');
 }
 
-function loadCal(dados) {
-  const phoneE164 = `+55${onlyDigits(dados.whatsapp)}`;
-  const notes = leadSummary(dados).join(' | ');
+// Mesmos dados para o embed e para o link alternativo
+function calPrefill(dados) {
+  const phone = `+55${onlyDigits(dados.whatsapp)}`;
+  const fields = {
+    name: dados.nome,
+    email: dados.email,
+    notes: leadSummary(dados).join(' | '),
+    [CAL_COMPANY_FIELD]: dados.empresa,
+  };
+  CAL_PHONE_FIELDS.forEach((f) => { fields[f] = phone; });
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach((k) => { if (dados[k]) fields[k] = dados[k]; });
+  return fields;
+}
 
-  // Link alternativo (abre a página do Cal.com com os mesmos dados)
+function loadCal(dados) {
+  const fields = calPrefill(dados);
+
+  // Link alternativo: a página do Cal.com com os mesmos dados na URL
   const fallback = new URL(`${CAL_ORIGIN}/${CAL_LINK}`);
-  fallback.searchParams.set('name', dados.nome);
-  if (dados.email) fallback.searchParams.set('email', dados.email);
-  fallback.searchParams.set(CAL_WHATSAPP_FIELD, phoneE164);
-  fallback.searchParams.set('notes', notes);
+  Object.entries(fields).forEach(([k, v]) => { if (v) fallback.searchParams.set(k, v); });
   $('#calFallback').href = fallback.toString();
 
   if (calLoaded) return;
@@ -449,10 +487,7 @@ function loadCal(dados) {
   Cal('init', CAL_NAMESPACE, { origin: CAL_ORIGIN });
   const cal = Cal.ns[CAL_NAMESPACE];
 
-  const config = { layout: 'month_view', theme: 'dark', name: dados.nome, notes, [CAL_WHATSAPP_FIELD]: phoneE164 };
-  if (dados.email) config.email = dados.email;
-
-  cal('inline', { elementOrSelector: '#calEmbed', calLink: CAL_LINK, config });
+  cal('inline', { elementOrSelector: '#calEmbed', calLink: CAL_LINK, config: { layout: 'month_view', theme: 'dark', ...fields } });
   cal('ui', {
     theme: 'dark',
     cssVarsPerTheme: { light: { 'cal-brand': BRAND_RED }, dark: { 'cal-brand': BRAND_RED } },
