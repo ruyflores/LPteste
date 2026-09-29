@@ -1,36 +1,21 @@
-# Avanttá — Landing Page
+# Avanttá: Landing Page
 
-Landing page da **Avanttá** (sites e landing pages) em HTML, CSS e JavaScript puro — sem build, é só abrir o `index.html` no navegador.
+Landing page da **Avanttá** em HTML, CSS e JavaScript puro, sem etapa de build. Para ver, sirva a pasta com qualquer servidor estático ou abra o `index.html` no navegador.
+
+O contexto do projeto, as regras de copy, as regras de performance e as pendências ficam no [`CLAUDE.md`](CLAUDE.md).
 
 ## Versões de cor
 
 | Versão | Como abrir |
 | --- | --- |
-| Preto, vermelho e branco (padrão) | `index.html` ou `index.html?tema=vermelho` |
-| Preto e branco | `preto-e-branco.html` ou `index.html?tema=pb` |
+| Preto, vermelho e branco (oficial) | `index.html` |
+| Preto e branco (só para comparação) | `preto-e-branco.html` ou `index.html?tema=pb` |
 
-Também dá para alternar pelo botão **P&B / Cor** no topo da página (a escolha fica salva no navegador).
-As cores ficam todas em variáveis no início de `assets/css/style.css`.
+## Conversão
 
-## Estrutura
+1. O formulário tem 4 etapas: investimento, urgência, serviço e contato.
+2. Quem escolhe "Até R$ 800" vai para uma tela de agradecimento com botão de WhatsApp.
+3. As demais faixas veem a agenda do Cal.com (`avantta/avantta`) embutida na página.
+4. O agendamento confirmado mostra a tela "Reunião confirmada".
 
-```
-index.html              → página (seções: hero, números, problema, benefícios,
-                          serviços, como funciona, cases, depoimentos, formulário, FAQ)
-preto-e-branco.html     → atalho para a versão P&B
-assets/css/style.css    → estilos + temas + responsivo
-assets/js/script.js     → menu mobile, tema, animações, formulário e WhatsApp
-assets/img/favicon.svg  → ícone da aba
-```
-
-## Antes de publicar (pendências)
-
-- [ ] Colocar o número real em `WHATSAPP_NUMBER` (`assets/js/script.js`)
-- [ ] Trocar os **depoimentos de exemplo** por depoimentos reais
-- [ ] Trocar os mockups da seção **Cases** por prints de sites entregues
-- [ ] Revisar textos do FAQ (prazos, domínio, manutenção) conforme o serviço real
-- [ ] (Opcional) Enviar os leads para planilha/CRM — ver comentário no `submit` do formulário
-
-## Como o formulário funciona
-
-É dividido em 2 passos (contato → qualificação) para aumentar a conversão. Ao enviar, abre o WhatsApp da Avanttá com uma mensagem já preenchida com todas as respostas.
+Configuração no topo de `assets/js/script.js`: `WHATSAPP_NUMBER`, `CAL_LINK`, `CAL_WHATSAPP_FIELD`, `saveLead()` e `trackConversion()`.
