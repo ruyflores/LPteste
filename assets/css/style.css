@@ -407,7 +407,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 }
 .service h3 { font-family: var(--font-display); font-weight: 400; font-size: 2.1rem; text-transform: uppercase; }
 .service > p { color: var(--muted); font-size: .93rem; }
-.service ul { display: grid; gap: 10px; margin: 6px 0 12px; flex: 1; }
+.service ul { display: grid; gap: 10px; margin: 6px 0 12px; flex: 1; align-content: start; }
 .service li { display: flex; gap: 10px; align-items: flex-start; font-size: .9rem; }
 .service li .ico { color: var(--accent-text); margin-top: 3px; }
 .service .btn { width: 100%; }
@@ -415,6 +415,8 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .service--featured { border-color: var(--accent); box-shadow: 0 30px 80px -40px var(--glow); background: linear-gradient(180deg, var(--glow-soft), var(--surface) 40%); }
 .service--featured .service__tag { background: var(--btn-a); color: var(--on-accent); border-color: var(--btn-a); }
 
+.services__help { margin-top: 26px; text-align: center; color: var(--muted); font-size: 1.05rem; }
+.services__help strong { color: var(--text); }
 .maint {
   margin-top: 24px; display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center;
   padding: 28px 32px; border-radius: var(--radius);
