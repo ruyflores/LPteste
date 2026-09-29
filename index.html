@@ -41,11 +41,13 @@
 
   <link rel="preload" href="assets/fonts/bebas-neue-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="assets/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" as="image" type="image/avif" href="assets/img/hero-mobile.avif" media="(max-width: 760px)" fetchpriority="high" />
+  <link rel="preload" as="image" type="image/avif" imagesrcset="assets/img/hero-1280.avif 1280w, assets/img/hero-1920.avif 1920w" imagesizes="100vw" media="(min-width: 761px)" fetchpriority="high" />
   <link rel="stylesheet" href="assets/css/style.css" />
 
   <script defer src="assets/vendor/motion.min.js"></script>
   <script defer src="assets/js/reveal.js"></script>
-  <script defer src="assets/js/scroll-video.js"></script>
+  <script defer src="assets/js/hero-scene.js"></script>
   <script defer src="assets/js/script.js"></script>
 
   <!-- Dados estruturados: quem é a Avanttá e as perguntas do FAQ (mesmo texto da página) -->
@@ -249,57 +251,53 @@
     </div>
   </header>
 
-  <!-- ===================== VÍDEO GUIADO PELA ROLAGEM =====================
-       Fica fixo atrás da cena de abertura e avança conforme a pessoa rola.
-       Vídeo provisório (NovaAI, recolorido para preto e vermelho). Para trocar
-       pelo vídeo da Avanttá, mude só o data-src (e o data-poster, se houver). -->
-  <div class="scroll-video" id="scrollVideo" aria-hidden="true"
-       data-src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260729_102822_0e6c87e8-c141-4744-bf32-ad30db296371.mp4"
-       data-poster="">
-    <img class="scroll-video__poster" alt="" hidden />
-    <video class="scroll-video__video" muted playsinline preload="none"></video>
-    <canvas class="scroll-video__canvas"></canvas>
-    <div class="scroll-video__tint"></div>
+  <!-- ===================== FUNDO DA CENA DE ABERTURA =====================
+       Arte do hero (celular + brilho vermelho), fixa atrás da cena.
+       A rolagem conduz uma "câmera": aproxima do celular e depois a imagem
+       se divide em faixas que deslizam (assets/js/hero-scene.js).
+       As imagens saem de tools/make-hero.py. -->
+  <div class="hero-bg" id="heroBg" aria-hidden="true">
+    <div class="hero-bg__cam">
+      <picture>
+        <source media="(max-width: 760px)" type="image/avif" srcset="assets/img/hero-mobile.avif" />
+        <source media="(max-width: 760px)" type="image/webp" srcset="assets/img/hero-mobile.webp" />
+        <source type="image/avif" srcset="assets/img/hero-1280.avif 1280w, assets/img/hero-1920.avif 1920w" sizes="100vw" />
+        <img class="hero-bg__img" src="assets/img/hero-1920.webp" srcset="assets/img/hero-1280.webp 1280w, assets/img/hero-1920.webp 1920w" sizes="100vw" width="1920" height="1080" alt="" fetchpriority="high" decoding="async" />
+      </picture>
+      <div class="hero-bg__strips"></div>
+    </div>
+    <div class="hero-bg__light"></div>
+    <div class="hero-bg__shade"></div>
   </div>
 
   <main id="conteudo">
 
     <!-- ===================== CENA DE ABERTURA =====================
-         Hero + respiro (80vh, é ele que dá espaço para o vídeo avançar) +
-         "Sua situação", tudo em vidro por cima do vídeo. -->
+         Hero + respiro (80vh, é o espaço da "câmera" andar) + "Sua situação". -->
     <div class="scene" id="cena">
 
       <!-- HERO -->
       <section class="stage stage--hero" id="hero" data-hide-wa>
-        <div class="stage__top">
-          <ul class="svc-list" aria-label="O que a Avanttá faz">
-            <li class="hero-in" style="--d:150ms">/ Site completo da empresa</li>
-            <li class="hero-in" style="--d:270ms">/ Página de vendas</li>
-            <li class="hero-in" style="--d:390ms">/ Loja virtual</li>
+        <div class="hero-copy" id="heroCopy">
+          <p class="eyebrow hero-in" style="--d:100ms"><span class="pulse" aria-hidden="true"></span> +250 sites entregues para todo o Brasil</p>
+          <h1 class="stage__title">Seu negócio merece ser <span class="hl">visto.</span></h1>
+          <p class="hero-copy__sub hero-in" style="--d:220ms">Antes de fechar, seu cliente pesquisa você no celular. Se ele não te acha, ou acha um site que você tem vergonha de mandar, ele fecha com o concorrente. <strong>A gente monta a prévia do seu site e te mostra numa conversa por vídeo, antes de você pagar qualquer coisa.</strong></p>
+          <div class="stage__ctas hero-in" style="--d:340ms">
+            <a href="#contato" class="pill pill--primary pill--lg">Quero minha prévia grátis <svg class="ico" aria-hidden="true"><use href="#i-arrow" /></svg></a>
+            <a href="https://wa.me/5561995905615" class="pill pill--glass pill--lg js-whatsapp" data-section="Topo da página"><svg class="ico ico--wa" aria-hidden="true"><use href="#i-wa" /></svg> Falar no WhatsApp</a>
+          </div>
+          <ul class="hero-copy__trust hero-in" style="--d:460ms">
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Prévia do seu site grátis</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Conversa por vídeo</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Entrega ágil</li>
           </ul>
-          <p class="stage__intro hero-in" style="--d:300ms">Seu negócio já cresceu. Sua presença na internet ainda não. A gente cria o site que faz sua empresa aparecer no Google e nas inteligências artificiais, bem na hora em que o cliente procura.</p>
         </div>
-
-        <div class="stage__bottom">
-          <div class="stage__headline">
-            <p class="badge hero-in" style="--d:150ms">+250 sites entregues em todo o Brasil</p>
-            <h1 class="stage__title">Seu negócio merece ser <span class="hl">visto.</span></h1>
-          </div>
-
-          <div class="contact-card hero-in" style="--d:420ms">
-            <span class="contact-card__mark" aria-hidden="true"><svg><use href="#logo-mark" /></svg></span>
-            <div class="contact-card__txt">
-              <p class="contact-card__name">Fale com a Avanttá</p>
-              <p class="contact-card__role">Prévia grátis do seu site</p>
-              <a href="#contato" class="pill pill--primary">Quero minha prévia <svg class="ico" aria-hidden="true"><use href="#i-chevron" /></svg></a>
-            </div>
-          </div>
-        </div>
+        <p class="scroll-hint hero-in" style="--d:900ms" aria-hidden="true"><span></span> Role para ver</p>
       </section>
 
       <div class="scene__spacer" aria-hidden="true"></div>
 
-      <!-- SUA SITUAÇÃO HOJE (sobre o vídeo) -->
+      <!-- SUA SITUAÇÃO HOJE (depois que a imagem se abre em faixas) -->
       <section class="stage stage--situation" id="situacao">
         <div class="stage__top">
           <p class="badge reveal" data-delay="120">Sua situação hoje</p>
@@ -494,7 +492,7 @@
         </header>
 
         <div class="services__grid">
-            <article class="service tilt reveal" data-delay="0">
+            <article class="service luz reveal" data-delay="0">
               <span class="service__tag">Mais completo</span>
               <h3>Site completo da empresa</h3>
               <p>A loja inteira da sua empresa na internet: vitrine, balcão e cartão de visita juntos.</p>
@@ -505,7 +503,7 @@
               </ul>
               <a href="#contato" class="btn btn--primary" data-service="Site completo da empresa">Quero o site completo</a>
             </article>
-            <article class="service service--featured tilt reveal" data-delay="90">
+            <article class="service service--featured luz reveal" data-delay="90">
               <span class="service__tag">Mais pedido</span>
               <h3>Página de vendas</h3>
               <p>Um vendedor focado em uma coisa só: fazer quem chegou pelo anúncio chamar você no WhatsApp.</p>
@@ -516,7 +514,7 @@
               </ul>
               <a href="#contato" class="btn btn--primary" data-service="Página de vendas">Quero a página de vendas</a>
             </article>
-            <article class="service tilt reveal" data-delay="180">
+            <article class="service luz reveal" data-delay="180">
               <span class="service__tag">Para quem já tem site</span>
               <h3>Reforma do site</h3>
               <p>Seu site está velho ou lento? A gente reforma sem fechar as portas.</p>
@@ -527,7 +525,7 @@
               </ul>
               <a href="#contato" class="btn btn--primary" data-service="Reforma do site">Quero reformar meu site</a>
             </article>
-            <article class="service tilt reveal" data-delay="270">
+            <article class="service luz reveal" data-delay="270">
               <span class="service__tag">Para vender produtos</span>
               <h3>Loja virtual</h3>
               <p>Sua loja aberta 24 horas, montada na Shopify. O cliente compra sozinho e você só separa o pedido.</p>
@@ -553,33 +551,30 @@
           <h2 class="display display--md reveal" data-delay="100">Do formulário ao site no ar <span class="hl">em 4 passos.</span></h2>
         </header>
 
-        <div class="steps-wrap">
-        <span class="steps__line" aria-hidden="true"></span>
-        <ol class="steps">
-          <li class="step reveal">
+        <ol class="steps" id="steps">
+          <li class="step">
             <span class="step__num">01</span>
             <h3>Você deixa seus contatos</h3>
             <p>E responde 3 perguntas rápidas sobre o que precisa. Leva menos de um minuto.</p>
           </li>
-          <li class="step reveal">
+          <li class="step">
             <span class="step__num">02</span>
             <h3>A gente monta sua prévia</h3>
             <p>Uma prévia do seu site, com a cara da sua empresa, que você já consegue abrir e clicar.</p>
           </li>
-          <li class="step reveal">
+          <li class="step">
             <span class="step__num">03</span>
             <h3>Conversa por vídeo</h3>
             <p>Pelo Google Meet, você passeia pela prévia com a gente. Se fizer sentido, já sai com a proposta.</p>
           </li>
-          <li class="step reveal">
+          <li class="step">
             <span class="step__num">04</span>
             <h3>Site no ar</h3>
             <p>Com a sua aprovação, a gente finaliza e publica. Entrega ágil, com prazo definido na proposta.</p>
           </li>
         </ol>
-        </div>
 
-        <div class="perks reveal">
+        <div class="perks luz reveal">
           <p class="perks__title">Ao agendar, você recebe</p>
           <ul class="perks__list">
             <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> <span><b>Prévia do seu site, grátis</b> para abrir no celular antes de pagar</span></li>

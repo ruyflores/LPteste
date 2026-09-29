@@ -6,7 +6,7 @@
    4. Formulário em etapas + roteamento
    5. Cal.com (carregado só quando o lead chega na agenda)
    6. Animações (Motion + Lenis: assets/vendor/motion.min.js, assets/js/reveal.js)
-   O vídeo guiado pela rolagem fica em assets/js/scroll-video.js
+   A cena de abertura (arte do hero guiada pela rolagem) fica em assets/js/hero-scene.js
    ========================================================= */
 
 /* ---------- 1. Configuração ---------- */
@@ -511,20 +511,62 @@ function loadCal(dados) {
 /* ---------- 6. Animações ----------
    Motion (motion.dev) em JS puro. Regras: só transform e opacity,
    400 a 700ms, e nada para quem pediu movimento reduzido. */
-// Inclinação leve dos cards (mouse e toque), via CSS: transição curta no transform
-function initTilt() {
-  $$('.tilt').forEach((el) => {
-    const tiltTo = (x, y) => {
+// Luz que segue o mouse (efeito 12): o JS só escreve a posição em --x/--y,
+// o brilho é um degradê do CSS (.luz::before). Só com mouse de verdade.
+function initLight() {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  $$('.luz').forEach((el) => {
+    el.addEventListener('pointermove', (ev) => {
       const r = el.getBoundingClientRect();
-      const px = (x - r.left) / r.width - 0.5;
-      const py = (y - r.top) / r.height - 0.5;
-      el.style.transform = `perspective(900px) rotateX(${(-py * 6).toFixed(2)}deg) rotateY(${(px * 6).toFixed(2)}deg)`;
-    };
-    const reset = () => { el.style.transform = ''; };
-    el.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') tiltTo(e.clientX, e.clientY); });
-    el.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') tiltTo(e.clientX, e.clientY); });
-    ['pointerleave', 'pointerup', 'pointercancel'].forEach((ev) => el.addEventListener(ev, reset));
+      el.style.setProperty('--x', `${ev.clientX - r.left}px`);
+      el.style.setProperty('--y', `${ev.clientY - r.top}px`);
+    });
   });
+}
+
+// Cartões que empilham (efeito 01) no "Como funciona".
+// Cada passo gruda no topo; os que ficam por baixo encolhem e escurecem.
+function initStack() {
+  const list = $('#steps');
+  if (!list) return;
+  const cards = $$('.step', list);
+  const limitar = (v, min, max) => Math.max(min, Math.min(max, v));
+  let naturais = [];
+  let topo = 0;
+
+  // Pegadinha do sticky: a posição natural é medida com o sticky desligado
+  const medir = () => {
+    topo = parseFloat(getComputedStyle(cards[0]).top) || 0;
+    naturais = cards.map((c) => {
+      const antes = c.style.position;
+      c.style.position = 'static';
+      const y = c.getBoundingClientRect().top + window.scrollY;
+      c.style.position = antes;
+      return y;
+    });
+  };
+
+  let raf = 0;
+  let ativo = false;
+  const passo = () => {
+    raf = 0;
+    cards.forEach((c, i) => {
+      if (i === cards.length - 1) return; // o último não fica por baixo de ninguém
+      const vao = c.offsetHeight + 18;
+      // quanto o próximo cartão já subiu por cima deste
+      const coberto = limitar((window.scrollY + topo - naturais[i + 1] + vao) / vao, 0, 1);
+      c.style.transform = `scale(${1 - coberto * 0.08})`;
+      c.style.setProperty('--dim', (coberto * 0.55).toFixed(3));
+    });
+  };
+  const pedir = () => { if (ativo && !raf) raf = requestAnimationFrame(passo); };
+
+  medir();
+  window.addEventListener('resize', () => { medir(); pedir(); }, { passive: true });
+  window.addEventListener('scroll', pedir, { passive: true });
+  // só trabalha enquanto a lista está na tela
+  new IntersectionObserver(([e]) => { ativo = e.isIntersecting; pedir(); }, { rootMargin: '200px 0px' }).observe(list);
+  if (document.fonts) document.fonts.ready.then(() => { medir(); pedir(); });
 }
 
 // devolve o controle ao navegador entre fases (evita tarefas longas no carregamento)
@@ -553,22 +595,9 @@ async function initAnimations() {
   const bar = $('.scroll-progress');
   if (bar) M.scroll(M.animate(bar, { transform: ['scaleX(0)', 'scaleX(1)'] }, { ease: 'linear' }));
 
-  // Linha vermelha que se desenha entre os passos, ligada à rolagem
-  const line = $('.steps__line');
-  const stepsEl = $('.steps');
-  if (line && stepsEl) {
-    const desktop = window.matchMedia('(min-width: 961px)').matches;
-    const mobile = window.matchMedia('(max-width: 640px)').matches;
-    if (desktop || mobile) {
-      const prop = desktop ? 'scaleX' : 'scaleY';
-      M.scroll(M.animate(line, { transform: [`${prop}(0)`, `${prop}(1)`] }, { ease: 'linear' }), {
-        target: stepsEl,
-        offset: desktop ? ['start 80%', 'end 55%'] : ['start 75%', 'end 60%'],
-      });
-    }
-  }
+  initStack();
 
-  initTilt();
+  initLight();
 }
 
 initAnimations();
