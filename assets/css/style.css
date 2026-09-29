@@ -145,7 +145,6 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .display--md { font-size: clamp(2.4rem, 5vw, 3.9rem); }
 .hl { color: var(--accent-text); }
 [data-theme="mono"] .display .hl { color: transparent; -webkit-text-stroke: 1.5px var(--text); }
-.split .w { display: inline-block; }
 .kicker {
   display: inline-flex; align-items: center; gap: 10px;
   font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
@@ -402,7 +401,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .card__icon svg { width: 26px; height: 26px; }
 .card h3 { font-size: 1.2rem; margin-bottom: 10px; }
 .card p { color: var(--muted); font-size: .95rem; }
-.tilt { transform-style: preserve-3d; will-change: auto; }
+.tilt { transition: transform .45s var(--ease); }
 
 /* Serviços */
 .services { background: var(--bg-2); border-block: 1px solid var(--border); }
@@ -612,9 +611,9 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 
 /* ---------- Estado inicial do mockup do hero ----------
    .anim é adicionada no <head> só para quem não pediu movimento reduzido.
-   O GSAP monta as camadas; se ele não carregar, o JS adiciona .no-gsap. */
+   O Motion monta as camadas; se ele não carregar, o JS adiciona .no-motion. */
 .anim .hero__visual .layer { opacity: 0; }
-.anim.no-gsap .hero__visual .layer { opacity: 1; }
+.anim.no-motion .hero__visual .layer { opacity: 1; }
 
 /* =========================================================
    RESPONSIVO

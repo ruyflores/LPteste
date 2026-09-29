@@ -41,8 +41,8 @@
   <link rel="preload" href="assets/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="assets/css/style.css" />
 
-  <script defer src="assets/vendor/gsap.min.js"></script>
-  <script defer src="assets/vendor/ScrollTrigger.min.js"></script>
+  <script defer src="assets/vendor/motion.min.js"></script>
+  <script defer src="assets/js/reveal.js"></script>
   <script defer src="assets/js/script.js"></script>
 
   <script type="application/ld+json">
@@ -143,7 +143,7 @@
           </ul>
         </div>
 
-        <!-- Mockup feito só com CSS. Cada .layer entra em sequência (GSAP) -->
+        <!-- Mockup feito só com CSS. Cada .layer entra em sequência (Motion) -->
         <div class="hero__visual" aria-hidden="true">
           <div class="mock-wrap">
             <div class="mock">
@@ -192,7 +192,7 @@
       <div class="container problem__grid">
         <div>
           <p class="kicker reveal">O que você perde sem perceber</p>
-          <h2 class="display display--md split">
+          <h2 class="display display--md">
             Seu cliente decide em segundos. <span class="hl">E decide pelo que vê na tela.</span>
           </h2>
           <p class="lead reveal">
@@ -220,7 +220,7 @@
       <div class="container">
         <header class="section-head">
           <p class="kicker reveal">Diagnóstico rápido</p>
-          <h2 class="display display--md split">Qual dessas é a <span class="hl">sua situação hoje?</span></h2>
+          <h2 class="display display--md">Qual dessas é a <span class="hl">sua situação hoje?</span></h2>
           <p class="lead reveal">Toque ou passe o mouse no card para ver quanto isso custa para você.</p>
         </header>
 
@@ -279,7 +279,7 @@
     <!-- ===================== b) CUSTO DE ADIAR ===================== -->
     <section class="section cost" id="custo">
       <div class="container cost__inner">
-        <h2 class="display display--md split">Enquanto você adia, <span class="hl">alguém está sendo escolhido no seu lugar.</span></h2>
+        <h2 class="display display--md">Enquanto você adia, <span class="hl">alguém está sendo escolhido no seu lugar.</span></h2>
         <div class="cost__text">
           <p class="reveal">Cada semana sem um site que convence é uma semana de orçamentos indo para outra empresa. Você não vê esse prejuízo porque ele não aparece no extrato.</p>
           <p class="reveal">O seu serviço pode ser o melhor da cidade. O problema está em como ele aparece para quem ainda não te conhece.</p>
@@ -293,7 +293,7 @@
       <div class="container">
         <header class="section-head">
           <p class="kicker reveal">Comparativo</p>
-          <h2 class="display display--md split">Site comum x <span class="hl">Site Avanttá</span></h2>
+          <h2 class="display display--md">Site comum x <span class="hl">Site Avanttá</span></h2>
         </header>
 
         <div class="compare__wrap reveal">
@@ -348,7 +348,7 @@
       <div class="container">
         <header class="section-head">
           <p class="kicker reveal">Antes de agendar</p>
-          <h2 class="display display--md split">A Avanttá <span class="hl">não é para todo mundo.</span></h2>
+          <h2 class="display display--md">A Avanttá <span class="hl">não é para todo mundo.</span></h2>
         </header>
         <div class="fit__grid">
           <div class="fit__col fit__col--yes reveal">
@@ -375,7 +375,7 @@
       <div class="container">
         <header class="section-head">
           <p class="kicker reveal">Por que a Avanttá</p>
-          <h2 class="display display--md split">Um site feito para o cliente <span class="hl">escolher você.</span></h2>
+          <h2 class="display display--md">Um site feito para o cliente <span class="hl">escolher você.</span></h2>
         </header>
 
         <div class="cards">
@@ -430,7 +430,7 @@
       <div class="container">
         <header class="section-head">
           <p class="kicker reveal">Serviços</p>
-          <h2 class="display display--md split">Escolha o formato <span class="hl">certo para o seu momento.</span></h2>
+          <h2 class="display display--md">Escolha o formato <span class="hl">certo para o seu momento.</span></h2>
         </header>
 
         <div class="services__grid">
@@ -507,7 +507,7 @@
       <div class="container">
         <header class="section-head">
           <p class="kicker reveal">Como funciona</p>
-          <h2 class="display display--md split">Do formulário ao site no ar <span class="hl">em 4 passos.</span></h2>
+          <h2 class="display display--md">Do formulário ao site no ar <span class="hl">em 4 passos.</span></h2>
         </header>
 
         <div class="steps-wrap">
@@ -548,7 +548,7 @@
         <header class="section-head section-head--row">
           <div>
             <p class="kicker reveal">Cases</p>
-            <h2 class="display display--md split">Negócios que agora <span class="hl">parecem o que são.</span></h2>
+            <h2 class="display display--md">Negócios que agora <span class="hl">parecem o que são.</span></h2>
           </div>
           <a href="https://www.instagram.com/avanttasites/" target="_blank" rel="noopener" class="link-arrow reveal">
             Ver mais no Instagram <svg class="ico"><use href="#i-arrow" /></svg>
@@ -580,7 +580,7 @@
       <div class="container">
         <header class="section-head">
           <p class="kicker reveal">Feedbacks</p>
-          <h2 class="display display--md split">Quem já fez, <span class="hl">recomenda.</span></h2>
+          <h2 class="display display--md">Quem já fez, <span class="hl">recomenda.</span></h2>
         </header>
 
         <div class="testimonials__grid">
@@ -610,7 +610,7 @@
         <div class="offer__box reveal">
           <div class="offer__head">
             <p class="kicker">Oferta para quem agenda</p>
-            <h2 class="display display--md split">O que você recebe <span class="hl">ao agendar</span></h2>
+            <h2 class="display display--md">O que você recebe <span class="hl">ao agendar</span></h2>
             <p class="offer__sub">Se fizer sentido para você, a reunião já sai com a proposta.</p>
           </div>
           <ol class="offer__list">
@@ -641,7 +641,7 @@
       <div class="container contact__grid">
         <div class="contact__copy">
           <p class="kicker reveal">Prévia gratuita</p>
-          <h2 class="display display--md split">Veja o seu site <span class="hl">antes de pagar.</span></h2>
+          <h2 class="display display--md">Veja o seu site <span class="hl">antes de pagar.</span></h2>
           <p class="lead reveal">São 4 perguntas rápidas. Depois você escolhe o melhor horário para a reunião pelo Google Meet. Se fizer sentido, você já sai dela com a proposta.</p>
           <ul class="contact__list reveal">
             <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Prévia navegável gratuita</li>
@@ -791,7 +791,7 @@
       <div class="container faq__inner">
         <header class="section-head">
           <p class="kicker reveal">Dúvidas</p>
-          <h2 class="display display--md split">Perguntas <span class="hl">frequentes.</span></h2>
+          <h2 class="display display--md">Perguntas <span class="hl">frequentes.</span></h2>
         </header>
 
         <div class="faq__list">
@@ -832,7 +832,7 @@
       <div class="final__spot" aria-hidden="true"></div>
       <div class="container final__inner">
         <span class="brand__mark brand__mark--xl reveal"><svg aria-hidden="true"><use href="#logo-mark" /></svg></span>
-        <h2 class="display split">Seu negócio já cresceu. <span class="hl">Agora falta o seu digital.</span></h2>
+        <h2 class="display">Seu negócio já cresceu. <span class="hl">Agora falta o seu digital.</span></h2>
         <div class="hero__ctas hero__ctas--center reveal">
           <a href="#contato" class="btn btn--primary btn--lg btn--shine">Quero minha prévia gratuita</a>
           <a href="https://wa.me/5561995905615" class="btn btn--ghost btn--lg js-whatsapp" data-section="Chamada final">

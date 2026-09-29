@@ -5,7 +5,7 @@
    3. Interface (header, menu, WhatsApp, cards que viram)
    4. Formulário em etapas + roteamento
    5. Cal.com (carregado só quando o lead chega na agenda)
-   6. Animações (GSAP + ScrollTrigger)
+   6. Animações (Motion: assets/vendor/motion.min.js + assets/js/reveal.js)
    ========================================================= */
 
 /* ---------- 1. Configuração ---------- */
@@ -368,57 +368,31 @@ function loadCal(dados) {
   setTimeout(showFallback, 15000);
 }
 
-/* ---------- 6. Animações ---------- */
-function splitWords(el) {
-  const words = [];
-  const walk = (node) => {
-    [...node.childNodes].forEach((child) => {
-      if (child.nodeType === 3) {
-        const frag = document.createDocumentFragment();
-        child.textContent.split(/(\s+)/).forEach((part) => {
-          if (!part) return;
-          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
-          const span = document.createElement('span');
-          span.className = 'w';
-          span.textContent = part;
-          frag.appendChild(span);
-          words.push(span);
-        });
-        node.replaceChild(frag, child);
-      } else if (child.nodeType === 1 && child.tagName !== 'BR') {
-        walk(child);
-      }
-    });
-  };
-  walk(el);
-  return words;
-}
+/* ---------- 6. Animações ----------
+   Motion (motion.dev) em JS puro. Regras: só transform e opacity,
+   400 a 700ms, e nada para quem pediu movimento reduzido. */
+const EASE = [0.22, 1, 0.36, 1];
 
-function animateCounter(el) {
+function animateCounter(M, el) {
   const target = +el.dataset.count;
   const prefix = el.dataset.prefix || '';
-  const obj = { v: 0 };
   el.textContent = `${prefix}0`;
-  window.gsap.to(obj, {
-    v: target, duration: 1.6, ease: 'power2.out',
-    scrollTrigger: { trigger: el, start: 'top 90%', once: true },
-    onUpdate: () => { el.textContent = prefix + Math.round(obj.v); },
-  });
+  const stop = M.inView(el, () => {
+    stop();
+    M.animate(0, target, { duration: 1.4, ease: EASE, onUpdate: (v) => { el.textContent = prefix + Math.round(v); } });
+  }, { amount: 0.6 });
 }
 
-function initTilt(gsap) {
+// Inclinação leve dos cards (mouse e toque), via CSS: transição curta no transform
+function initTilt() {
   $$('.tilt').forEach((el) => {
-    const rx = gsap.quickTo(el, 'rotationX', { duration: 0.45, ease: 'power3.out' });
-    const ry = gsap.quickTo(el, 'rotationY', { duration: 0.45, ease: 'power3.out' });
-    gsap.set(el, { transformPerspective: 900 });
     const tiltTo = (x, y) => {
       const r = el.getBoundingClientRect();
       const px = (x - r.left) / r.width - 0.5;
       const py = (y - r.top) / r.height - 0.5;
-      ry(px * 8);
-      rx(-py * 8);
+      el.style.transform = `perspective(900px) rotateX(${(-py * 6).toFixed(2)}deg) rotateY(${(px * 6).toFixed(2)}deg)`;
     };
-    const reset = () => { rx(0); ry(0); };
+    const reset = () => { el.style.transform = ''; };
     el.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') tiltTo(e.clientX, e.clientY); });
     el.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') tiltTo(e.clientX, e.clientY); });
     ['pointerleave', 'pointerup', 'pointercancel'].forEach((ev) => el.addEventListener(ev, reset));
@@ -429,82 +403,40 @@ function initTilt(gsap) {
 const yieldToMain = () => new Promise((r) => setTimeout(r, 0));
 
 async function initAnimations() {
-  const { gsap, ScrollTrigger } = window;
+  const M = window.Motion;
   if (reducedMotion) return;
-  if (!gsap || !ScrollTrigger) {
-    document.documentElement.classList.add('no-gsap');
-    return;
-  }
-  gsap.registerPlugin(ScrollTrigger);
+  if (!M) { document.documentElement.classList.add('no-motion'); return; }
 
-  // Fase 1: hero, o mockup "se monta" em camadas
+  // Hero: o mockup "se monta" em camadas
   const layers = $$('.hero__visual .layer');
-  const floats = $$('.hero__visual .float-card');
-  gsap.set(layers, { y: 18 });
-  gsap.timeline({ delay: 0.2, scrollTrigger: { trigger: '.hero__visual', start: 'top 90%', once: true } })
-    .to(layers, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out', stagger: 0.07 })
-    .add(() => {
-      floats.forEach((f, i) => gsap.to(f, { y: -8, duration: 2.6 + i * 0.4, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
-    });
-  gsap.to('.mock-wrap', {
-    yPercent: -6, ease: 'none',
-    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
-  });
-
-  await yieldToMain();
-
-  // Fase 2: blocos que entram ao rolar
-  const reveals = $$('.reveal');
-  gsap.set(reveals, { opacity: 0, y: 26 });
-  ScrollTrigger.batch(reveals, {
-    start: 'top 90%',
-    once: true,
-    onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.08, overwrite: true }),
-  });
-
-  await yieldToMain();
-
-  // Fase 3: títulos revelados palavra por palavra.
-  // Cada título só é quebrado em palavras quando chega perto da tela.
-  const prepareTitle = (el) => {
-    const words = splitWords(el);
-    gsap.set(words, { opacity: 0, yPercent: 45 });
-    ScrollTrigger.create({
-      trigger: el, start: 'top 88%', once: true,
-      onEnter: () => gsap.to(words, { opacity: 1, yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.045 }),
-    });
-  };
-  const titles = $$('.split');
-  if ('IntersectionObserver' in window) {
-    const near = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        near.unobserve(e.target);
-        prepareTitle(e.target);
-      });
-    }, { rootMargin: '0px 0px 400px 0px' });
-    titles.forEach((el) => near.observe(el));
+  if (layers.length) {
+    M.animate(layers, { opacity: [0, 1], transform: ['translateY(18px)', 'translateY(0px)'] }, { duration: 0.55, ease: EASE, delay: M.stagger(0.07, { startDelay: 0.2 }) });
   }
 
   await yieldToMain();
 
-  // Fase 4: linha vermelha entre os passos, contador e inclinação dos cards
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 961px)', () => {
-    gsap.fromTo('.steps__line', { scaleX: 0 }, {
-      scaleX: 1, ease: 'none',
-      scrollTrigger: { trigger: '.steps', start: 'top 80%', end: 'bottom 55%', scrub: 0.6 },
-    });
-  });
-  mm.add('(max-width: 640px)', () => {
-    gsap.fromTo('.steps__line', { scaleY: 0 }, {
-      scaleY: 1, ease: 'none',
-      scrollTrigger: { trigger: '.steps', start: 'top 75%', end: 'bottom 60%', scrub: 0.6 },
-    });
-  });
+  // Seções entram ao rolar (componente reutilizável em assets/js/reveal.js)
+  window.reveal('.reveal');
 
-  $$('[data-count]').forEach(animateCounter);
-  initTilt(gsap);
+  await yieldToMain();
+
+  // Linha vermelha que se desenha entre os passos, ligada à rolagem
+  const line = $('.steps__line');
+  const stepsEl = $('.steps');
+  if (line && stepsEl) {
+    const desktop = window.matchMedia('(min-width: 961px)').matches;
+    const mobile = window.matchMedia('(max-width: 640px)').matches;
+    if (desktop || mobile) {
+      const prop = desktop ? 'scaleX' : 'scaleY';
+      M.scroll(M.animate(line, { transform: [`${prop}(0)`, `${prop}(1)`] }, { ease: 'linear' }), {
+        target: stepsEl,
+        offset: desktop ? ['start 80%', 'end 55%'] : ['start 75%', 'end 60%'],
+      });
+    }
+  }
+
+  $$('[data-count]').forEach((el) => animateCounter(M, el));
+  initTilt();
 }
 
 initAnimations();
