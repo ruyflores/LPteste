@@ -407,12 +407,6 @@ async function initAnimations() {
   if (reducedMotion) return;
   if (!M) { document.documentElement.classList.add('no-motion'); return; }
 
-  // Hero: o mockup "se monta" em camadas
-  const layers = $$('.hero__visual .layer');
-  if (layers.length) {
-    M.animate(layers, { opacity: [0, 1], transform: ['translateY(18px)', 'translateY(0px)'] }, { duration: 0.55, ease: EASE, delay: M.stagger(0.07, { startDelay: 0.2 }) });
-  }
-
   await yieldToMain();
 
   // Seções entram ao rolar (componente reutilizável em assets/js/reveal.js)

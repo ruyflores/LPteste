@@ -44,6 +44,7 @@
   <script defer src="assets/vendor/motion.min.js"></script>
   <script defer src="assets/js/reveal.js"></script>
   <script defer src="assets/js/script.js"></script>
+  <script defer src="assets/js/glass-hero.js"></script>
 
   <script type="application/ld+json">
   {
@@ -112,78 +113,35 @@
 
   <main id="conteudo">
 
-    <!-- ===================== HERO ===================== -->
-    <section class="hero" data-hide-wa>
-      <div class="hero__spot" aria-hidden="true"></div>
-      <div class="container hero__grid">
-        <div class="hero__content">
-          <p class="eyebrow"><span class="pulse" aria-hidden="true"></span> +250 sites entregues para todo o Brasil</p>
-          <h1 class="display">
-            Presença digital que faz <span class="hl">justiça</span> ao seu negócio.
-          </h1>
-          <p class="hero__sub">
-            Antes de fechar, seu cliente pesquisa você no celular. Se ele não te acha, ou acha um site
-            que você tem vergonha de mandar, ele fecha com o concorrente.
-            <strong>A gente monta a prévia do seu site e te mostra numa reunião, antes de você pagar qualquer coisa.</strong>
-          </p>
-          <div class="hero__ctas">
-            <a href="#contato" class="btn btn--primary btn--lg btn--shine">
-              Quero minha prévia gratuita
-              <svg class="ico" aria-hidden="true"><use href="#i-arrow" /></svg>
-            </a>
-            <a href="https://wa.me/5561995905615" class="btn btn--ghost btn--lg js-whatsapp" data-section="Topo da página">
-              <svg class="ico" aria-hidden="true"><use href="#i-wa" /></svg>
-              Falar no WhatsApp
-            </a>
-          </div>
-          <ul class="hero__trust">
-            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Prévia navegável gratuita</li>
-            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Reunião pelo Google Meet</li>
-            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Entrega ágil</li>
-          </ul>
-        </div>
-
-        <!-- Mockup feito só com CSS. Cada .layer entra em sequência (Motion) -->
-        <div class="hero__visual" aria-hidden="true">
-          <div class="mock-wrap">
-            <div class="mock">
-              <div class="mock__bar layer"><i></i><i></i><i></i><span>suaempresa.com.br</span></div>
-              <div class="mock__body">
-                <div class="mock__nav layer"><b></b><span></span><span></span><span></span></div>
-                <div class="mock__hero">
-                  <div class="mock__lines">
-                    <span class="w80 layer"></span><span class="w60 accent layer"></span><span class="w40 layer"></span>
-                    <em class="layer"></em>
-                  </div>
-                  <div class="mock__img layer"></div>
-                </div>
-                <div class="mock__cards"><span class="layer"></span><span class="layer"></span><span class="layer"></span></div>
-              </div>
-            </div>
-            <div class="float-card float-card--a layer">
-              <strong>+250</strong>
-              <span>sites entregues</span>
-            </div>
-            <div class="float-card float-card--b layer">
-              <span class="stars">★★★★★</span>
-              <span>Sua empresa aparecendo no Google</span>
-            </div>
-            <div class="float-card float-card--c layer">
-              <svg class="ico"><use href="#i-wa" /></svg>
-              <span><b>Novo contato</b> pelo site</span>
-            </div>
-          </div>
+    <!-- ===================== HERO (Glass Headline Hero, 21st.dev) =====================
+         O título é um h1 de verdade. O vidro é desenhado por assets/js/glass-hero.js
+         a partir das 5 cores em data-colors (a primeira é o fundo). -->
+    <section class="ghr-root" id="hero" data-hide-wa data-colors="#050505,#c40500,#ff5a47,#3d0000,#ffe3dc">
+      <canvas class="ghr-canvas" aria-hidden="true"></canvas>
+      <div class="ghr-content">
+        <p class="ghr-eyebrow">Prévia do seu site grátis</p>
+        <h1 class="ghr-title"><span class="ghr-word">Seu</span> <span class="ghr-word">negócio</span> <span class="ghr-word">merece</span> <span class="ghr-word">ser</span> <span class="ghr-word">visto</span></h1>
+        <p class="ghr-desc">Seu negócio já cresceu. Sua presença na internet ainda não. A gente cria o site que faz sua empresa aparecer no Google e nas respostas das inteligências artificiais, bem na hora em que o cliente está procurando.</p>
+        <div class="ghr-actions">
+          <a href="#contato" class="btn btn--primary btn--lg btn--shine">
+            Receber minha prévia grátis
+            <svg class="ico" aria-hidden="true"><use href="#i-arrow" /></svg>
+          </a>
+          <a href="https://wa.me/5561995905615" class="btn btn--glass btn--lg js-whatsapp" data-section="Topo da página">
+            <svg class="ico" aria-hidden="true"><use href="#i-wa" /></svg>
+            Falar no WhatsApp
+          </a>
         </div>
       </div>
     </section>
 
-    <!-- ===================== NÚMEROS ===================== -->
-    <section class="stats" aria-label="Números da Avanttá">
+    <!-- ===================== DESTAQUES ===================== -->
+    <section class="stats" aria-label="Destaques da Avanttá">
       <div class="container stats__grid">
-        <div class="stat reveal"><strong data-count="250" data-prefix="+">+250</strong><span>sites e LPs entregues</span></div>
-        <div class="stat reveal"><strong>Grátis</strong><span>a prévia do seu site</span></div>
-        <div class="stat reveal"><strong>100%</strong><span>pensado para o celular</span></div>
-        <div class="stat reveal"><strong>Brasil</strong><span>atendimento em todo o país</span></div>
+        <div class="stat reveal"><strong data-count="250" data-prefix="+">+250</strong><span>sites entregues em todo o Brasil</span></div>
+        <div class="stat reveal"><strong>Grátis</strong><span>a prévia do seu site, antes de pagar</span></div>
+        <div class="stat reveal"><strong>100%</strong><span>perfeito no celular</span></div>
+        <div class="stat reveal"><strong>Google + IA</strong><span>preparado para aparecer nos dois</span></div>
       </div>
     </section>
 
