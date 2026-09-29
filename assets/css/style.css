@@ -470,38 +470,43 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: hidden; }
 
-/* ---------- Fundo da cena de abertura (arte do hero) ----------
-   Fixo atrás da cena. A "câmera" (.hero-bg__cam) aproxima com a rolagem;
-   depois a imagem é trocada por faixas que deslizam (hero-scene.js). */
-.hero-bg {
-  --pos: 72% 50%;
+/* ---------- Vídeo guiado pela rolagem ----------
+   Fixo atrás da cena de abertura. Poster → vídeo → canvas (crossfade 500ms).
+   Os quadros saem em preto e branco e a tinta aplica o vermelho da marca. */
+.scroll-video {
   position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
-  background: radial-gradient(60% 55% at 70% 60%, rgba(150,8,4,.45), transparent 70%), #050505;
+  background:
+    radial-gradient(60% 55% at 70% 35%, rgba(196,5,0,.38), transparent 70%),
+    radial-gradient(50% 45% at 20% 75%, rgba(110,0,0,.5), transparent 70%),
+    #0a0a0a;
   transition: opacity .6s var(--ease);
 }
-.hero-bg.is-off { opacity: 0; }
-.hero-bg__cam { position: absolute; inset: 0; transform-origin: 72% 48%; will-change: transform; }
-.hero-bg__img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: var(--pos); }
-.hero-bg__strips { position: absolute; inset: 0; }
-.hero-bg__strip { position: absolute; top: 0; bottom: 0; overflow: hidden; will-change: transform, opacity; }
-.hero-bg__strip-img { position: absolute; top: 0; bottom: 0; background-size: cover; background-position: var(--pos); }
-.hero-bg.is-split .hero-bg__img { opacity: 0; }
-.hero-bg__strips { display: none; }
-.hero-bg.is-split .hero-bg__strips { display: block; }
+.scroll-video.is-off { opacity: 0; }
+.scroll-video__poster, .scroll-video__video, .scroll-video__canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover;
+  transition: opacity .5s ease;
+}
+.scroll-video__poster, .scroll-video__video, .scroll-video__canvas { filter: grayscale(1) contrast(1.12) brightness(.92); }
+.scroll-video__video, .scroll-video__canvas { opacity: 0; }
+.scroll-video.has-frame .scroll-video__poster { opacity: 0; }
+.scroll-video.has-frame .scroll-video__video { opacity: 1; }
+.scroll-video.frames-ready .scroll-video__video { opacity: 0; }
+.scroll-video.frames-ready .scroll-video__canvas { opacity: 1; }
+.scroll-video__tint {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(5,5,5,.55) 0%, rgba(5,5,5,.05) 35%, rgba(5,5,5,.1) 60%, rgba(5,5,5,.75) 100%),
+    radial-gradient(80% 70% at 60% 40%, rgba(225,6,0,.55), rgba(110,0,0,.65) 70%);
+  mix-blend-mode: multiply;
+}
+[data-theme="mono"] .scroll-video__tint { background: linear-gradient(180deg, rgba(5,5,5,.55), rgba(5,5,5,.1) 40%, rgba(5,5,5,.75)); }
 /* luz vermelha que segue o mouse (efeito 12), movida só com transform */
-.hero-bg__light {
+.scroll-video__light {
   position: absolute; top: 0; left: 0; width: 600px; height: 600px; border-radius: 50%;
   background: radial-gradient(circle, rgba(255,40,30,.22), transparent 65%);
   mix-blend-mode: screen; opacity: 0; transition: opacity .6s ease; will-change: transform;
 }
-.hero-bg.has-light .hero-bg__light { opacity: 1; }
-/* sombra para o texto ficar legível sobre a arte */
-.hero-bg__shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(5,5,5,.92) 0%, rgba(5,5,5,.55) 38%, transparent 62%), linear-gradient(0deg, rgba(5,5,5,.8), transparent 30%); }
-@media (max-width: 760px) {
-  .hero-bg { --pos: 50% 100%; }
-  .hero-bg__cam { transform-origin: 50% 70%; }
-  .hero-bg__shade { background: linear-gradient(180deg, rgba(5,5,5,.75) 0%, rgba(5,5,5,.35) 48%, transparent 62%, rgba(5,5,5,.5) 100%); }
-}
+.scroll-video.has-light .scroll-video__light { opacity: 1; }
 
 /* ---------- Cena de abertura (hero + respiro + sua situação) ---------- */
 .scene { position: relative; z-index: 1; }
@@ -513,23 +518,6 @@ html.lenis, html.lenis body { height: auto; }
   max-width: 1440px; margin: 0 auto;
 }
 .stage__top { display: flex; flex-direction: column; gap: 32px; }
-.stage--hero { justify-content: center; }
-.hero-copy { max-width: 40rem; will-change: transform, opacity; }
-.hero-copy .stage__title { font-size: clamp(3.6rem, 7.6vw, 7rem); margin-top: 22px; }
-.hero-copy__sub { margin-top: 24px; max-width: 34rem; font-size: clamp(1rem, 1.3vw, 1.15rem); line-height: 1.65; color: rgba(255,255,255,.78); text-shadow: 0 2px 12px rgba(0,0,0,.7); }
-.hero-copy__sub strong { color: #fff; font-weight: 600; }
-.hero-copy .stage__ctas { margin-top: 32px; }
-.hero-copy__trust { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 10px 24px; font-size: .92rem; color: rgba(255,255,255,.8); }
-.hero-copy__trust li { display: inline-flex; align-items: center; gap: 8px; }
-.hero-copy__trust .ico { color: var(--accent-text); }
-.pill--lg { min-height: 56px; padding: 14px 28px; font-size: 1rem; }
-.pill--lg .ico { width: 18px; height: 18px; }
-.pill .ico--wa { width: 20px; height: 20px; }
-.pill:hover .ico--wa { transform: none; }
-.scroll-hint { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: .68rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.55); }
-.scroll-hint span { width: 1px; height: 34px; background: linear-gradient(180deg, transparent, var(--accent)); transform-origin: top; animation: hint 2.2s var(--ease) infinite; }
-@keyframes hint { 0% { transform: scaleY(0); opacity: 1; } 70% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(1); opacity: 0; } }
-
 /* luz que segue o mouse nos cartões (efeito 12) */
 .luz { position: relative; isolation: isolate; }
 .luz::before {
@@ -550,6 +538,10 @@ html.lenis, html.lenis body { height: auto; }
 .stage__left { max-width: 36rem; }
 
 
+/* lista de serviços em "mono" */
+.svc-list { display: grid; gap: 8px; }
+.svc-list li, .mono { font-size: .76rem; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.92); text-shadow: 0 2px 8px rgba(0,0,0,.6); }
+
 /* selo com filete à esquerda (vermelho da marca) */
 .badge {
   display: inline-flex; align-items: center; align-self: flex-start;
@@ -559,6 +551,19 @@ html.lenis, html.lenis body { height: auto; }
 }
 .section-head .badge { margin-bottom: 16px; }
 
+
+/* cartão de contato em vidro */
+.contact-card {
+  display: flex; align-items: center; gap: 16px; align-self: flex-start;
+  padding: 12px 18px 12px 12px; border-radius: 14px;
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.18);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.contact-card__mark { width: 80px; height: 96px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; background: #050505; border: 1px solid rgba(225,6,0,.6); box-shadow: inset 0 0 30px -8px var(--glow); }
+.contact-card__mark svg { width: 46px; height: 46px; }
+.contact-card__txt { display: flex; flex-direction: column; gap: 6px; }
+.contact-card__name { font-size: .95rem; font-weight: 600; color: #fff; }
+.contact-card__role { font-size: .66rem; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; color: rgba(255,255,255,.7); }
 
 /* pílulas (botões da cena) */
 .pill {
@@ -573,6 +578,7 @@ html.lenis, html.lenis body { height: auto; }
 .pill--primary:hover { transform: translateY(-1px); }
 .pill--glass { border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.1); color: #fff; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 .pill--glass:hover { background: rgba(255,255,255,.2); }
+.contact-card .pill { margin-top: 4px; min-height: 40px; padding: 8px 16px; font-size: .82rem; align-self: flex-start; }
 .btn--glass { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22); color: #fff; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 .btn--glass:hover { background: rgba(255,255,255,.22); }
 
@@ -690,6 +696,7 @@ html.lenis, html.lenis body { height: auto; }
 
   .stage { padding-left: 20px; padding-right: 20px; }
   .stage__top { gap: 22px; }
+  .contact-card { align-self: stretch; }
   .stage__ctas .pill { flex: 1 1 100%; }
 
   .services__grid, .testimonials__grid { grid-template-columns: 1fr; }

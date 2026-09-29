@@ -14,10 +14,10 @@ Leia este arquivo antes de mexer no projeto. Ele vale para todas as sessões.
 
 ## Estrutura da página (enxuta: só o que qualifica e converte)
 
-1. **Cena de abertura** (`#cena`), sobre a arte do hero fixa e guiada pela rolagem (`#heroBg`): hero (`#hero`, texto à esquerda, celular da arte à direita) → respiro de 80vh (não remover: é onde a câmera aproxima do celular) → "Sua situação" (`#situacao`, sanfonado num painel de vidro), que entra enquanto a arte se abre em faixas.
+1. **Cena de abertura** (`#cena`), sobre o vídeo fixo guiado pela rolagem (`#scrollVideo`): hero (`#hero`) → respiro de 80vh (não remover: é o espaço do vídeo avançar) → "Sua situação" (`#situacao`, sanfonado com 3 situações num painel de vidro).
 2. **Resto da página** (`.flow`), que sobe por cima da cena como uma cortina: comparação dos celulares → serviços (4 cartões + linha de manutenção) → como funciona + o que você recebe → formulário → 5 dúvidas → rodapé.
 
-Sistema visual da cena (vindo da referência NovaAI, nas cores da Avanttá): selo com filete vermelho à esquerda (`.badge`), rótulos em caixa alta espaçada, pílulas (`.pill--primary` vermelha, `.pill--glass`), painéis de vidro (`.glass-panel`), texto branco com sombra sobre a arte do hero. Títulos em Bebas Neue, o resto em Inter.
+Sistema visual da cena (vindo da referência NovaAI, nas cores da Avanttá): selo com filete vermelho à esquerda (`.badge`), rótulos em caixa alta espaçada, pílulas (`.pill--primary` vermelha, `.pill--glass`), painéis de vidro (`.glass-panel`), texto branco com sombra sobre o vídeo. Títulos em Bebas Neue, o resto em Inter.
 
 ## Objetivo da página
 
@@ -44,12 +44,11 @@ preto-e-branco.html     atalho para index.html?tema=pb (só para comparação; n
 assets/css/style.css    estilos, temas (red / mono) e responsivo
 assets/js/script.js     configuração, integrações, interface, formulário, Cal.com, animações
 assets/js/reveal.js     componente de entrada suave das seções (classe .reveal)
-assets/js/hero-scene.js  cena de abertura: câmera sobre a arte, faixas e luz que segue o mouse
+assets/js/scroll-video.js vídeo do hero guiado pela rolagem (adaptado do hero NovaAI) + luz que segue o mouse
 assets/vendor/motion.min.js  Motion (animate, inView, scroll, stagger) + Lenis (rolagem suave), global window.Motion
 tools/motion-entry.js   entrada do pacote acima ("npm install && npm run vendor" gera de novo)
 assets/fonts/           Bebas Neue e Inter em woff2 (subset latin)
-assets/img/             favicon.svg, og-image.jpg e a arte do hero (hero-1920/1280/mobile em AVIF e WebP)
-tools/make-hero.py      gera a arte do hero a partir de tools/hero-original.webp (recorte, melhoria, continuação do cenário)
+assets/img/             favicon.svg e og-image.jpg (1200x630, compartilhamento)
 robots.txt, sitemap.xml, llms.txt
 ```
 
@@ -136,9 +135,9 @@ A checagem não pega trios de verbos e adjetivos: releia as frases novas.
 - Respeitar `prefers-reduced-motion`: sem movimento, o conteúdo só aparece (a comparação dos celulares mostra o estado final).
 - Conteúdo que troca sozinho precisa de controle: a comparação tem botões de troca e "Repetir", e troca sozinha uma única vez.
 - Transição entre seções sem bordas nem quebras: fundos em degradê que emendam, e a barra fina de progresso de leitura no menu.
-- **Cena de abertura** (`hero-scene.js`): a rolagem conduz uma câmera sobre a arte do hero (aproxima do celular), e a arte se abre em faixas que deslizam em sentidos alternados enquanto o "Sua situação" sobe. A linha do tempo é presa às posições reais das seções, não a percentuais. As faixas só são criadas na primeira rolagem, a partir da imagem já carregada; o `<img>` do hero (com `fetchpriority="high"` e `preload`) é o maior elemento da tela.
-- **Arte do hero:** para trocar, substitua `tools/hero-original.webp` e rode `python3 tools/make-hero.py` (precisa de Pillow). Ele usa só a metade direita da arte original (a esquerda tinha texto embutido).
-- **Efeitos do Não Codei em uso:** 01 cartões que empilham ("Como funciona"; o escurecimento é uma camada com `opacity`, não `filter`), 06 faixas (abertura da arte do hero), 10 inércia (feito pelo Lenis na página inteira) e 12 luz que segue o mouse (fundo do hero e cartões `.luz`). **Fora de propósito:** 09 cursor personalizado (atrapalha quem quer clicar e contratar), 23 painéis que expandem e 21 galeria com filtro (animam largura, não transform), 08 cubo e 02 galeria horizontal (alongam a página e não ajudam a vender), 05 máscara (anima `clip-path`; a transição foi feita com as faixas).
+- **Vídeo do hero guiado pela rolagem** (`scroll-video.js`): só avança com a rolagem, nunca toca sozinho. Começa a carregar depois do `load` + momento livre; não carrega com `prefers-reduced-motion` nem com economia de dados. Na primeira rolagem, os quadros são fatiados uma vez (90 a até 960px no desktop, 48 a até 640px no celular, por memória) com `createImageBitmap` redimensionando fora da thread principal; até lá o vídeo avança pelo caminho de reserva (seek). O preto e branco é um filtro fixo de CSS (feito pela placa de vídeo) e a camada `.scroll-video__tint` aplica o vermelho da marca. **Não** voltar a aplicar filtro quadro a quadro no canvas: custava de 150 a 200 ms por quadro no celular e derrubava a nota para 72.
+- **Vídeo provisório:** o `data-src` aponta para o vídeo do NovaAI no CloudFront de outra empresa (pode sair do ar). Trocar pelo vídeo da Avanttá é mudar só o `data-src` (e `data-poster`, com uma imagem do primeiro quadro). O servidor precisa aceitar pedidos por partes (Range), senão o vídeo não avança.
+- **Efeitos do Não Codei em uso:** 01 cartões que empilham ("Como funciona"; o escurecimento é uma camada com `opacity`, não `filter`), 10 inércia (feito pelo Lenis na página inteira) e 12 luz que segue o mouse (sobre o vídeo do hero e nos cartões `.luz`). **Fora de propósito:** 09 cursor personalizado (atrapalha quem quer clicar e contratar), 23 painéis que expandem e 21 galeria com filtro (animam largura, não transform), 08 cubo e 02 galeria horizontal (alongam a página e não ajudam a vender), 05 máscara (anima `clip-path`). O 06 faixas chegou a ser usado com uma arte estática no hero, mas voltamos ao vídeo com a transição em cortina.
 - **Rolagem suave (Lenis)** dá a sensação de site contínuo; é desligada com `prefers-reduced-motion`. Para rolar por código, use `scrollToEl()` (funciona com e sem Lenis).
 - O texto do hero nunca depende de JS para aparecer: a entrada é CSS (`.hero-in`) e o `<h1>` não é animado (LCP).
 - O script do Cal.com só carrega quando o contato chega à agenda.
@@ -156,7 +155,7 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 
 ## Pendências
 
-- [ ] **Arte do hero:** a tela do celular mostra números de um cliente fictício ("+150 obras", "98% clientes satisfeitos", "12 anos"). Trocar por uma arte com um site real entregue, ou sem números
+- [ ] **Vídeo próprio do hero** em preto e vermelho (MP4 hospedado no próprio site + poster do primeiro quadro), no lugar do vídeo provisório do NovaAI
 - [ ] **Cal.com**: confirmar os identificadores das perguntas (telefone e empresa) e ajustar `CAL_PHONE_FIELDS` / `CAL_COMPANY_FIELD`
 - [ ] **Domínio**: trocar o endereço provisório da Vercel em canonical, Open Graph, JSON-LD, sitemap.xml, robots.txt e llms.txt
 - [ ] **Depoimentos reais** (destaque "Feedbacks" do Instagram) para reativar a seção Feedbacks
