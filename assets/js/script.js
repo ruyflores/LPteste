@@ -99,12 +99,36 @@ if ('IntersectionObserver' in window) {
   $$('[data-hide-wa]').forEach((el) => io.observe(el));
 }
 
-// Cards "Qual dessas é a sua situação": viram ao toque (e no hover pelo CSS)
-$$('.flip__toggle').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const card = btn.closest('.flip');
-    const flipped = card.classList.toggle('is-flipped');
-    btn.setAttribute('aria-pressed', String(flipped));
+// "Qual é a sua situação?": abas acessíveis (setas do teclado + clique)
+const sitTabs = $$('.sit__tab');
+function selectSituation(tab, focus = false) {
+  sitTabs.forEach((t) => {
+    const on = t === tab;
+    t.setAttribute('aria-selected', String(on));
+    t.tabIndex = on ? 0 : -1;
+    const panel = $(`#${t.getAttribute('aria-controls')}`);
+    if (on && panel.hidden) {
+      panel.hidden = false;
+      if (window.Motion && !reducedMotion) {
+        window.Motion.animate(panel, { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0px)'] }, { duration: 0.45, ease: [0.22, 1, 0.36, 1] });
+      }
+    } else if (!on) {
+      panel.hidden = true;
+    }
+  });
+  if (focus) tab.focus();
+}
+sitTabs.forEach((tab, i) => {
+  tab.addEventListener('click', () => selectSituation(tab));
+  tab.addEventListener('keydown', (e) => {
+    const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    if (e.key in keys) {
+      e.preventDefault();
+      selectSituation(sitTabs[(i + keys[e.key] + sitTabs.length) % sitTabs.length], true);
+    } else if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault();
+      selectSituation(sitTabs[e.key === 'Home' ? 0 : sitTabs.length - 1], true);
+    }
   });
 });
 

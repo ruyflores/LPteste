@@ -87,7 +87,6 @@
     <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/></symbol>
     <symbol id="i-back" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 18l-6-6 6-6"/></symbol>
-    <symbol id="i-flip" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"/></symbol>
   </svg>
 
   <!-- ===================== HEADER ===================== -->
@@ -145,92 +144,80 @@
       </div>
     </section>
 
-    <!-- ===================== PROBLEMA (5 sinais) ===================== -->
-    <section class="section problem" id="problema">
-      <div class="container problem__grid">
-        <div>
-          <p class="kicker reveal">O que você perde sem perceber</p>
-          <h2 class="display display--md">
-            Seu cliente decide em segundos. <span class="hl">E decide pelo que vê na tela.</span>
-          </h2>
-          <p class="lead reveal">
-            Enquanto você atende cliente e cuida da equipe, alguém pesquisa o seu serviço no celular.
-            Aparecem três empresas na tela. A sua não está entre elas.
-          </p>
-        </div>
-
-        <div class="signs reveal">
-          <h3 class="signs__title"><span class="hl-num">5</span> sinais de que sua empresa precisa de um site</h3>
-          <ul class="signs__list">
-            <li><svg class="ico" aria-hidden="true"><use href="#i-x" /></svg> Quando pedem o seu site, você manda o Instagram</li>
-            <li><svg class="ico" aria-hidden="true"><use href="#i-x" /></svg> Você pesquisa o seu serviço no Google e só aparece concorrente</li>
-            <li><svg class="ico" aria-hidden="true"><use href="#i-x" /></svg> Você enrola para mandar o link do site atual</li>
-            <li><svg class="ico" aria-hidden="true"><use href="#i-x" /></svg> O cliente pede orçamento, some e fecha com outro</li>
-            <li><svg class="ico" aria-hidden="true"><use href="#i-x" /></svg> Um concorrente menor que você parece maior na internet</li>
-          </ul>
-          <p class="signs__foot">Marcou <strong>3 ou mais</strong>? Já passou da hora.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== a) SITUAÇÃO (cards que viram) ===================== -->
+    <!-- ===================== SUA SITUAÇÃO HOJE (abas) =====================
+         Três situações. Cada uma: título, a dor, uma analogia e o que muda.
+         As abas funcionam sem JS na primeira situação; com JS, trocam com Motion. -->
     <section class="section situation" id="situacao">
       <div class="container">
         <header class="section-head">
-          <p class="kicker reveal">Diagnóstico rápido</p>
-          <h2 class="display display--md">Qual dessas é a <span class="hl">sua situação hoje?</span></h2>
-          <p class="lead reveal">Toque ou passe o mouse no card para ver quanto isso custa para você.</p>
+          <p class="kicker reveal">Sua situação hoje</p>
+          <h2 class="display display--md reveal">Qual é a <span class="hl">sua situação?</span></h2>
+          <p class="lead reveal">Escolha a que mais parece com o seu negócio hoje.</p>
         </header>
 
-        <div class="flips">
-          <article class="flip reveal">
-            <div class="flip__inner">
-              <div class="flip__face flip__front">
-                <span class="flip__num">01</span>
-                <h3>Não tenho site</h3>
-                <p>Você vive de indicação e de quem já te conhece.</p>
-                <span class="flip__hint"><svg class="ico" aria-hidden="true"><use href="#i-flip" /></svg> Ver o custo</span>
-              </div>
-              <div class="flip__face flip__back">
-                <p class="flip__label">O que acontece</p>
-                <p class="flip__text">O cliente pesquisa, não te acha e fecha com quem aparece. Você nem fica sabendo que perdeu.</p>
-              </div>
-            </div>
-            <button class="flip__toggle" type="button" aria-pressed="false"><span class="sr-only">Ver o custo de não ter site</span></button>
-          </article>
+        <div class="sit reveal">
+          <div class="sit__tabs" role="tablist" aria-label="Qual é a sua situação?">
+            <button class="sit__tab" type="button" role="tab" id="sit-tab-1" aria-controls="sit-panel-1" aria-selected="true">
+              <span class="sit__n" aria-hidden="true">01</span>
+              <span class="sit__t">Tenho site, mas ele não me traz clientes</span>
+            </button>
+            <button class="sit__tab" type="button" role="tab" id="sit-tab-2" aria-controls="sit-panel-2" aria-selected="false" tabindex="-1">
+              <span class="sit__n" aria-hidden="true">02</span>
+              <span class="sit__t">Ainda não tenho site</span>
+            </button>
+            <button class="sit__tab" type="button" role="tab" id="sit-tab-3" aria-controls="sit-panel-3" aria-selected="false" tabindex="-1">
+              <span class="sit__n" aria-hidden="true">03</span>
+              <span class="sit__t">Vivo só de Instagram e WhatsApp</span>
+            </button>
+          </div>
 
-          <article class="flip reveal">
-            <div class="flip__inner">
-              <div class="flip__face flip__front">
-                <span class="flip__num">02</span>
-                <h3>Tenho site, mas não traz ninguém</h3>
-                <p>Ele existe, mas o telefone nunca tocou por causa dele.</p>
-                <span class="flip__hint"><svg class="ico" aria-hidden="true"><use href="#i-flip" /></svg> Ver o custo</span>
-              </div>
-              <div class="flip__face flip__back">
-                <p class="flip__label">O que acontece</p>
-                <p class="flip__text">Site que não vende é cartão de visitas caro. Você paga todo ano por algo que não traz cliente.</p>
-              </div>
+          <div class="sit__panel" role="tabpanel" id="sit-panel-1" aria-labelledby="sit-tab-1" tabindex="0">
+            <div class="sit__block sit__block--pain">
+              <h3>O que acontece hoje</h3>
+              <p>Você pagou por um site. Ele existe, mas o telefone não toca por causa dele e ninguém comenta que te achou por lá. Às vezes você até evita mandar o link, porque ele não mostra a empresa que você tem hoje. Está lento e fica estranho no celular.</p>
             </div>
-            <button class="flip__toggle" type="button" aria-pressed="false"><span class="sr-only">Ver o custo de ter um site que não traz clientes</span></button>
-          </article>
+            <div class="sit__block sit__block--analogy">
+              <h3>É como se fosse</h3>
+              <p>Uma loja bonita numa rua sem movimento, com a porta emperrada. Ela existe, mas ninguém entra.</p>
+            </div>
+            <div class="sit__block sit__block--fix">
+              <h3>Com a Avanttá</h3>
+              <p>O site vira um vendedor que trabalha 24 horas. Ele aparece quando o cliente procura e leva a pessoa direto para o seu WhatsApp.</p>
+            </div>
+          </div>
 
-          <article class="flip reveal">
-            <div class="flip__inner">
-              <div class="flip__face flip__front">
-                <span class="flip__num">03</span>
-                <h3>Vivo só do Instagram</h3>
-                <p>Os posts rendem, mas toda semana é um recomeço.</p>
-                <span class="flip__hint"><svg class="ico" aria-hidden="true"><use href="#i-flip" /></svg> Ver o custo</span>
-              </div>
-              <div class="flip__face flip__back">
-                <p class="flip__label">O que acontece</p>
-                <p class="flip__text">Seu faturamento depende de um algoritmo que você não controla. Uma mudança e o alcance some.</p>
-              </div>
+          <div class="sit__panel" role="tabpanel" id="sit-panel-2" aria-labelledby="sit-tab-2" tabindex="0" hidden>
+            <div class="sit__block sit__block--pain">
+              <h3>O que acontece hoje</h3>
+              <p>O cliente pesquisa o seu nome ou o seu serviço no Google e encontra o concorrente. Uma empresa menor que a sua parece maior na internet. E quem não te conhece não tem onde conferir se você é de confiança antes de chamar.</p>
             </div>
-            <button class="flip__toggle" type="button" aria-pressed="false"><span class="sr-only">Ver o custo de depender só do Instagram</span></button>
-          </article>
+            <div class="sit__block sit__block--analogy">
+              <h3>É como se fosse</h3>
+              <p>Um ótimo restaurante sem placa na fachada. Quem já sabe onde fica, vai. Quem está passando, segue reto.</p>
+            </div>
+            <div class="sit__block sit__block--fix">
+              <h3>Com a Avanttá</h3>
+              <p>Sua empresa ganha um endereço próprio na internet, que passa confiança na primeira olhada. E começa a ser encontrada por quem nunca ouviu falar de você.</p>
+            </div>
+          </div>
+
+          <div class="sit__panel" role="tabpanel" id="sit-panel-3" aria-labelledby="sit-tab-3" tabindex="0" hidden>
+            <div class="sit__block sit__block--pain">
+              <h3>O que acontece hoje</h3>
+              <p>Funciona, mas depende de você postar todo dia e do humor do algoritmo (a regra do Instagram que decide quem vê seus posts). Se o Instagram bloquear a sua conta ou mudar a regra, o movimento some. O perfil não é seu, é emprestado. E muita gente que procura no Google nunca chega até o seu Instagram.</p>
+            </div>
+            <div class="sit__block sit__block--analogy">
+              <h3>É como se fosse</h3>
+              <p>Vender só em barraca de feira alugada. Dá movimento, mas o ponto não é seu. Se o dono da feira mudar a regra, você sai.</p>
+            </div>
+            <div class="sit__block sit__block--fix">
+              <h3>Com a Avanttá</h3>
+              <p>O Instagram continua, mas agora leva para um lugar que é seu. Um lugar que aparece no Google e nas inteligências artificiais e que funciona mesmo nos dias em que você não postou nada.</p>
+            </div>
+          </div>
         </div>
+
+        <p class="sit__close reveal">Em qualquer um dos três casos, o cliente já está procurando. <strong>A pergunta é se ele vai encontrar você ou o concorrente.</strong></p>
       </div>
     </section>
 
