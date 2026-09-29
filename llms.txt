@@ -1,0 +1,31 @@
+# Avanttá
+
+> A Avanttá cria sites, páginas de vendas e lojas virtuais para donos de pequenas e médias empresas de todo o Brasil. Todo projeto sai preparado para aparecer no Google e nas respostas das inteligências artificiais. Antes de fechar, o cliente recebe uma prévia grátis do próprio site e vê tudo numa conversa por vídeo. Mais de 250 sites entregues.
+
+## O que a Avanttá faz
+
+- **Site completo da empresa**: várias páginas (Início, Quem somos, Serviços e Contato), botão do WhatsApp, mapa de como chegar, endereço próprio (suaempresa.com.br) e e-mail profissional.
+- **Página de vendas**: uma página só, feita para transformar quem chega por um anúncio ou link em contato no WhatsApp. Pronta para anúncios no Google e no Instagram.
+- **Reforma do site**: refaz sites antigos ou lentos, com visual e organização novos, sem perder a posição que a empresa já tem no Google.
+- **Loja virtual**: loja na Shopify para vender produtos pela internet, com pagamento e cálculo de frete.
+- **Manutenção**: planos mensais para manter o site no ar e atualizado, inclusive sites feitos por outra empresa.
+
+## Para quem é
+
+Donos de pequenas e médias empresas e prestadores de serviço de qualquer segmento (clínicas, escritórios, estética, construção, comércio, alimentação e outros), em todo o Brasil. O foco é quem vê o site da empresa como investimento.
+
+## Como funciona
+
+1. O interessado responde algumas perguntas rápidas no site.
+2. A Avanttá monta uma prévia grátis do site dele.
+3. Numa conversa por vídeo (Google Meet), ele vê a prévia. Se fizer sentido, sai com a proposta.
+4. Com a aprovação, o site é finalizado e publicado. O prazo é definido na proposta.
+
+Os preços dependem do projeto e são informados na proposta.
+
+## Contato
+
+- Site: https://lpteste-liard.vercel.app/
+- WhatsApp: +55 61 99590-5615 (https://wa.me/5561995905615)
+- Instagram: https://www.instagram.com/avanttasites/
+- Agendar a prévia grátis: https://lpteste-liard.vercel.app/#contato

@@ -3,28 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Avanttá | Sites e Landing Pages com prévia gratuita</title>
-  <meta name="description" content="Veja o seu site funcionando antes de pagar. A Avanttá cria sites, landing pages e lojas Shopify para empresas de todo o Brasil. Mais de 250 sites entregues." />
-  <meta name="robots" content="index, follow" />
+  <title>Avanttá | Sites e páginas de vendas com prévia grátis</title>
+  <meta name="description" content="Veja o site da sua empresa pronto antes de pagar. A Avanttá cria sites, páginas de vendas e lojas virtuais que aparecem no Google e nas respostas das inteligências artificiais. Mais de 250 sites entregues em todo o Brasil." />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="theme-color" content="#050505" />
   <meta name="author" content="Avanttá" />
+  <!-- Endereço provisório (prévia na Vercel). Quando o domínio da Avanttá estiver no ar,
+       trocar em: canonical, og:url, og:image, twitter:image, JSON-LD, sitemap.xml, robots.txt e llms.txt. -->
+  <link rel="canonical" href="https://lpteste-liard.vercel.app/" />
 
-  <!-- Compartilhamento (WhatsApp, Instagram, Facebook, LinkedIn).
-       Quando o domínio estiver definido: trocar og:image e og:url por endereços absolutos
-       e incluir <link rel="canonical">. -->
+  <!-- Compartilhamento (WhatsApp, Instagram, Facebook, LinkedIn) -->
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="pt_BR" />
   <meta property="og:site_name" content="Avanttá" />
-  <meta property="og:title" content="Avanttá | Presença digital que faz justiça ao seu negócio" />
-  <meta property="og:description" content="Receba uma prévia navegável e gratuita do seu site. Mais de 250 sites entregues para todo o Brasil." />
-  <meta property="og:image" content="assets/img/og-image.jpg" />
+  <meta property="og:url" content="https://lpteste-liard.vercel.app/" />
+  <meta property="og:title" content="Avanttá | Seu negócio merece ser visto" />
+  <meta property="og:description" content="Receba uma prévia grátis do seu site. Sites que aparecem no Google e nas inteligências artificiais. Mais de 250 sites entregues." />
+  <meta property="og:image" content="https://lpteste-liard.vercel.app/assets/img/og-image.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Avanttá: presença digital que faz justiça ao seu negócio" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Avanttá | Presença digital que faz justiça ao seu negócio" />
-  <meta name="twitter:description" content="Receba uma prévia navegável e gratuita do seu site. Mais de 250 sites entregues." />
-  <meta name="twitter:image" content="assets/img/og-image.jpg" />
+  <meta name="twitter:title" content="Avanttá | Seu negócio merece ser visto" />
+  <meta name="twitter:description" content="Receba uma prévia grátis do seu site. Mais de 250 sites entregues." />
+  <meta name="twitter:image" content="https://lpteste-liard.vercel.app/assets/img/og-image.jpg" />
 
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
 
@@ -46,23 +48,183 @@
   <script defer src="assets/js/script.js"></script>
   <script defer src="assets/js/glass-hero.js"></script>
 
+  <!-- Dados estruturados: quem é a Avanttá e as perguntas do FAQ (mesmo texto da página) -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    "name": "Avanttá",
-    "description": "Criação de sites, landing pages, lojas Shopify e manutenção de sites para empresas de todo o Brasil.",
-    "areaServed": { "@type": "Country", "name": "Brasil" },
-    "telephone": "+55 61 99590-5615",
-    "sameAs": ["https://www.instagram.com/avanttasites/"],
-    "makesOffer": [
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Landing Page" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Site Institucional" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Loja Shopify" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Redesign de site" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Manutenção de sites" } }
-    ]
-  }
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": [
+        "Organization",
+        "ProfessionalService"
+      ],
+      "@id": "https://lpteste-liard.vercel.app/#avantta",
+      "name": "Avanttá",
+      "url": "https://lpteste-liard.vercel.app/",
+      "logo": "https://lpteste-liard.vercel.app/assets/img/favicon.svg",
+      "image": "https://lpteste-liard.vercel.app/assets/img/og-image.jpg",
+      "description": "A Avanttá cria sites, páginas de vendas e lojas virtuais para pequenas e médias empresas de todo o Brasil, preparados para aparecer no Google e nas respostas das inteligências artificiais. O cliente recebe uma prévia grátis do site antes de fechar.",
+      "slogan": "Presença digital que faz justiça ao seu negócio",
+      "areaServed": {
+        "@type": "Country",
+        "name": "Brasil"
+      },
+      "telephone": "+55 61 99590-5615",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+55 61 99590-5615",
+        "contactType": "sales",
+        "availableLanguage": "Portuguese",
+        "url": "https://wa.me/5561995905615"
+      },
+      "sameAs": [
+        "https://www.instagram.com/avanttasites/"
+      ],
+      "knowsAbout": [
+        "criação de sites",
+        "páginas de vendas",
+        "lojas virtuais",
+        "aparecer no Google",
+        "aparecer em inteligências artificiais"
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Serviços da Avanttá",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Site completo da empresa",
+              "description": "Site com várias páginas (Início, Quem somos, Serviços e Contato), botão do WhatsApp, mapa, endereço próprio e e-mail profissional."
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Página de vendas",
+              "description": "Uma página só, feita para transformar visita em cliente, pronta para anúncios no Google e no Instagram."
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Reforma do site",
+              "description": "Site antigo refeito com visual e organização novos, mais rápido e sem perder a posição no Google."
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Loja virtual",
+              "description": "Loja na Shopify para vender produtos pela internet, com pagamento e frete."
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Manutenção de sites",
+              "description": "Planos mensais de manutenção, inclusive para sites feitos por outra empresa."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://lpteste-liard.vercel.app/#site",
+      "url": "https://lpteste-liard.vercel.app/",
+      "name": "Avanttá",
+      "inLanguage": "pt-BR",
+      "publisher": {
+        "@id": "https://lpteste-liard.vercel.app/#avantta"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://lpteste-liard.vercel.app/#faq",
+      "inLanguage": "pt-BR",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Quanto custa um site com a Avanttá?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Depende do projeto. Uma página de vendas e uma loja virtual têm tamanhos bem diferentes. O valor vem na proposta, depois que você vê a prévia e a gente entende o que você precisa."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "A prévia é gratuita mesmo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "É. A gente monta a prévia do seu site e mostra tudo numa conversa por vídeo, sem você pagar nada. Se fizer sentido para você, a conversa já sai com a proposta."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Meu site vai aparecer no Google e nas IAs?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Todo site e toda página da Avanttá já saem preparados para isso: textos organizados do jeito que o Google e as inteligências artificiais (ChatGPT, Gemini, Perplexity e outras) conseguem entender, e um site que abre rápido."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "O que é aparecer nas IAs?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Quando alguém pergunta ao ChatGPT ou ao Gemini algo como \"indica um escritório de advocacia em Brasília\", a IA responde citando empresas que ela consegue entender na internet. Preparamos seu site para ele ser uma dessas empresas."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Preciso escrever os textos do site?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Não. Os textos que convencem o cliente estão inclusos. Você conta como o seu negócio funciona e a gente escreve. Se você já tiver fotos e textos, a gente aproveita."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "O site funciona bem no celular?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Funciona. A maioria dos seus clientes vai te ver pelo celular, então cada página é desenhada primeiro para a tela pequena e depois para o computador."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "O site fica no meu nome?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Fica. O site e o endereço dele (suaempresa.com.br) são seus, e a gente cuida de onde ele fica guardado e funcionando 24 horas. Você não fica preso à Avanttá."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quanto tempo leva para ficar pronto?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A entrega é ágil, e o prazo exato fica definido na proposta, de acordo com o tamanho do projeto."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "E depois que o site ficar pronto?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Você continua com a gente. Quem agenda agora ganha 2 meses de manutenção grátis depois da entrega do site, por tempo limitado. Depois disso, você pode seguir com um plano de manutenção mensal."
+          }
+        }
+      ]
+    }
+  ]
+}
   </script>
 </head>
 <body>
@@ -219,7 +381,7 @@
             </div>
             <div class="sit__block sit__block--fix">
               <h3>Com a Avanttá</h3>
-              <p>O Instagram continua, mas agora leva para um lugar que é seu. Um lugar que aparece no Google e nas inteligências artificiais e que funciona mesmo nos dias em que você não postou nada.</p>
+              <p>O Instagram continua, mas agora leva para um lugar que é seu. Um lugar que aparece no Google e nas inteligências artificiais e que continua trabalhando mesmo quando você passa uma semana sem postar.</p>
             </div>
           </div>
         </div>
@@ -252,7 +414,7 @@
             <h3>É para você se</h3>
             <ul>
               <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Você leva o seu negócio a sério</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Você vê presença digital como investimento</li>
+              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Você vê o site da empresa como investimento</li>
               <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Você quer ser escolhido por quem ainda não te conhece</li>
             </ul>
           </div>
@@ -280,8 +442,8 @@
             <div class="card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </div>
-            <h3>Aparecer no Google</h3>
-            <p>Quem procura o seu serviço na sua cidade precisa achar você primeiro. O site já sai com a estrutura de SEO pronta.</p>
+            <h3>Encontrado no Google e nas IAs</h3>
+            <p>Hoje muita gente pergunta para a inteligência artificial antes de pesquisar no Google. Seu site sai preparado para ser citado nos dois.</p>
           </article>
           <article class="card tilt reveal">
             <div class="card__icon" aria-hidden="true">
@@ -294,14 +456,14 @@
             <div class="card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7h6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <h3>Feito para gerar contato</h3>
+            <h3>Feito para o cliente te chamar</h3>
             <p>Chamadas claras e botão de WhatsApp em todo lugar. Quem entra no site sabe exatamente o que fazer.</p>
           </article>
           <article class="card tilt reveal">
             <div class="card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </div>
-            <h3>Pensado para o celular</h3>
+            <h3>Perfeito no celular</h3>
             <p>É no celular que o seu cliente te pesquisa, na fila do banco ou no intervalo do almoço. Cada página nasce para a tela pequena.</p>
           </article>
           <article class="card tilt reveal">
@@ -316,7 +478,7 @@
               <svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
             </div>
             <h3>Você vê antes de pagar</h3>
-            <p>Você recebe uma prévia navegável gratuita e passeia por ela com a gente na reunião.</p>
+            <p>Você recebe uma prévia grátis do seu site, abre no celular e passeia por ela com a gente na conversa.</p>
           </article>
         </div>
       </div>
@@ -538,12 +700,12 @@
           <li class="step reveal">
             <span class="step__num">02</span>
             <h3>A gente monta sua prévia</h3>
-            <p>Criamos uma prévia navegável do seu site, com a cara da sua empresa.</p>
+            <p>Criamos uma prévia do seu site, com a cara da sua empresa, que você já consegue abrir e clicar.</p>
           </li>
           <li class="step reveal">
             <span class="step__num">03</span>
-            <h3>Reunião pelo Google Meet</h3>
-            <p>Você navega na prévia com a gente e tira suas dúvidas. Se fizer sentido, já sai com a proposta.</p>
+            <h3>Conversa por vídeo</h3>
+            <p>Uma chamada pelo Google Meet: você passeia pela prévia com a gente e tira suas dúvidas. Se fizer sentido, já sai com a proposta.</p>
           </li>
           <li class="step reveal">
             <span class="step__num">04</span>
@@ -633,11 +795,11 @@
           <ol class="offer__list">
             <li>
               <span class="offer__n">1</span>
-              <div><h3>Prévia navegável do seu site</h3><p>Gratuita. Você navega nela e vê como o seu cliente vai te encontrar.</p></div>
+              <div><h3>Prévia do seu site, grátis</h3><p>Você abre no celular e vê como o seu cliente vai te encontrar.</p></div>
             </li>
             <li>
               <span class="offer__n">2</span>
-              <div><h3>Diagnóstico da sua presença digital</h3><p>Na reunião, a gente mostra onde você está perdendo cliente hoje.</p></div>
+              <div><h3>Uma avaliação de como você aparece hoje</h3><p>Na conversa, a gente mostra onde você está perdendo cliente hoje, no Google e nas IAs.</p></div>
             </li>
             <li class="offer__bonus">
               <span class="offer__n">+</span>
@@ -661,8 +823,8 @@
           <h2 class="display display--md">Veja o seu site <span class="hl">antes de pagar.</span></h2>
           <p class="lead reveal">São 4 perguntas rápidas. Depois você escolhe o melhor horário para a reunião pelo Google Meet. Se fizer sentido, você já sai dela com a proposta.</p>
           <ul class="contact__list reveal">
-            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Prévia navegável gratuita</li>
-            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Reunião online, de onde você estiver</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Prévia do seu site grátis</li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Conversa por vídeo, de onde você estiver</li>
             <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Seus dados ficam protegidos</li>
           </ul>
         </div>
@@ -783,7 +945,7 @@
           <!-- ---------- Agenda do Cal.com (carregada só nesta etapa) ---------- -->
           <div class="panel panel--cal" id="panelCal" hidden tabindex="-1">
             <h3 class="panel__title">Escolha o melhor horário para ver a sua prévia</h3>
-            <p class="panel__sub">A reunião é pelo Google Meet. O link chega no seu e-mail assim que você confirmar.</p>
+            <p class="panel__sub">A conversa é por vídeo, pelo Google Meet. O link chega no seu e-mail assim que você confirmar.</p>
             <div class="cal-embed" id="calEmbed">
               <p class="cal-embed__loading">Carregando a agenda...</p>
             </div>
@@ -814,15 +976,23 @@
         <div class="faq__list">
           <details class="faq__item reveal">
             <summary>Quanto custa um site com a Avanttá?</summary>
-            <p>Depende do projeto. Uma landing page e uma loja Shopify têm tamanhos bem diferentes. O valor vem na proposta, depois que você vê a prévia e a gente entende o que você precisa.</p>
+            <p>Depende do projeto. Uma página de vendas e uma loja virtual têm tamanhos bem diferentes. O valor vem na proposta, depois que você vê a prévia e a gente entende o que você precisa.</p>
           </details>
           <details class="faq__item reveal">
             <summary>A prévia é gratuita mesmo?</summary>
-            <p>É. A gente monta a prévia navegável do seu site e mostra tudo na reunião, sem você pagar nada. Se fizer sentido para você, a reunião já sai com a proposta.</p>
+            <p>É. A gente monta a prévia do seu site e mostra tudo numa conversa por vídeo, sem você pagar nada. Se fizer sentido para você, a conversa já sai com a proposta.</p>
+          </details>
+          <details class="faq__item reveal">
+            <summary>Meu site vai aparecer no Google e nas IAs?</summary>
+            <p>Todo site e toda página da Avanttá já saem preparados para isso: textos organizados do jeito que o Google e as inteligências artificiais (ChatGPT, Gemini, Perplexity e outras) conseguem entender, e um site que abre rápido.</p>
+          </details>
+          <details class="faq__item reveal">
+            <summary>O que é aparecer nas IAs?</summary>
+            <p>Quando alguém pergunta ao ChatGPT ou ao Gemini algo como "indica um escritório de advocacia em Brasília", a IA responde citando empresas que ela consegue entender na internet. Preparamos seu site para ele ser uma dessas empresas.</p>
           </details>
           <details class="faq__item reveal">
             <summary>Preciso escrever os textos do site?</summary>
-            <p>Não. A estratégia de copy está inclusa. Você conta como o seu negócio funciona e a gente escreve. Se você já tiver fotos e textos, a gente aproveita.</p>
+            <p>Não. Os textos que convencem o cliente estão inclusos. Você conta como o seu negócio funciona e a gente escreve. Se você já tiver fotos e textos, a gente aproveita.</p>
           </details>
           <details class="faq__item reveal">
             <summary>O site funciona bem no celular?</summary>
@@ -830,7 +1000,7 @@
           </details>
           <details class="faq__item reveal">
             <summary>O site fica no meu nome?</summary>
-            <p>Fica. O site e o domínio são seus. Você não fica preso à Avanttá.</p>
+            <p>Fica. O site e o endereço dele (suaempresa.com.br) são seus, e a gente cuida de onde ele fica guardado e funcionando 24 horas. Você não fica preso à Avanttá.</p>
           </details>
           <details class="faq__item reveal">
             <summary>Quanto tempo leva para ficar pronto?</summary>
@@ -849,7 +1019,7 @@
       <div class="final__spot" aria-hidden="true"></div>
       <div class="container final__inner">
         <span class="brand__mark brand__mark--xl reveal"><svg aria-hidden="true"><use href="#logo-mark" /></svg></span>
-        <h2 class="display">Seu negócio já cresceu. <span class="hl">Agora falta o seu digital.</span></h2>
+        <h2 class="display">Seu negócio já cresceu. <span class="hl">Agora falta a internet saber disso.</span></h2>
         <div class="hero__ctas hero__ctas--center reveal">
           <a href="#contato" class="btn btn--primary btn--lg btn--shine">Quero minha prévia gratuita</a>
           <a href="https://wa.me/5561995905615" class="btn btn--ghost btn--lg js-whatsapp" data-section="Chamada final">
