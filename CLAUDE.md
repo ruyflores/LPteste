@@ -12,6 +12,13 @@ Leia este arquivo antes de mexer no projeto. Ele vale para todas as sessões.
 - **Bônus atual:** 2 meses de manutenção grátis após a entrega do site, por tempo limitado.
 - O público chega pelo **Instagram** (orgânico e anúncios): **o celular é a prioridade absoluta** (testar em 375px).
 
+## Estrutura da página (enxuta: só o que qualifica e converte)
+
+1. **Cena de abertura** (`#cena`), sobre o vídeo fixo guiado pela rolagem: hero (`#hero`) → respiro de 80vh (não remover: é o espaço do vídeo avançar) → "Sua situação" (`#situacao`, sanfonado com 3 situações num painel de vidro).
+2. **Resto da página** (`.flow`), que sobe por cima do vídeo como uma cortina: comparação dos celulares → serviços (4 cartões + linha de manutenção) → como funciona + o que você recebe → formulário → 5 dúvidas → rodapé.
+
+Sistema visual da cena (vindo da referência NovaAI, nas cores da Avanttá): selo com filete vermelho à esquerda (`.badge`), rótulos em caixa alta espaçada, pílulas (`.pill--primary` vermelha, `.pill--glass`), painéis de vidro (`.glass-panel`), texto branco com sombra sobre o vídeo. Títulos em Bebas Neue, o resto em Inter.
+
 ## Objetivo da página
 
 Uma única conversão: o contato preenche o formulário e **agenda a conversa no Cal.com**. O WhatsApp é a saída secundária.
@@ -37,8 +44,8 @@ preto-e-branco.html     atalho para index.html?tema=pb (só para comparação; n
 assets/css/style.css    estilos, temas (red / mono) e responsivo
 assets/js/script.js     configuração, integrações, interface, formulário, Cal.com, animações
 assets/js/reveal.js     componente de entrada suave das seções (classe .reveal)
-assets/js/glass-hero.js Glass Headline Hero do 21st.dev, portado de React para JS puro (WebGL2)
-assets/vendor/motion.min.js  Motion (motion.dev) só com animate, inView, scroll e stagger
+assets/js/scroll-video.js vídeo do hero guiado pela rolagem (adaptado do hero NovaAI)
+assets/vendor/motion.min.js  Motion (animate, inView, scroll, stagger) + Lenis (rolagem suave), global window.Motion
 tools/motion-entry.js   entrada do pacote acima ("npm install && npm run vendor" gera de novo)
 assets/fonts/           Bebas Neue e Inter em woff2 (subset latin)
 assets/img/             favicon.svg e og-image.jpg (1200x630, compartilhamento)
@@ -127,7 +134,11 @@ A checagem não pega trios de verbos e adjetivos: releia as frases novas.
 - Animar **apenas `transform` e `opacity`**. Nada de animar `box-shadow`, `filter`, `width` ou `top`, e nada de `filter: blur` em elementos grandes.
 - Respeitar `prefers-reduced-motion`: sem movimento, o conteúdo só aparece (a comparação dos celulares mostra o estado final).
 - Conteúdo que troca sozinho precisa de controle: a comparação tem botões de troca e "Repetir", e troca sozinha uma única vez.
-- **Hero de vidro:** o texto do hero nunca é animado (LCP). O WebGL liga só depois do `load` + momento livre, e **não liga em renderizador por software** (SwiftShader, llvmpipe), onde trava a página. Com o efeito forçado sem placa de vídeo, a nota de Performance cai para 65. Para testar o efeito: `?glass=force`.
+- Transição entre seções sem bordas nem quebras: fundos em degradê que emendam, e a barra fina de progresso de leitura no menu.
+- **Vídeo do hero guiado pela rolagem** (`scroll-video.js`): só avança com a rolagem, nunca toca sozinho. Começa a carregar depois do `load` + momento livre; não carrega com `prefers-reduced-motion` nem com economia de dados. Os quadros são fatiados uma vez (90 a até 960px no desktop, 48 a até 640px no celular, por memória), convertidos para preto e branco e tingidos de vermelho pela camada `.scroll-video__tint`. A fatia devolve o controle ao navegador a cada quadro (sem tarefas longas).
+- **Vídeo provisório:** o `data-src` aponta para o vídeo do NovaAI no CloudFront de outra empresa (pode sair do ar). Trocar pelo vídeo da Avanttá é mudar só o `data-src` (e `data-poster`, com uma imagem do primeiro quadro). O servidor precisa aceitar pedidos por partes (Range), senão o vídeo não avança.
+- **Rolagem suave (Lenis)** dá a sensação de site contínuo; é desligada com `prefers-reduced-motion`. Para rolar por código, use `scrollToEl()` (funciona com e sem Lenis).
+- O texto do hero nunca depende de JS para aparecer: a entrada é CSS (`.hero-in`) e o `<h1>` não é animado (LCP).
 - O script do Cal.com só carrega quando o contato chega à agenda.
 - Nada de vídeo em autoplay. Imagens em WebP ou AVIF com `loading="lazy"` e `width`/`height` definidos.
 - Fontes em woff2 locais com `font-display: swap` e `preload` só das duas usadas acima da dobra.
@@ -143,6 +154,7 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 
 ## Pendências
 
+- [ ] **Vídeo próprio do hero** em preto e vermelho (MP4 hospedado no próprio site + poster do primeiro quadro), no lugar do vídeo provisório do NovaAI
 - [ ] **Cal.com**: confirmar os identificadores das perguntas (telefone e empresa) e ajustar `CAL_PHONE_FIELDS` / `CAL_COMPANY_FIELD`
 - [ ] **Domínio**: trocar o endereço provisório da Vercel em canonical, Open Graph, JSON-LD, sitemap.xml, robots.txt e llms.txt
 - [ ] **Depoimentos reais** (destaque "Feedbacks" do Instagram) para reativar a seção Feedbacks

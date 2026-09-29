@@ -5,7 +5,8 @@
    3. Interface (header, menu, WhatsApp, cards que viram)
    4. Formulário em etapas + roteamento
    5. Cal.com (carregado só quando o lead chega na agenda)
-   6. Animações (Motion: assets/vendor/motion.min.js + assets/js/reveal.js)
+   6. Animações (Motion + Lenis: assets/vendor/motion.min.js, assets/js/reveal.js)
+   O vídeo guiado pela rolagem fica em assets/js/scroll-video.js
    ========================================================= */
 
 /* ---------- 1. Configuração ---------- */
@@ -88,6 +89,13 @@ const origem = (() => {
 const newId = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : `lead-${Date.now()}-${Math.random().toString(16).slice(2)}`);
 
 /* ---------- 3. Interface ---------- */
+// Rolagem até um elemento (usa o Lenis quando ele está ligado)
+function scrollToEl(el) {
+  const offset = -(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 64) - 16;
+  if (window.lenis) window.lenis.scrollTo(el, { offset, duration: 1.1 });
+  else el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+}
+
 const waLink = (msg) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 
 // Cada botão diz de qual seção a pessoa clicou
@@ -116,6 +124,7 @@ function toggleMenu(open) {
   menuBtn.setAttribute('aria-expanded', String(isOpen));
   menuBtn.setAttribute('aria-label', isOpen ? 'Fechar menu' : 'Abrir menu');
   document.body.style.overflow = isOpen ? 'hidden' : '';
+  if (window.lenis) (isOpen ? window.lenis.stop() : window.lenis.start());
 }
 menuBtn.addEventListener('click', () => toggleMenu());
 $$('a', nav).forEach((a) => a.addEventListener('click', () => toggleMenu(false)));
@@ -132,36 +141,24 @@ if ('IntersectionObserver' in window) {
   $$('[data-hide-wa]').forEach((el) => io.observe(el));
 }
 
-// "Qual é a sua situação?": abas acessíveis (setas do teclado + clique)
-const sitTabs = $$('.sit__tab');
-function selectSituation(tab, focus = false) {
-  sitTabs.forEach((t) => {
-    const on = t === tab;
-    t.setAttribute('aria-selected', String(on));
-    t.tabIndex = on ? 0 : -1;
-    const panel = $(`#${t.getAttribute('aria-controls')}`);
-    if (on && panel.hidden) {
-      panel.hidden = false;
-      if (window.Motion && !reducedMotion) {
-        window.Motion.animate(panel, { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0px)'] }, { duration: 0.45, ease: [0.22, 1, 0.36, 1] });
+// "Qual é a sua situação?": sanfonado acessível (uma situação aberta por vez)
+const sitButtons = $$('.sit-row__btn');
+sitButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const opening = btn.getAttribute('aria-expanded') !== 'true';
+    sitButtons.forEach((other) => {
+      const body = $(`#${other.getAttribute('aria-controls')}`);
+      const open = other === btn && opening;
+      other.setAttribute('aria-expanded', String(open));
+      if (open && body.hidden) {
+        body.hidden = false;
+        if (window.Motion && !reducedMotion) {
+          window.Motion.animate(body, { opacity: [0, 1], transform: ['translateY(-6px)', 'translateY(0px)'] }, { duration: 0.45, ease: EASE });
+        }
+      } else if (!open) {
+        body.hidden = true;
       }
-    } else if (!on) {
-      panel.hidden = true;
-    }
-  });
-  if (focus) tab.focus();
-}
-sitTabs.forEach((tab, i) => {
-  tab.addEventListener('click', () => selectSituation(tab));
-  tab.addEventListener('keydown', (e) => {
-    const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
-    if (e.key in keys) {
-      e.preventDefault();
-      selectSituation(sitTabs[(i + keys[e.key] + sitTabs.length) % sitTabs.length], true);
-    } else if (e.key === 'Home' || e.key === 'End') {
-      e.preventDefault();
-      selectSituation(sitTabs[e.key === 'Home' ? 0 : sitTabs.length - 1], true);
-    }
+    });
   });
 });
 
@@ -273,7 +270,7 @@ function goToStep(n) {
   // mantém o topo do formulário visível no celular
   const top = form.getBoundingClientRect().top;
   if (top < 0 || top > window.innerHeight * 0.6) {
-    form.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+    scrollToEl(form);
   }
   // leva o foco para a pergunta nova (teclado e leitor de tela)
   const legend = $('legend', steps[current - 1]);
@@ -408,7 +405,7 @@ function showPanel(id) {
   $$('.funnel .panel').forEach((p) => { p.hidden = p.id !== id; });
   const panel = $(`#${id}`);
   panel.focus({ preventScroll: true });
-  panel.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+  scrollToEl(panel);
   return panel;
 }
 
@@ -514,16 +511,6 @@ function loadCal(dados) {
 /* ---------- 6. Animações ----------
    Motion (motion.dev) em JS puro. Regras: só transform e opacity,
    400 a 700ms, e nada para quem pediu movimento reduzido. */
-function animateCounter(M, el) {
-  const target = +el.dataset.count;
-  const prefix = el.dataset.prefix || '';
-  el.textContent = `${prefix}0`;
-  const stop = M.inView(el, () => {
-    stop();
-    M.animate(0, target, { duration: 1.4, ease: EASE, onUpdate: (v) => { el.textContent = prefix + Math.round(v); } });
-  }, { amount: 0.6 });
-}
-
 // Inclinação leve dos cards (mouse e toque), via CSS: transição curta no transform
 function initTilt() {
   $$('.tilt').forEach((el) => {
@@ -548,12 +535,23 @@ async function initAnimations() {
   if (reducedMotion) return;
   if (!M) { document.documentElement.classList.add('no-motion'); return; }
 
+  // Rolagem suave (Lenis): a página desliza como um fluxo contínuo.
+  // No toque do celular a rolagem continua nativa (mais natural).
+  if (M.Lenis) {
+    const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 64;
+    window.lenis = new M.Lenis({ autoRaf: true, lerp: 0.1, anchors: { offset: -(headerH + 16) } });
+  }
+
   await yieldToMain();
 
   // Seções entram ao rolar (componente reutilizável em assets/js/reveal.js)
   window.reveal('.reveal');
 
   await yieldToMain();
+
+  // Barra fina de progresso de leitura, embaixo do menu
+  const bar = $('.scroll-progress');
+  if (bar) M.scroll(M.animate(bar, { transform: ['scaleX(0)', 'scaleX(1)'] }, { ease: 'linear' }));
 
   // Linha vermelha que se desenha entre os passos, ligada à rolagem
   const line = $('.steps__line');
@@ -570,7 +568,6 @@ async function initAnimations() {
     }
   }
 
-  $$('[data-count]').forEach((el) => animateCounter(M, el));
   initTilt();
 }
 

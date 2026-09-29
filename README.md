@@ -22,4 +22,6 @@ Configuração no topo de `assets/js/script.js`: `WHATSAPP_NUMBER`, `CAL_LINK`, 
 
 ## Animações
 
-O Motion (motion.dev) fica em `assets/vendor/motion.min.js`. Para gerar de novo depois de atualizar a versão: `npm install && npm run vendor`. O hero de vidro (`assets/js/glass-hero.js`) liga sozinho em aparelhos com placa de vídeo; para testar em qualquer máquina, abra `index.html?glass=force`.
+O Motion (motion.dev) e o Lenis (rolagem suave) ficam em `assets/vendor/motion.min.js`. Para gerar de novo depois de atualizar as versões: `npm install && npm run vendor`.
+
+O hero usa um vídeo que avança com a rolagem (`assets/js/scroll-video.js`). Para trocar o vídeo, mude o `data-src` do elemento `#scrollVideo` no `index.html`.

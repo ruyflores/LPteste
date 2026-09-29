@@ -45,8 +45,8 @@
 
   <script defer src="assets/vendor/motion.min.js"></script>
   <script defer src="assets/js/reveal.js"></script>
+  <script defer src="assets/js/scroll-video.js"></script>
   <script defer src="assets/js/script.js"></script>
-  <script defer src="assets/js/glass-hero.js"></script>
 
   <!-- Dados estruturados: quem é a Avanttá e as perguntas do FAQ (mesmo texto da página) -->
   <script type="application/ld+json">
@@ -167,14 +167,6 @@
         },
         {
           "@type": "Question",
-          "name": "Meu site vai aparecer no Google e nas IAs?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Todo site e toda página da Avanttá já saem preparados para isso: textos organizados do jeito que o Google e as inteligências artificiais (ChatGPT, Gemini, Perplexity e outras) conseguem entender, e um site que abre rápido."
-          }
-        },
-        {
-          "@type": "Question",
           "name": "O que é aparecer nas IAs?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -183,34 +175,10 @@
         },
         {
           "@type": "Question",
-          "name": "Preciso escrever os textos do site?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Não. Os textos que convencem o cliente estão inclusos. Você conta como o seu negócio funciona e a gente escreve. Se você já tiver fotos e textos, a gente aproveita."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "O site funciona bem no celular?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Funciona. A maioria dos seus clientes vai te ver pelo celular, então cada página é desenhada primeiro para a tela pequena e depois para o computador."
-          }
-        },
-        {
-          "@type": "Question",
           "name": "O site fica no meu nome?",
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Fica. O site e o endereço dele (suaempresa.com.br) são seus, e a gente cuida de onde ele fica guardado e funcionando 24 horas. Você não fica preso à Avanttá."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Quanto tempo leva para ficar pronto?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "A entrega é ágil, e o prazo exato fica definido na proposta, de acordo com o tamanho do projeto."
           }
         },
         {
@@ -255,11 +223,13 @@
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9V6l7-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
     <symbol id="i-flag" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
     <symbol id="i-hourglass" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9s8 4 8 9"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6"/></symbol>
     <symbol id="i-back" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M11 18l-6-6 6-6"/></symbol>
   </svg>
 
   <!-- ===================== HEADER ===================== -->
   <header class="header" id="topo">
+    <span class="scroll-progress" aria-hidden="true"></span>
     <div class="container header__inner">
       <a href="#topo" class="brand" aria-label="Avanttá, voltar ao início">
         <span class="brand__mark"><svg aria-hidden="true"><use href="#logo-mark" /></svg></span>
@@ -270,7 +240,7 @@
         <a href="#processo">Como funciona</a>
         <a href="#servicos">Serviços</a>
         <a href="#faq">Dúvidas</a>
-        <a href="#contato" class="btn btn--primary btn--sm nav__cta">Quero minha prévia</a>
+        <a href="#contato" class="btn btn--glass btn--sm nav__cta">Quero minha prévia</a>
       </nav>
 
       <button class="menu-btn" id="menuBtn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav">
@@ -279,210 +249,124 @@
     </div>
   </header>
 
+  <!-- ===================== VÍDEO GUIADO PELA ROLAGEM =====================
+       Fica fixo atrás da cena de abertura e avança conforme a pessoa rola.
+       Vídeo provisório (NovaAI, recolorido para preto e vermelho). Para trocar
+       pelo vídeo da Avanttá, mude só o data-src (e o data-poster, se houver). -->
+  <div class="scroll-video" id="scrollVideo" aria-hidden="true"
+       data-src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260729_102822_0e6c87e8-c141-4744-bf32-ad30db296371.mp4"
+       data-poster="">
+    <img class="scroll-video__poster" alt="" hidden />
+    <video class="scroll-video__video" muted playsinline preload="none"></video>
+    <canvas class="scroll-video__canvas"></canvas>
+    <div class="scroll-video__tint"></div>
+  </div>
+
   <main id="conteudo">
 
-    <!-- ===================== HERO (Glass Headline Hero, 21st.dev) =====================
-         O título é um h1 de verdade. O vidro é desenhado por assets/js/glass-hero.js
-         a partir das 5 cores em data-colors (a primeira é o fundo). -->
-    <section class="ghr-root" id="hero" data-hide-wa data-colors="#050505,#c40500,#ff5a47,#3d0000,#ffe3dc">
-      <canvas class="ghr-canvas" aria-hidden="true"></canvas>
-      <div class="ghr-content">
-        <p class="ghr-eyebrow">Prévia do seu site grátis</p>
-        <h1 class="ghr-title"><span class="ghr-word">Seu</span> <span class="ghr-word">negócio</span> <span class="ghr-word">merece</span> <span class="ghr-word">ser</span> <span class="ghr-word">visto</span></h1>
-        <p class="ghr-desc">Seu negócio já cresceu. Sua presença na internet ainda não. A gente cria o site que faz sua empresa aparecer no Google e nas respostas das inteligências artificiais, bem na hora em que o cliente está procurando.</p>
-        <div class="ghr-actions">
-          <a href="#contato" class="btn btn--primary btn--lg btn--shine">
-            Receber minha prévia grátis
-            <svg class="ico" aria-hidden="true"><use href="#i-arrow" /></svg>
-          </a>
-          <a href="https://wa.me/5561995905615" class="btn btn--glass btn--lg js-whatsapp" data-section="Topo da página">
-            <svg class="ico" aria-hidden="true"><use href="#i-wa" /></svg>
-            Falar no WhatsApp
-          </a>
+    <!-- ===================== CENA DE ABERTURA =====================
+         Hero + respiro (80vh, é ele que dá espaço para o vídeo avançar) +
+         "Sua situação", tudo em vidro por cima do vídeo. -->
+    <div class="scene" id="cena">
+
+      <!-- HERO -->
+      <section class="stage stage--hero" id="hero" data-hide-wa>
+        <div class="stage__top">
+          <ul class="svc-list" aria-label="O que a Avanttá faz">
+            <li class="hero-in" style="--d:150ms">/ Site completo da empresa</li>
+            <li class="hero-in" style="--d:270ms">/ Página de vendas</li>
+            <li class="hero-in" style="--d:390ms">/ Loja virtual</li>
+          </ul>
+          <p class="stage__intro hero-in" style="--d:300ms">Seu negócio já cresceu. Sua presença na internet ainda não. A gente cria o site que faz sua empresa aparecer no Google e nas inteligências artificiais, bem na hora em que o cliente procura.</p>
         </div>
-      </div>
-    </section>
 
-    <!-- ===================== DESTAQUES ===================== -->
-    <section class="stats" aria-label="Destaques da Avanttá">
-      <div class="container stats__grid">
-        <div class="stat reveal"><strong data-count="250" data-prefix="+">+250</strong><span>sites entregues em todo o Brasil</span></div>
-        <div class="stat reveal"><strong>Grátis</strong><span>a prévia do seu site, antes de pagar</span></div>
-        <div class="stat reveal"><strong>100%</strong><span>perfeito no celular</span></div>
-        <div class="stat reveal"><strong>Google + IA</strong><span>preparado para aparecer nos dois</span></div>
-      </div>
-    </section>
-
-    <!-- ===================== SUA SITUAÇÃO HOJE (abas) =====================
-         Três situações. Cada uma: título, a dor, uma analogia e o que muda.
-         As abas funcionam sem JS na primeira situação; com JS, trocam com Motion. -->
-    <section class="section situation" id="situacao">
-      <div class="container">
-        <header class="section-head">
-          <p class="kicker reveal">Sua situação hoje</p>
-          <h2 class="display display--md reveal">Qual é a <span class="hl">sua situação?</span></h2>
-          <p class="lead reveal">Escolha a que mais parece com o seu negócio hoje.</p>
-        </header>
-
-        <div class="sit reveal">
-          <div class="sit__tabs" role="tablist" aria-label="Qual é a sua situação?">
-            <button class="sit__tab" type="button" role="tab" id="sit-tab-1" aria-controls="sit-panel-1" aria-selected="true">
-              <span class="sit__n" aria-hidden="true">01</span>
-              <span class="sit__t">Tenho site, mas ele não me traz clientes</span>
-            </button>
-            <button class="sit__tab" type="button" role="tab" id="sit-tab-2" aria-controls="sit-panel-2" aria-selected="false" tabindex="-1">
-              <span class="sit__n" aria-hidden="true">02</span>
-              <span class="sit__t">Ainda não tenho site</span>
-            </button>
-            <button class="sit__tab" type="button" role="tab" id="sit-tab-3" aria-controls="sit-panel-3" aria-selected="false" tabindex="-1">
-              <span class="sit__n" aria-hidden="true">03</span>
-              <span class="sit__t">Vivo só de Instagram e WhatsApp</span>
-            </button>
+        <div class="stage__bottom">
+          <div class="stage__headline">
+            <p class="badge hero-in" style="--d:150ms">+250 sites entregues em todo o Brasil</p>
+            <h1 class="stage__title">Seu negócio merece ser <span class="hl">visto.</span></h1>
           </div>
 
-          <div class="sit__panel" role="tabpanel" id="sit-panel-1" aria-labelledby="sit-tab-1" tabindex="0">
-            <div class="sit__block sit__block--pain">
-              <h3>O que acontece hoje</h3>
-              <p>Você pagou por um site. Ele existe, mas o telefone não toca por causa dele e ninguém comenta que te achou por lá. Às vezes você até evita mandar o link, porque ele não mostra a empresa que você tem hoje. Está lento e fica estranho no celular.</p>
-            </div>
-            <div class="sit__block sit__block--analogy">
-              <h3>É como se fosse</h3>
-              <p>Uma loja bonita numa rua sem movimento, com a porta emperrada. Ela existe, mas ninguém entra.</p>
-            </div>
-            <div class="sit__block sit__block--fix">
-              <h3>Com a Avanttá</h3>
-              <p>O site vira um vendedor que trabalha 24 horas. Ele aparece quando o cliente procura e leva a pessoa direto para o seu WhatsApp.</p>
-            </div>
-          </div>
-
-          <div class="sit__panel" role="tabpanel" id="sit-panel-2" aria-labelledby="sit-tab-2" tabindex="0" hidden>
-            <div class="sit__block sit__block--pain">
-              <h3>O que acontece hoje</h3>
-              <p>O cliente pesquisa o seu nome ou o seu serviço no Google e encontra o concorrente. Uma empresa menor que a sua parece maior na internet. E quem não te conhece não tem onde conferir se você é de confiança antes de chamar.</p>
-            </div>
-            <div class="sit__block sit__block--analogy">
-              <h3>É como se fosse</h3>
-              <p>Um ótimo restaurante sem placa na fachada. Quem já sabe onde fica, vai. Quem está passando, segue reto.</p>
-            </div>
-            <div class="sit__block sit__block--fix">
-              <h3>Com a Avanttá</h3>
-              <p>Sua empresa ganha um endereço próprio na internet, que passa confiança na primeira olhada. E começa a ser encontrada por quem nunca ouviu falar de você.</p>
-            </div>
-          </div>
-
-          <div class="sit__panel" role="tabpanel" id="sit-panel-3" aria-labelledby="sit-tab-3" tabindex="0" hidden>
-            <div class="sit__block sit__block--pain">
-              <h3>O que acontece hoje</h3>
-              <p>Funciona, mas depende de você postar todo dia e do humor do algoritmo (a regra do Instagram que decide quem vê seus posts). Se o Instagram bloquear a sua conta ou mudar a regra, o movimento some. O perfil não é seu, é emprestado. E muita gente que procura no Google nunca chega até o seu Instagram.</p>
-            </div>
-            <div class="sit__block sit__block--analogy">
-              <h3>É como se fosse</h3>
-              <p>Vender só em barraca de feira alugada. Dá movimento, mas o ponto não é seu. Se o dono da feira mudar a regra, você sai.</p>
-            </div>
-            <div class="sit__block sit__block--fix">
-              <h3>Com a Avanttá</h3>
-              <p>O Instagram continua, mas agora leva para um lugar que é seu. Um lugar que aparece no Google e nas inteligências artificiais e que continua trabalhando mesmo quando você passa uma semana sem postar.</p>
+          <div class="contact-card hero-in" style="--d:420ms">
+            <span class="contact-card__mark" aria-hidden="true"><svg><use href="#logo-mark" /></svg></span>
+            <div class="contact-card__txt">
+              <p class="contact-card__name">Fale com a Avanttá</p>
+              <p class="contact-card__role">Prévia grátis do seu site</p>
+              <a href="#contato" class="pill pill--primary">Quero minha prévia <svg class="ico" aria-hidden="true"><use href="#i-chevron" /></svg></a>
             </div>
           </div>
         </div>
+      </section>
 
-        <p class="sit__close reveal">Em qualquer um dos três casos, o cliente já está procurando. <strong>A pergunta é se ele vai encontrar você ou o concorrente.</strong></p>
-      </div>
-    </section>
+      <div class="scene__spacer" aria-hidden="true"></div>
 
-    <!-- ===================== b) CUSTO DE ADIAR ===================== -->
-    <section class="section cost" id="custo">
-      <div class="container cost__inner">
-        <h2 class="display display--md">Enquanto você adia, <span class="hl">alguém está sendo escolhido no seu lugar.</span></h2>
-        <div class="cost__text">
-          <p class="reveal">Cada semana sem um site que convence é uma semana de orçamentos indo para outra empresa. Você não vê esse prejuízo porque ele não aparece no extrato.</p>
-          <p class="reveal">O seu serviço pode ser o melhor da cidade. O problema está em como ele aparece para quem ainda não te conhece.</p>
-          <a href="#contato" class="btn btn--primary btn--lg reveal">Quero ver a minha prévia <svg class="ico" aria-hidden="true"><use href="#i-arrow" /></svg></a>
+      <!-- SUA SITUAÇÃO HOJE (sobre o vídeo) -->
+      <section class="stage stage--situation" id="situacao">
+        <div class="stage__top">
+          <p class="badge reveal" data-delay="120">Sua situação hoje</p>
+          <p class="stage__intro reveal" data-delay="220">Em qualquer um dos três casos, o cliente já está procurando. A pergunta é se ele vai encontrar você ou o concorrente.</p>
         </div>
-      </div>
-    </section>
 
-    <!-- ===================== e) PARA QUEM É / NÃO É ===================== -->
-    <section class="section fit" id="para-quem">
-      <div class="container">
-        <header class="section-head">
-          <p class="kicker reveal">Antes de agendar</p>
-          <h2 class="display display--md">A Avanttá <span class="hl">não é para todo mundo.</span></h2>
-        </header>
-        <div class="fit__grid">
-          <div class="fit__col fit__col--yes reveal">
-            <h3>É para você se</h3>
-            <ul>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Você leva o seu negócio a sério</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Você vê o site da empresa como investimento</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Você quer ser escolhido por quem ainda não te conhece</li>
-            </ul>
+        <div class="stage__bottom stage__bottom--wide">
+          <div class="stage__left">
+            <h2 class="stage__title reveal" data-delay="180">Qual é a <span class="hl">sua situação?</span></h2>
+            <p class="stage__body reveal" data-delay="320">Toque na que mais parece com o seu negócio hoje e veja o que muda com um site feito para vender.</p>
+            <div class="stage__ctas reveal" data-delay="420">
+              <a href="#contato" class="pill pill--primary">Quero minha prévia grátis <svg class="ico" aria-hidden="true"><use href="#i-chevron" /></svg></a>
+              <a href="https://wa.me/5561995905615" class="pill pill--glass js-whatsapp" data-section="Sua situação">Falar no WhatsApp</a>
+            </div>
           </div>
-          <div class="fit__col fit__col--no reveal">
-            <h3>Não é para você se</h3>
-            <ul>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-x" /></svg> Você procura o site mais barato</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-x" /></svg> Você quer qualquer coisa só para ter</li>
-            </ul>
+
+          <div class="glass-panel sit-panel">
+            <div class="sit-row reveal" data-delay="300">
+              <h3 class="sit-row__h">
+                <button class="sit-row__btn" type="button" id="sit-btn-1" aria-expanded="true" aria-controls="sit-body-1">
+                  <span class="sit-row__n">01</span>
+                  <span class="sit-row__t">Tenho site, mas ele não me traz clientes</span>
+                  <svg class="sit-row__chev" aria-hidden="true"><use href="#i-chevron" /></svg>
+                </button>
+              </h3>
+              <div class="sit-row__body" id="sit-body-1" role="region" aria-labelledby="sit-btn-1">
+                <p>Você pagou por um site. Ele existe, mas o telefone não toca por causa dele. Às vezes você até evita mandar o link, porque ele não mostra a empresa que você tem hoje.</p>
+                <p class="sit-row__ana"><span>É como</span> uma loja bonita numa rua sem movimento, com a porta emperrada. Ela existe, mas ninguém entra.</p>
+                <p class="sit-row__fix"><span>Com a Avanttá</span> O site vira um vendedor que trabalha 24 horas. Ele aparece quando o cliente procura e leva a pessoa direto para o seu WhatsApp.</p>
+              </div>
+            </div>
+            <div class="sit-row reveal" data-delay="410">
+              <h3 class="sit-row__h">
+                <button class="sit-row__btn" type="button" id="sit-btn-2" aria-expanded="false" aria-controls="sit-body-2">
+                  <span class="sit-row__n">02</span>
+                  <span class="sit-row__t">Ainda não tenho site</span>
+                  <svg class="sit-row__chev" aria-hidden="true"><use href="#i-chevron" /></svg>
+                </button>
+              </h3>
+              <div class="sit-row__body" id="sit-body-2" role="region" aria-labelledby="sit-btn-2" hidden>
+                <p>O cliente pesquisa o seu serviço no Google e encontra o concorrente. Uma empresa menor que a sua parece maior na internet.</p>
+                <p class="sit-row__ana"><span>É como</span> um ótimo restaurante sem placa na fachada. Quem já sabe onde fica, vai. Quem está passando, segue reto.</p>
+                <p class="sit-row__fix"><span>Com a Avanttá</span> Sua empresa ganha um endereço próprio na internet, que passa confiança na primeira olhada. E começa a ser encontrada por quem nunca ouviu falar de você.</p>
+              </div>
+            </div>
+            <div class="sit-row reveal" data-delay="520">
+              <h3 class="sit-row__h">
+                <button class="sit-row__btn" type="button" id="sit-btn-3" aria-expanded="false" aria-controls="sit-body-3">
+                  <span class="sit-row__n">03</span>
+                  <span class="sit-row__t">Vivo só de Instagram e WhatsApp</span>
+                  <svg class="sit-row__chev" aria-hidden="true"><use href="#i-chevron" /></svg>
+                </button>
+              </h3>
+              <div class="sit-row__body" id="sit-body-3" role="region" aria-labelledby="sit-btn-3" hidden>
+                <p>Funciona, mas depende de você postar todo dia e do humor do algoritmo (a regra que decide quem vê seus posts). Se o Instagram bloquear a sua conta, o movimento some.</p>
+                <p class="sit-row__ana"><span>É como</span> vender só em barraca de feira alugada. Dá movimento, mas o ponto não é seu.</p>
+                <p class="sit-row__fix"><span>Com a Avanttá</span> O Instagram continua, mas agora leva para um lugar que é seu, que aparece no Google e nas IAs e continua trabalhando mesmo quando você passa uma semana sem postar.</p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
 
-    <!-- ===================== BENEFÍCIOS ===================== -->
-    <section class="section benefits" id="beneficios">
-      <div class="container">
-        <header class="section-head">
-          <p class="kicker reveal">Por que a Avanttá</p>
-          <h2 class="display display--md">Um site feito para o cliente <span class="hl">escolher você.</span></h2>
-        </header>
-
-        <div class="cards">
-          <article class="card tilt reveal">
-            <div class="card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </div>
-            <h3>Encontrado no Google e nas IAs</h3>
-            <p>Hoje muita gente pergunta para a inteligência artificial antes de pesquisar no Google. Seu site sai preparado para ser citado nos dois.</p>
-          </article>
-          <article class="card tilt reveal">
-            <div class="card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9V6l7-3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 12l2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <h3>Confiança na primeira olhada</h3>
-            <p>O cliente abre o link e sente que está falando com uma empresa séria. Aquele constrangimento de mandar o site acaba.</p>
-          </article>
-          <article class="card tilt reveal">
-            <div class="card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7h6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <h3>Feito para o cliente te chamar</h3>
-            <p>Chamadas claras e botão de WhatsApp em todo lugar. Quem entra no site sabe exatamente o que fazer.</p>
-          </article>
-          <article class="card tilt reveal">
-            <div class="card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </div>
-            <h3>Perfeito no celular</h3>
-            <p>É no celular que o seu cliente te pesquisa, na fila do banco ou no intervalo do almoço. Cada página nasce para a tela pequena.</p>
-          </article>
-          <article class="card tilt reveal">
-            <div class="card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-            </div>
-            <h3>Abre rápido</h3>
-            <p>Página lenta perde cliente antes de carregar. Seu site é leve e abre rápido até no 4G.</p>
-          </article>
-          <article class="card tilt reveal">
-            <div class="card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-            </div>
-            <h3>Você vê antes de pagar</h3>
-            <p>Você recebe uma prévia grátis do seu site, abre no celular e passeia por ela com a gente na conversa.</p>
-          </article>
-        </div>
-      </div>
-    </section>
+    <!-- ===================== RESTO DA PÁGINA =====================
+         Sobe por cima do vídeo como uma cortina (fundo sólido, cantos arredondados). -->
+    <div class="flow">
 
     <!-- ===================== COMPARAÇÃO ANIMADA (dois celulares) =====================
          A mesma história nos dois sites. Cada etapa entra a cada 0,6s (Motion),
@@ -490,8 +374,8 @@
     <section class="section race" id="comparacao">
       <div class="container">
         <header class="section-head">
-          <p class="kicker reveal">Na prática</p>
-          <h2 class="display display--md reveal">Site comum x <span class="hl">site Avanttá</span></h2>
+          <p class="badge reveal">Na prática</p>
+          <h2 class="display display--md reveal" data-delay="100">Site comum x <span class="hl">site Avanttá</span></h2>
           <p class="lead reveal">O mesmo cliente, procurando o mesmo serviço. Veja o que acontece em cada um dos sites.</p>
         </header>
 
@@ -605,88 +489,68 @@
     <section class="section services" id="servicos">
       <div class="container">
         <header class="section-head">
-          <p class="kicker reveal">Serviços</p>
-          <h2 class="display display--md reveal">Escolha o formato <span class="hl">certo para o seu momento.</span></h2>
+          <p class="badge reveal">Serviços</p>
+          <h2 class="display display--md reveal" data-delay="100">Escolha o formato <span class="hl">certo para o seu momento.</span></h2>
         </header>
 
         <div class="services__grid">
-          <article class="service tilt reveal">
-            <span class="service__tag">Mais completo</span>
-            <h3>Site completo da empresa</h3>
-            <p>É a loja inteira da sua empresa na internet: vitrine, balcão e cartão de visita juntos. Várias páginas para o cliente conhecer você antes de chamar.</p>
-            <ul aria-label="O que inclui">
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Páginas Início, Quem somos, Serviços e Contato</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Aparece no Google e nas inteligências artificiais</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Botão do WhatsApp e mapa de como chegar</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Endereço próprio (suaempresa.com.br) e e-mail profissional (voce@suaempresa.com.br)</li>
-            </ul>
-            <a href="#contato" class="btn btn--primary" data-service="Site completo da empresa">Quero o site completo</a>
-          </article>
-
-          <article class="service service--featured tilt reveal">
-            <span class="service__tag">Mais pedido</span>
-            <h3>Página de vendas</h3>
-            <p>É um vendedor focado em uma coisa só: pega quem chegou por um anúncio ou link e convence a pessoa a chamar você no WhatsApp.</p>
-            <ul aria-label="O que inclui">
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Textos que convencem o cliente a agir</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Formulário e botão do WhatsApp</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Pronta para anúncios no Google e no Instagram</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Medição de quantas visitas viram contato</li>
-            </ul>
-            <a href="#contato" class="btn btn--primary" data-service="Página de vendas">Quero a página de vendas</a>
-          </article>
-
-          <article class="service tilt reveal">
-            <span class="service__tag">Para quem já tem site</span>
-            <h3>Reforma do site</h3>
-            <p>Seu site está velho, lento ou não mostra o tamanho que sua empresa tem hoje? A gente reforma sem fechar as portas.</p>
-            <ul aria-label="O que inclui">
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Avaliação do site atual</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Visual e organização novos</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Mais rápido e mais fácil de achar no Google e nas IAs</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Mudança sem perder a posição que você já tem no Google</li>
-            </ul>
-            <a href="#contato" class="btn btn--primary" data-service="Reforma do site">Quero reformar meu site</a>
-          </article>
-
-          <article class="service tilt reveal">
-            <span class="service__tag">Para vender produtos</span>
-            <h3>Loja virtual</h3>
-            <p>É a sua loja aberta 24 horas na internet, montada na Shopify (uma das plataformas de loja virtual mais usadas do mundo). O cliente compra sozinho e você só separa o pedido.</p>
-            <ul aria-label="O que inclui">
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Loja pronta para receber pagamentos</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Cálculo de frete automático</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Página caprichada para cada produto</li>
-              <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Pronta para anúncios no Google e no Instagram</li>
-            </ul>
-            <a href="#contato" class="btn btn--primary" data-service="Loja virtual">Quero minha loja virtual</a>
-          </article>
-
+            <article class="service tilt reveal" data-delay="0">
+              <span class="service__tag">Mais completo</span>
+              <h3>Site completo da empresa</h3>
+              <p>A loja inteira da sua empresa na internet: vitrine, balcão e cartão de visita juntos.</p>
+              <ul aria-label="O que inclui">
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Início, Quem somos, Serviços e Contato</li>
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Aparece no Google e nas IAs</li>
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Endereço próprio e e-mail profissional</li>
+              </ul>
+              <a href="#contato" class="btn btn--primary" data-service="Site completo da empresa">Quero o site completo</a>
+            </article>
+            <article class="service service--featured tilt reveal" data-delay="90">
+              <span class="service__tag">Mais pedido</span>
+              <h3>Página de vendas</h3>
+              <p>Um vendedor focado em uma coisa só: fazer quem chegou pelo anúncio chamar você no WhatsApp.</p>
+              <ul aria-label="O que inclui">
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Textos que convencem o cliente a agir</li>
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Pronta para anúncios no Google e no Instagram</li>
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Medição de quantas visitas viram contato</li>
+              </ul>
+              <a href="#contato" class="btn btn--primary" data-service="Página de vendas">Quero a página de vendas</a>
+            </article>
+            <article class="service tilt reveal" data-delay="180">
+              <span class="service__tag">Para quem já tem site</span>
+              <h3>Reforma do site</h3>
+              <p>Seu site está velho ou lento? A gente reforma sem fechar as portas.</p>
+              <ul aria-label="O que inclui">
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Visual e organização novos</li>
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Mais rápido e mais fácil de achar</li>
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Sem perder a posição que você já tem no Google</li>
+              </ul>
+              <a href="#contato" class="btn btn--primary" data-service="Reforma do site">Quero reformar meu site</a>
+            </article>
+            <article class="service tilt reveal" data-delay="270">
+              <span class="service__tag">Para vender produtos</span>
+              <h3>Loja virtual</h3>
+              <p>Sua loja aberta 24 horas, montada na Shopify. O cliente compra sozinho e você só separa o pedido.</p>
+              <ul aria-label="O que inclui">
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Pagamento e frete automáticos</li>
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Página caprichada para cada produto</li>
+                <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> Pronta para anúncios no Google e no Instagram</li>
+              </ul>
+              <a href="#contato" class="btn btn--primary" data-service="Loja virtual">Quero minha loja virtual</a>
+            </article>
         </div>
 
         <p class="services__help reveal">Não sabe qual escolher? <strong>Na prévia gratuita a gente te indica o formato certo.</strong></p>
-
-        <div class="maint reveal">
-          <div class="maint__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4 2.6-2.6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-          </div>
-          <div class="maint__text">
-            <h3>Planos de Manutenção</h3>
-            <p>Como a revisão do carro: todo mês a gente confere se o site está no ar, atualiza o que precisa e faz os ajustes que você pedir. Vale também para site feito por outra empresa.</p>
-          </div>
-          <a href="https://wa.me/5561995905615" class="btn btn--ghost js-whatsapp" data-section="Planos de Manutenção">
-            <svg class="ico" aria-hidden="true"><use href="#i-wa" /></svg> Falar sobre manutenção
-          </a>
-        </div>
+        <p class="services__maint reveal">Já tem site, mesmo feito por outra empresa? A gente também cuida da manutenção todo mês, como a revisão do carro. <a href="https://wa.me/5561995905615" class="js-whatsapp" data-section="Manutenção">Falar sobre manutenção</a></p>
       </div>
     </section>
 
-    <!-- ===================== PROCESSO ===================== -->
+    <!-- ===================== COMO FUNCIONA + O QUE VOCÊ RECEBE ===================== -->
     <section class="section process" id="processo">
       <div class="container">
         <header class="section-head">
-          <p class="kicker reveal">Como funciona</p>
-          <h2 class="display display--md">Do formulário ao site no ar <span class="hl">em 4 passos.</span></h2>
+          <p class="badge reveal">Como funciona</p>
+          <h2 class="display display--md reveal" data-delay="100">Do formulário ao site no ar <span class="hl">em 4 passos.</span></h2>
         </header>
 
         <div class="steps-wrap">
@@ -700,12 +564,12 @@
           <li class="step reveal">
             <span class="step__num">02</span>
             <h3>A gente monta sua prévia</h3>
-            <p>Criamos uma prévia do seu site, com a cara da sua empresa, que você já consegue abrir e clicar.</p>
+            <p>Uma prévia do seu site, com a cara da sua empresa, que você já consegue abrir e clicar.</p>
           </li>
           <li class="step reveal">
             <span class="step__num">03</span>
             <h3>Conversa por vídeo</h3>
-            <p>Uma chamada pelo Google Meet: você passeia pela prévia com a gente e tira suas dúvidas. Se fizer sentido, já sai com a proposta.</p>
+            <p>Pelo Google Meet, você passeia pela prévia com a gente. Se fizer sentido, já sai com a proposta.</p>
           </li>
           <li class="step reveal">
             <span class="step__num">04</span>
@@ -713,6 +577,16 @@
             <p>Com a sua aprovação, a gente finaliza e publica. Entrega ágil, com prazo definido na proposta.</p>
           </li>
         </ol>
+        </div>
+
+        <div class="perks reveal">
+          <p class="perks__title">Ao agendar, você recebe</p>
+          <ul class="perks__list">
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> <span><b>Prévia do seu site, grátis</b> para abrir no celular antes de pagar</span></li>
+            <li><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> <span><b>Uma avaliação</b> de onde você está perdendo cliente hoje</span></li>
+            <li class="perks__bonus"><svg class="ico" aria-hidden="true"><use href="#i-check" /></svg> <span><b>Bônus: 2 meses de manutenção grátis</b> depois da entrega, por tempo limitado</span></li>
+          </ul>
+          <a href="#contato" class="btn btn--primary btn--lg btn--shine">Quero agendar minha prévia <svg class="ico" aria-hidden="true"><use href="#i-arrow" /></svg></a>
         </div>
       </div>
     </section>
@@ -783,43 +657,11 @@
     </section>
     ===================== fim de CASES e FEEDBACKS ===================== -->
 
-    <!-- ===================== d) OFERTA ===================== -->
-    <section class="offer" id="oferta">
-      <div class="container">
-        <div class="offer__box reveal">
-          <div class="offer__head">
-            <p class="kicker">Oferta para quem agenda</p>
-            <h2 class="display display--md">O que você recebe <span class="hl">ao agendar</span></h2>
-            <p class="offer__sub">Se fizer sentido para você, a reunião já sai com a proposta.</p>
-          </div>
-          <ol class="offer__list">
-            <li>
-              <span class="offer__n">1</span>
-              <div><h3>Prévia do seu site, grátis</h3><p>Você abre no celular e vê como o seu cliente vai te encontrar.</p></div>
-            </li>
-            <li>
-              <span class="offer__n">2</span>
-              <div><h3>Uma avaliação de como você aparece hoje</h3><p>Na conversa, a gente mostra onde você está perdendo cliente hoje, no Google e nas IAs.</p></div>
-            </li>
-            <li class="offer__bonus">
-              <span class="offer__n">+</span>
-              <div>
-                <span class="offer__tag">Bônus por tempo limitado</span>
-                <h3>2 meses de manutenção grátis</h3>
-                <p>Depois da entrega do site, os dois primeiros meses de manutenção ficam por nossa conta.</p>
-              </div>
-            </li>
-          </ol>
-          <a href="#contato" class="btn btn--primary btn--lg btn--shine offer__cta">Quero agendar minha prévia <svg class="ico" aria-hidden="true"><use href="#i-arrow" /></svg></a>
-        </div>
-      </div>
-    </section>
-
     <!-- ===================== FORMULÁRIO + AGENDA ===================== -->
     <section class="section contact" id="contato" data-hide-wa>
       <div class="container contact__grid">
         <div class="contact__copy">
-          <p class="kicker reveal">Prévia gratuita</p>
+          <p class="badge reveal">Prévia gratuita</p>
           <h2 class="display display--md">Veja o seu site <span class="hl">antes de pagar.</span></h2>
           <p class="lead reveal">São 4 passos rápidos. Depois você escolhe o melhor horário para a conversa por vídeo, já com os seus dados preenchidos. Se fizer sentido, você já sai dela com a proposta.</p>
           <ul class="contact__list reveal">
@@ -969,10 +811,9 @@
     <section class="section faq" id="faq">
       <div class="container faq__inner">
         <header class="section-head">
-          <p class="kicker reveal">Dúvidas</p>
-          <h2 class="display display--md">Perguntas <span class="hl">frequentes.</span></h2>
+          <p class="badge reveal">Dúvidas</p>
+          <h2 class="display display--md reveal" data-delay="100">Perguntas <span class="hl">frequentes.</span></h2>
         </header>
-
         <div class="faq__list">
           <details class="faq__item reveal">
             <summary>Quanto custa um site com a Avanttá?</summary>
@@ -983,28 +824,12 @@
             <p>É. A gente monta a prévia do seu site e mostra tudo numa conversa por vídeo, sem você pagar nada. Se fizer sentido para você, a conversa já sai com a proposta.</p>
           </details>
           <details class="faq__item reveal">
-            <summary>Meu site vai aparecer no Google e nas IAs?</summary>
-            <p>Todo site e toda página da Avanttá já saem preparados para isso: textos organizados do jeito que o Google e as inteligências artificiais (ChatGPT, Gemini, Perplexity e outras) conseguem entender, e um site que abre rápido.</p>
-          </details>
-          <details class="faq__item reveal">
             <summary>O que é aparecer nas IAs?</summary>
             <p>Quando alguém pergunta ao ChatGPT ou ao Gemini algo como "indica um escritório de advocacia em Brasília", a IA responde citando empresas que ela consegue entender na internet. Preparamos seu site para ele ser uma dessas empresas.</p>
           </details>
           <details class="faq__item reveal">
-            <summary>Preciso escrever os textos do site?</summary>
-            <p>Não. Os textos que convencem o cliente estão inclusos. Você conta como o seu negócio funciona e a gente escreve. Se você já tiver fotos e textos, a gente aproveita.</p>
-          </details>
-          <details class="faq__item reveal">
-            <summary>O site funciona bem no celular?</summary>
-            <p>Funciona. A maioria dos seus clientes vai te ver pelo celular, então cada página é desenhada primeiro para a tela pequena e depois para o computador.</p>
-          </details>
-          <details class="faq__item reveal">
             <summary>O site fica no meu nome?</summary>
             <p>Fica. O site e o endereço dele (suaempresa.com.br) são seus, e a gente cuida de onde ele fica guardado e funcionando 24 horas. Você não fica preso à Avanttá.</p>
-          </details>
-          <details class="faq__item reveal">
-            <summary>Quanto tempo leva para ficar pronto?</summary>
-            <p>A entrega é ágil, e o prazo exato fica definido na proposta, de acordo com o tamanho do projeto.</p>
           </details>
           <details class="faq__item reveal">
             <summary>E depois que o site ficar pronto?</summary>
@@ -1013,21 +838,7 @@
         </div>
       </div>
     </section>
-
-    <!-- ===================== CTA FINAL ===================== -->
-    <section class="final" data-hide-wa>
-      <div class="final__spot" aria-hidden="true"></div>
-      <div class="container final__inner">
-        <span class="brand__mark brand__mark--xl reveal"><svg aria-hidden="true"><use href="#logo-mark" /></svg></span>
-        <h2 class="display">Seu negócio já cresceu. <span class="hl">Agora falta a internet saber disso.</span></h2>
-        <div class="hero__ctas hero__ctas--center reveal">
-          <a href="#contato" class="btn btn--primary btn--lg btn--shine">Quero minha prévia gratuita</a>
-          <a href="https://wa.me/5561995905615" class="btn btn--ghost btn--lg js-whatsapp" data-section="Chamada final">
-            <svg class="ico" aria-hidden="true"><use href="#i-wa" /></svg> Chamar no WhatsApp
-          </a>
-        </div>
-      </div>
-    </section>
+    </div>
   </main>
 
   <!-- ===================== FOOTER ===================== -->
