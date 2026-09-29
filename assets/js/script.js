@@ -26,6 +26,7 @@ const LOW_BUDGET = 'Até R$ 800';
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const EASE = [0.22, 1, 0.36, 1]; // curva padrão das animações
 
 /* ---------- 2. Integrações ----------
    Pontos únicos de saída de dados. Quando o Supabase, o Pixel e o GA
@@ -131,6 +132,89 @@ sitTabs.forEach((tab, i) => {
     }
   });
 });
+
+// Comparação animada "site comum x site Avanttá"
+// Cada etapa entra a cada 0,6s; no fim, o contador sobe. No celular aparece
+// um aparelho por vez: o comum toca primeiro e troca uma vez para o da Avanttá.
+(function initRace() {
+  const race = $('#comparacao');
+  if (!race) return;
+  const stage = $('.race__stage', race);
+  const phones = { comum: $('[data-phone="comum"]', race), avantta: $('[data-phone="avantta"]', race) };
+  const switches = $$('.race__sw', race);
+  const mobile = window.matchMedia('(max-width: 760px)');
+  const STEP = 0.6;
+  let timers = [];
+  let controls = [];
+
+  const stopAll = () => {
+    timers.forEach(clearTimeout);
+    timers = [];
+    controls.forEach((c) => c && c.stop && c.stop());
+    controls = [];
+  };
+  const show = (which) => {
+    stage.dataset.active = which;
+    switches.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.show === which)));
+  };
+  const finalState = (phone) => {
+    $$('.pstep', phone).forEach((s) => { s.style.opacity = ''; s.style.transform = ''; });
+    const count = $('.phone__count', phone);
+    count.style.opacity = '';
+    const num = $('strong', count);
+    num.textContent = num.dataset.to;
+  };
+  // devolve quanto tempo (s) a sequência deste aparelho leva
+  const playPhone = (phone) => {
+    const M = window.Motion;
+    const steps = $$('.pstep', phone);
+    const count = $('.phone__count', phone);
+    const num = $('strong', count);
+    steps.forEach((s) => { s.style.opacity = '0'; s.style.transform = 'translateY(10px)'; });
+    count.style.opacity = '0';
+    num.textContent = '0';
+    steps.forEach((s, i) => {
+      controls.push(M.animate(s, { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0px)'] }, { duration: 0.45, delay: 0.2 + i * STEP, ease: EASE }));
+    });
+    const end = 0.2 + steps.length * STEP;
+    controls.push(M.animate(count, { opacity: [0, 1] }, { duration: 0.4, delay: end }));
+    timers.push(setTimeout(() => {
+      controls.push(M.animate(0, +num.dataset.to, { duration: 1.2, ease: EASE, onUpdate: (v) => { num.textContent = Math.round(v); } }));
+    }, end * 1000));
+    return end + 1.2;
+  };
+  const canAnimate = () => window.Motion && !reducedMotion;
+
+  const play = () => {
+    stopAll();
+    if (!canAnimate()) { finalState(phones.comum); finalState(phones.avantta); return; }
+    if (mobile.matches) {
+      show('comum');
+      finalState(phones.avantta);
+      const dur = playPhone(phones.comum);
+      timers.push(setTimeout(() => { show('avantta'); playPhone(phones.avantta); }, (dur + 1) * 1000));
+    } else {
+      playPhone(phones.comum);
+      playPhone(phones.avantta);
+    }
+  };
+
+  // troca manual (celular): mostra o escolhido e toca só ele
+  switches.forEach((b) => b.addEventListener('click', () => {
+    stopAll();
+    finalState(phones.comum);
+    finalState(phones.avantta);
+    show(b.dataset.show);
+    if (canAnimate()) playPhone(phones[b.dataset.show]);
+  }));
+  $('#raceReplay').addEventListener('click', play);
+
+  if (canAnimate()) {
+    // esconde antes de entrar na tela e toca uma vez quando aparece
+    $$('.pstep, .phone__count', race).forEach((el) => { el.style.opacity = '0'; });
+    const stop = window.Motion.inView(stage, () => { stop(); play(); }, { amount: 0.3 });
+  }
+})();
 
 /* ---------- 4. Formulário em etapas ---------- */
 const form = $('#leadForm');
@@ -395,8 +479,6 @@ function loadCal(dados) {
 /* ---------- 6. Animações ----------
    Motion (motion.dev) em JS puro. Regras: só transform e opacity,
    400 a 700ms, e nada para quem pediu movimento reduzido. */
-const EASE = [0.22, 1, 0.36, 1];
-
 function animateCounter(M, el) {
   const target = +el.dataset.count;
   const prefix = el.dataset.prefix || '';
