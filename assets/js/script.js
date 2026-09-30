@@ -571,13 +571,18 @@ function initHeroScroll(rolagem) {
   const celular = $('#heroFloat');
   if (!hero || !celular) return;
   let altura = 1;
+  let sobe = false; // no celular o aparelho fica embaixo dos botões: não sobe
   rolagem.add({
     el: hero,
-    medir: () => { altura = hero.offsetHeight || 1; },
+    medir: () => {
+      altura = hero.offsetHeight || 1;
+      sobe = window.innerWidth >= 1024;
+      if (!sobe) celular.style.transform = '';
+    },
     atualizar: (y) => {
       const p = limitar(y / altura);
       linhas.forEach((l, i) => { l.style.transform = `translate3d(${(i ? 1 : -1) * p * 14}vw,0,0)`; });
-      celular.style.transform = `translate3d(0,${-p * 140}px,0)`;
+      if (sobe) celular.style.transform = `translate3d(0,${-p * 140}px,0)`;
     },
   });
 }
@@ -621,21 +626,31 @@ function initMagnet() {
   document.documentElement.addEventListener('pointerleave', () => { px = py = -9999; if (!raf) raf = requestAnimationFrame(rodar); });
 }
 
-// Faixa que corre com a rolagem: deslocamento = (rolagem - topo da seção + altura da tela) x 0,3.
+// Faixa que corre com a rolagem. Enquanto a seção atravessa a tela, cada
+// fileira anda exatamente o que falta para mostrar todas as peças (assim nada
+// fica escondido no celular). Nunca mais devagar que a referência (x 0,3).
 // A primeira fileira vai para a esquerda e a segunda para a direita.
 function initMarquee(rolagem) {
   const secao = $('#nichos');
   if (!secao) return;
   const [a, b] = $$('.mq__row', secao);
   let topo = 0;
-  let max = 0;
+  let curso = 1;
+  let maxA = 0;
+  let maxB = 0;
   rolagem.add({
     el: secao,
-    medir: (vh) => { topo = topoNaPagina(secao); max = (secao.offsetHeight + vh) * 0.3; },
+    medir: (vh) => {
+      topo = topoNaPagina(secao);
+      curso = secao.offsetHeight + vh;
+      const largura = document.documentElement.clientWidth;
+      maxA = Math.max(a.scrollWidth - largura, curso * 0.3);
+      maxB = Math.max(b.scrollWidth - largura, curso * 0.3);
+    },
     atualizar: (y, vh) => {
-      const off = limitar((y - topo + vh) * 0.3, 0, max);
-      a.style.transform = `translate3d(${-off.toFixed(1)}px,0,0)`;
-      b.style.transform = `translate3d(${(off - max).toFixed(1)}px,0,0)`;
+      const p = limitar((y - topo + vh) / curso);
+      a.style.transform = `translate3d(${(-p * maxA).toFixed(1)}px,0,0)`;
+      b.style.transform = `translate3d(${((p - 1) * maxB).toFixed(1)}px,0,0)`;
     },
   });
 }
