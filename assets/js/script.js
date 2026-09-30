@@ -2,10 +2,12 @@
    AVANTTÁ | Landing Page (JS)
    1. Configuração
    2. Integrações (saveLead, trackConversion)
-   3. Interface (header, menu, WhatsApp, cards que viram)
+   3. Interface (menu, WhatsApp, sanfonado, comparação)
    4. Formulário em etapas + roteamento
    5. Cal.com (carregado só quando o lead chega na agenda)
-   6. Animações (GSAP + ScrollTrigger)
+   6. Animações (Motion + Lenis: assets/vendor/motion.min.js, assets/js/reveal.js)
+      ímã do celular no hero, faixa guiada pela rolagem, texto que acende
+      letra a letra e cartões que empilham
    ========================================================= */
 
 /* ---------- 1. Configuração ---------- */
@@ -15,9 +17,13 @@ const CAL_LINK = 'avantta/avantta';               // evento do Cal.com (usuario/
 const CAL_ORIGIN = 'https://cal.com';
 const CAL_EMBED_SRC = 'https://app.cal.com/embed/embed.js';
 const CAL_NAMESPACE = 'avantta';
-// Identificador do campo personalizado de WhatsApp no evento do Cal.com.
-// Confira em Cal.com > Event Types > avantta > Advanced > Booking questions.
-const CAL_WHATSAPP_FIELD = 'whatsapp';
+// Perguntas do evento no Cal.com que recebem dados já preenchidos.
+// A chave é o identificador da pergunta em Cal.com > Event Types > avantta >
+// Advanced > Booking Questions. Mandar um identificador que não existe não
+// quebra nada: o Cal.com só ignora. Por isso o telefone vai nos dois nomes
+// mais comuns até você confirmar qual é o seu.
+const CAL_PHONE_FIELDS = ['attendeePhoneNumber', 'whatsapp'];
+const CAL_COMPANY_FIELD = 'empresa';
 const BRAND_RED = '#e10600';
 
 // Quem responde "Até R$ 800" vai para o WhatsApp em vez da agenda
@@ -26,35 +32,71 @@ const LOW_BUDGET = 'Até R$ 800';
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const EASE = [0.22, 1, 0.36, 1]; // curva padrão das animações
 
 /* ---------- 2. Integrações ----------
-   Pontos únicos de saída de dados. Quando o Supabase, o Pixel e o GA
-   estiverem prontos, basta completar estas duas funções. */
+   Pontos únicos de saída de dados. Hoje não existe destino externo (nem
+   planilha, nem Pixel, nem GA): as duas funções só registram no console.
+   Quando o Supabase, o Pixel e o GA estiverem prontos, é só completar aqui. */
 
 /**
- * Salva o lead. Hoje só registra no console.
- * Futuro (Supabase):
- *   const { error } = await supabase.from('leads').insert(dados);
- *   if (error) throw error;
+ * Salva o contato. É chamada duas vezes com o mesmo lead_id:
+ *   etapa "contatos"  → assim que a pessoa passa do passo 1 (ninguém se perde)
+ *   etapa "completo"  → ao terminar o formulário
+ * Futuro (Supabase): upsert pelo lead_id
+ *   await supabase.from('leads').upsert(dados, { onConflict: 'lead_id' });
  */
 async function saveLead(dados) {
-  console.info('[Avanttá] Lead recebido:', dados);
+  console.info('[Avanttá] Lead salvo:', dados);
   return { ok: true };
 }
 
 /**
- * Dispara eventos de conversão.
- *   'Lead'     → formulário enviado
- *   'Schedule' → reunião agendada no Cal.com
+ * Eventos de conversão. Cada um dispara uma vez por visita.
+ *   'Lead'     → contatos enviados (fim do passo 1)
+ *   'Schedule' → conversa agendada no Cal.com
  * Futuro:
  *   if (window.fbq) fbq('track', evento, dados);
  *   if (window.gtag) gtag('event', evento === 'Schedule' ? 'schedule_meeting' : 'generate_lead', dados);
  */
+const tracked = new Set();
 function trackConversion(evento, dados = {}) {
+  if (tracked.has(evento)) return;
+  tracked.add(evento);
   console.info('[Avanttá] Conversão:', evento, dados);
 }
 
+/* Origem da visita: capturada ao entrar e guardada durante a visita
+   (sessionStorage), para saber de qual anúncio veio cada contato. */
+const ORIGEM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid'];
+const origem = (() => {
+  const KEY = 'avantta_origem';
+  let saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) { /* sem storage */ }
+  const params = new URLSearchParams(location.search);
+  const now = {};
+  ORIGEM_KEYS.forEach((k) => { if (params.get(k)) now[k] = params.get(k); });
+  // mantém a primeira origem da visita; parâmetros novos completam o que faltar
+  const data = Object.assign(
+    { pagina_origem: location.href.split('#')[0], referrer: document.referrer || '' },
+    saved || {},
+    saved ? Object.fromEntries(Object.entries(now).filter(([k]) => !saved[k])) : now
+  );
+  ORIGEM_KEYS.forEach((k) => { if (!(k in data)) data[k] = ''; });
+  try { sessionStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* sem storage */ }
+  return data;
+})();
+
+const newId = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : `lead-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+
 /* ---------- 3. Interface ---------- */
+// Rolagem até um elemento (usa o Lenis quando ele está ligado)
+function scrollToEl(el) {
+  const offset = -(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 64) - 16;
+  if (window.lenis) window.lenis.scrollTo(el, { offset, duration: 1.1 });
+  else el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+}
+
 const waLink = (msg) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 
 // Cada botão diz de qual seção a pessoa clicou
@@ -68,25 +110,34 @@ $$('.js-whatsapp').forEach((a) => {
 $('#year').textContent = new Date().getFullYear();
 
 // Header muda ao rolar
+// Faixa escura atrás das pílulas depois do topo
 const header = $('.header');
-const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 20);
+const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 40);
 onScroll();
 window.addEventListener('scroll', onScroll, { passive: true });
 
-// Menu mobile
+// Menu em painel (pílula "Menu"), em todas as telas
 const menuBtn = $('#menuBtn');
 const nav = $('#nav');
 function toggleMenu(open) {
   const isOpen = open ?? !nav.classList.contains('is-open');
   nav.classList.toggle('is-open', isOpen);
-  header.classList.toggle('menu-open', isOpen);
   menuBtn.setAttribute('aria-expanded', String(isOpen));
   menuBtn.setAttribute('aria-label', isOpen ? 'Fechar menu' : 'Abrir menu');
-  document.body.style.overflow = isOpen ? 'hidden' : '';
 }
-menuBtn.addEventListener('click', () => toggleMenu());
+menuBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
 $$('a', nav).forEach((a) => a.addEventListener('click', () => toggleMenu(false)));
+document.addEventListener('click', (e) => {
+  if (nav.classList.contains('is-open') && !nav.contains(e.target)) toggleMenu(false);
+});
+
 window.addEventListener('keydown', (e) => e.key === 'Escape' && toggleMenu(false));
+
+// Sobre a seção clara (serviços), a faixa escura atrás das pílulas sai
+const secaoClara = $('#servicos');
+if (secaoClara && 'IntersectionObserver' in window) {
+  new IntersectionObserver(([e]) => header.classList.toggle('on-light', e.isIntersecting), { rootMargin: '0px 0px -90% 0px' }).observe(secaoClara);
+}
 
 // WhatsApp flutuante some quando há botões importantes na tela (hero, formulário, chamada final)
 const waFloat = $('.wa-float');
@@ -99,45 +150,143 @@ if ('IntersectionObserver' in window) {
   $$('[data-hide-wa]').forEach((el) => io.observe(el));
 }
 
-// Cards "Qual dessas é a sua situação": viram ao toque (e no hover pelo CSS)
-$$('.flip__toggle').forEach((btn) => {
+// "Qual é a sua situação?": sanfonado acessível (uma situação aberta por vez)
+const sitButtons = $$('.sit-row__btn');
+sitButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
-    const card = btn.closest('.flip');
-    const flipped = card.classList.toggle('is-flipped');
-    btn.setAttribute('aria-pressed', String(flipped));
+    const opening = btn.getAttribute('aria-expanded') !== 'true';
+    sitButtons.forEach((other) => {
+      const body = $(`#${other.getAttribute('aria-controls')}`);
+      const open = other === btn && opening;
+      other.setAttribute('aria-expanded', String(open));
+      if (open && body.hidden) {
+        body.hidden = false;
+        if (window.Motion && !reducedMotion) {
+          window.Motion.animate(body, { opacity: [0, 1], transform: ['translateY(-6px)', 'translateY(0px)'] }, { duration: 0.45, ease: EASE });
+        }
+      } else if (!open) {
+        body.hidden = true;
+      }
+    });
   });
 });
 
-/* ---------- 4. Formulário em etapas ---------- */
+// Comparação animada "site comum x site Avanttá"
+// Cada etapa entra a cada 0,6s; no fim, o contador sobe. No celular aparece
+// um aparelho por vez: o comum toca primeiro e troca uma vez para o da Avanttá.
+(function initRace() {
+  const race = $('#comparacao');
+  if (!race) return;
+  const stage = $('.race__stage', race);
+  const phones = { comum: $('[data-phone="comum"]', race), avantta: $('[data-phone="avantta"]', race) };
+  const switches = $$('.race__sw', race);
+  const mobile = window.matchMedia('(max-width: 760px)');
+  const STEP = 0.6;
+  let timers = [];
+  let controls = [];
+
+  const stopAll = () => {
+    timers.forEach(clearTimeout);
+    timers = [];
+    controls.forEach((c) => c && c.stop && c.stop());
+    controls = [];
+  };
+  const show = (which) => {
+    stage.dataset.active = which;
+    switches.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.show === which)));
+  };
+  const finalState = (phone) => {
+    $$('.pstep', phone).forEach((s) => { s.style.opacity = ''; s.style.transform = ''; });
+    const count = $('.phone__count', phone);
+    count.style.opacity = '';
+    const num = $('strong', count);
+    num.textContent = num.dataset.to;
+  };
+  // devolve quanto tempo (s) a sequência deste aparelho leva
+  const playPhone = (phone) => {
+    const M = window.Motion;
+    const steps = $$('.pstep', phone);
+    const count = $('.phone__count', phone);
+    const num = $('strong', count);
+    steps.forEach((s) => { s.style.opacity = '0'; s.style.transform = 'translateY(10px)'; });
+    count.style.opacity = '0';
+    num.textContent = '0';
+    steps.forEach((s, i) => {
+      controls.push(M.animate(s, { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0px)'] }, { duration: 0.45, delay: 0.2 + i * STEP, ease: EASE }));
+    });
+    const end = 0.2 + steps.length * STEP;
+    controls.push(M.animate(count, { opacity: [0, 1] }, { duration: 0.4, delay: end }));
+    timers.push(setTimeout(() => {
+      controls.push(M.animate(0, +num.dataset.to, { duration: 1.2, ease: EASE, onUpdate: (v) => { num.textContent = Math.round(v); } }));
+    }, end * 1000));
+    return end + 1.2;
+  };
+  const canAnimate = () => window.Motion && !reducedMotion;
+
+  const play = () => {
+    stopAll();
+    if (!canAnimate()) { finalState(phones.comum); finalState(phones.avantta); return; }
+    if (mobile.matches) {
+      show('comum');
+      finalState(phones.avantta);
+      const dur = playPhone(phones.comum);
+      timers.push(setTimeout(() => { show('avantta'); playPhone(phones.avantta); }, (dur + 1) * 1000));
+    } else {
+      playPhone(phones.comum);
+      playPhone(phones.avantta);
+    }
+  };
+
+  // troca manual (celular): mostra o escolhido e toca só ele
+  switches.forEach((b) => b.addEventListener('click', () => {
+    stopAll();
+    finalState(phones.comum);
+    finalState(phones.avantta);
+    show(b.dataset.show);
+    if (canAnimate()) playPhone(phones[b.dataset.show]);
+  }));
+  $('#raceReplay').addEventListener('click', play);
+
+  if (canAnimate()) {
+    // esconde antes de entrar na tela e toca uma vez quando aparece
+    $$('.pstep, .phone__count', race).forEach((el) => { el.style.opacity = '0'; });
+    const stop = window.Motion.inView(stage, () => { stop(); play(); }, { amount: 0.3 });
+  }
+})();
+
+/* ---------- 4. Formulário em etapas ----------
+   Passo 1: contatos (salvos na hora) · 2: investimento · 3: urgência · 4: o que precisa */
 const form = $('#leadForm');
 const steps = $$('.form__step', form);
 const TOTAL = steps.length;
 const progress = $('.form__progress', form);
 const progressBar = $('#progressBar');
 const stepLabel = $('#stepLabel');
+const STEP_NAMES = ['Seus contatos', 'Investimento', 'Prazo', 'O que você precisa'];
+const leadId = newId();
 let current = 1;
 
 function goToStep(n) {
   current = Math.min(Math.max(n, 1), TOTAL);
   steps.forEach((s) => {
-    const active = +s.dataset.step === current;
-    s.classList.toggle('is-active', active);
+    s.classList.toggle('is-active', +s.dataset.step === current);
     s.classList.remove('has-error');
   });
   progressBar.style.transform = `scaleX(${current / TOTAL})`;
   progress.setAttribute('aria-valuenow', String(current));
-  stepLabel.textContent = current === TOTAL ? `Última etapa · ${current} de ${TOTAL}` : `Pergunta ${current} de ${TOTAL}`;
+  stepLabel.textContent = `Passo ${current} de ${TOTAL} · ${STEP_NAMES[current - 1]}`;
 
   // mantém o topo do formulário visível no celular
   const top = form.getBoundingClientRect().top;
   if (top < 0 || top > window.innerHeight * 0.6) {
-    form.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+    scrollToEl(form);
   }
-  const first = $('input:not([type=hidden])', steps[current - 1]);
-  if (first && current === TOTAL && window.matchMedia('(pointer: fine)').matches) first.focus({ preventScroll: true });
+  // leva o foco para a pergunta nova (teclado e leitor de tela)
+  const legend = $('legend', steps[current - 1]);
+  if (legend) { legend.tabIndex = -1; legend.focus({ preventScroll: true }); }
 }
 
-// Etapas 1 a 3: avança sozinho ao escolher uma opção
+// Passos 2 e 3: avança sozinho ao escolher uma opção
 $$('[data-auto]', form).forEach((group) => {
   group.addEventListener('change', (e) => {
     if (e.target.type !== 'radio') return;
@@ -147,24 +296,15 @@ $$('[data-auto]', form).forEach((group) => {
     setTimeout(() => { if (current === n) goToStep(n + 1); }, 280);
   });
 });
-
 $$('.js-prev', form).forEach((b) => b.addEventListener('click', () => goToStep(current - 1)));
 
-// Botões dos cards de serviço já deixam a etapa 3 marcada
+// Botões dos cartões de serviço já deixam o passo 4 marcado
 $$('[data-service]').forEach((btn) =>
   btn.addEventListener('click', () => {
     const radio = $(`input[name="servico"][value="${btn.dataset.service}"]`, form);
     if (radio) radio.checked = true;
   })
 );
-
-// Telefone adicional
-const outroTel = $('#outroTelefone');
-outroTel.addEventListener('change', () => {
-  $('#telefoneField').classList.toggle('is-visible', outroTel.checked);
-  outroTel.setAttribute('aria-expanded', String(outroTel.checked));
-  if (!outroTel.checked) { $('#telefone').value = ''; setError($('#telefone'), false); }
-});
 
 // Máscara (00) 00000-0000
 const onlyDigits = (v) => v.replace(/\D/g, '');
@@ -195,8 +335,7 @@ function setError(input, hasError) {
 }
 
 function validateChoice(stepEl) {
-  const radios = $$('input[type=radio]', stepEl);
-  const ok = radios.some((r) => r.checked);
+  const ok = $$('input[type=radio]', stepEl).some((r) => r.checked);
   stepEl.classList.toggle('has-error', !ok);
   return ok;
 }
@@ -205,21 +344,18 @@ function validateContact() {
   const nome = $('#nome');
   const empresa = $('#empresa');
   const whatsapp = $('#whatsapp');
-  const telefone = $('#telefone');
   const email = $('#email');
   const lgpd = $('#lgpd');
-
   const checks = [
     setError(nome, nome.value.trim().length < 2),
     setError(empresa, !empresa.value.trim()),
     setError(whatsapp, !isValidPhone(whatsapp.value)),
-    setError(telefone, outroTel.checked && telefone.value.trim() !== '' && !isValidPhone(telefone.value)),
-    setError(email, email.value.trim() !== '' && !isValidEmail(email.value.trim())),
+    setError(email, !isValidEmail(email.value.trim())),
     setError(lgpd, !lgpd.checked),
   ];
   const ok = checks.every(Boolean);
   if (!ok) {
-    const firstErr = $('.has-error input', steps[TOTAL - 1]);
+    const firstErr = $('.has-error input', steps[0]);
     if (firstErr) firstErr.focus();
   }
   return ok;
@@ -232,47 +368,44 @@ form.addEventListener('input', (e) => {
 });
 form.addEventListener('change', (e) => {
   if (e.target.id === 'lgpd' && e.target.checked) setError(e.target, false);
+  if (e.target.name === 'servico') steps[TOTAL - 1].classList.remove('has-error');
 });
-
-// Enter nos campos de texto não envia antes da hora em etapas anteriores
+// Enter no passo 1 avança; no campo do site/Instagram não envia sem querer
 form.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && e.target.id === 'link') { e.preventDefault(); }
+  if (e.key !== 'Enter' || e.target.tagName !== 'INPUT' || e.target.type === 'checkbox') return;
+  if (current === 1) { e.preventDefault(); $('#toStep2').click(); }
+  else if (e.target.id === 'link') e.preventDefault();
 });
 
-function collectData() {
+function collectData(etapa) {
   const fd = new FormData(form);
-  const params = new URLSearchParams(location.search);
+  const inv = fd.get('investimento') || '';
   return {
-    investimento: fd.get('investimento') || '',
-    urgencia: fd.get('urgencia') || '',
-    servico: fd.get('servico') || '',
-    link: (fd.get('link') || '').trim(),
+    lead_id: leadId,
+    etapa,
     nome: (fd.get('nome') || '').trim(),
     empresa: (fd.get('empresa') || '').trim(),
     whatsapp: fd.get('whatsapp') || '',
-    telefone: outroTel.checked ? (fd.get('telefone') || '') : '',
     email: (fd.get('email') || '').trim(),
     aceite_contato: $('#lgpd').checked,
-    rota: fd.get('investimento') === LOW_BUDGET ? 'whatsapp' : 'agenda',
-    utm_source: params.get('utm_source') || '',
-    utm_medium: params.get('utm_medium') || '',
-    utm_campaign: params.get('utm_campaign') || '',
-    utm_content: params.get('utm_content') || '',
-    pagina: location.href.split('#')[0],
+    investimento: inv,
+    urgencia: fd.get('urgencia') || '',
+    servico: fd.get('servico') || '',
+    link: (fd.get('link') || '').trim(),
+    rota: etapa === 'completo' ? (inv === LOW_BUDGET ? 'whatsapp' : 'agenda') : '',
+    ...origem,
     criado_em: new Date().toISOString(),
   };
 }
 
 function leadSummary(d) {
   return [
-    `Investimento: ${d.investimento}`,
-    `Urgência: ${d.urgencia}`,
-    `Preciso de: ${d.servico}`,
-    d.link && `Site ou Instagram: ${d.link}`,
     `Empresa: ${d.empresa}`,
     `WhatsApp: ${d.whatsapp}`,
-    d.telefone && `Outro telefone: ${d.telefone}`,
-    d.email && `E-mail: ${d.email}`,
+    `Investimento: ${d.investimento}`,
+    `Para quando: ${d.urgencia}`,
+    `Precisa de: ${d.servico}`,
+    d.link && `Site ou Instagram: ${d.link}`,
   ].filter(Boolean);
 }
 
@@ -281,28 +414,37 @@ function showPanel(id) {
   $$('.funnel .panel').forEach((p) => { p.hidden = p.id !== id; });
   const panel = $(`#${id}`);
   panel.focus({ preventScroll: true });
-  panel.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+  scrollToEl(panel);
   return panel;
 }
 
+// Passo 1 → salva os contatos e dispara o Lead (uma vez)
+$('#toStep2').addEventListener('click', async () => {
+  if (!validateContact()) return;
+  const dados = collectData('contatos');
+  goToStep(2);
+  try { await saveLead(dados); } catch (err) { console.warn('[Avanttá] Falha ao salvar o contato:', err); }
+  trackConversion('Lead', { etapa: 'contatos' });
+});
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  // confere todas as etapas; se faltar algo, volta para ela
-  for (let n = 1; n < TOTAL; n++) {
+  if (!validateContact()) return goToStep(1);
+  for (let n = 2; n <= TOTAL; n++) {
     if (!validateChoice(steps[n - 1])) { goToStep(n); steps[n - 1].classList.add('has-error'); return; }
   }
-  if (!validateContact()) return;
+  const dados = collectData('completo');
+  try { await saveLead(dados); } catch (err) { console.warn('[Avanttá] Falha ao salvar o contato:', err); }
+  trackConversion('Lead', { etapa: 'completo' }); // não duplica: já disparou no passo 1
 
-  const dados = collectData();
-  try { await saveLead(dados); } catch (err) { console.warn('[Avanttá] Falha ao salvar o lead:', err); }
-  trackConversion('Lead', { servico: dados.servico, investimento: dados.investimento });
-
+  const primeiroNome = dados.nome.split(' ')[0];
   if (dados.investimento === LOW_BUDGET) {
-    const msg = [`Oi, sou ${dados.nome} e vim pelo formulário do site da Avanttá.`, '', ...leadSummary(dados)].join('\n');
+    const msg = [`Oi, sou ${dados.nome}, da ${dados.empresa}. Vim pelo formulário do site da Avanttá.`, '', ...leadSummary(dados)].join('\n');
     $('#thanksWa').href = waLink(msg);
-    $$('[data-fill="nome"]').forEach((el) => { el.textContent = dados.nome.split(' ')[0]; });
+    $$('[data-fill="nome"]').forEach((el) => { el.textContent = primeiroNome; });
     showPanel('panelThanks');
   } else {
+    $('#calWa').href = waLink(`Oi, sou ${dados.nome}, da ${dados.empresa}. Preenchi o formulário do site da Avanttá e prefiro falar por aqui.`);
     showPanel('panelCal');
     loadCal(dados);
   }
@@ -319,16 +461,26 @@ function onBookingSuccess(payload) {
   showPanel('panelBooked');
 }
 
-function loadCal(dados) {
-  const phoneE164 = `+55${onlyDigits(dados.whatsapp)}`;
-  const notes = leadSummary(dados).join(' | ');
+// Mesmos dados para o embed e para o link alternativo
+function calPrefill(dados) {
+  const phone = `+55${onlyDigits(dados.whatsapp)}`;
+  const fields = {
+    name: dados.nome,
+    email: dados.email,
+    notes: leadSummary(dados).join(' | '),
+    [CAL_COMPANY_FIELD]: dados.empresa,
+  };
+  CAL_PHONE_FIELDS.forEach((f) => { fields[f] = phone; });
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach((k) => { if (dados[k]) fields[k] = dados[k]; });
+  return fields;
+}
 
-  // Link alternativo (abre a página do Cal.com com os mesmos dados)
+function loadCal(dados) {
+  const fields = calPrefill(dados);
+
+  // Link alternativo: a página do Cal.com com os mesmos dados na URL
   const fallback = new URL(`${CAL_ORIGIN}/${CAL_LINK}`);
-  fallback.searchParams.set('name', dados.nome);
-  if (dados.email) fallback.searchParams.set('email', dados.email);
-  fallback.searchParams.set(CAL_WHATSAPP_FIELD, phoneE164);
-  fallback.searchParams.set('notes', notes);
+  Object.entries(fields).forEach(([k, v]) => { if (v) fallback.searchParams.set(k, v); });
   $('#calFallback').href = fallback.toString();
 
   if (calLoaded) return;
@@ -341,10 +493,7 @@ function loadCal(dados) {
   Cal('init', CAL_NAMESPACE, { origin: CAL_ORIGIN });
   const cal = Cal.ns[CAL_NAMESPACE];
 
-  const config = { layout: 'month_view', theme: 'dark', name: dados.nome, notes, [CAL_WHATSAPP_FIELD]: phoneE164 };
-  if (dados.email) config.email = dados.email;
-
-  cal('inline', { elementOrSelector: '#calEmbed', calLink: CAL_LINK, config });
+  cal('inline', { elementOrSelector: '#calEmbed', calLink: CAL_LINK, config: { layout: 'month_view', theme: 'dark', ...fields } });
   cal('ui', {
     theme: 'dark',
     cssVarsPerTheme: { light: { 'cal-brand': BRAND_RED }, dark: { 'cal-brand': BRAND_RED } },
@@ -368,60 +517,264 @@ function loadCal(dados) {
   setTimeout(showFallback, 15000);
 }
 
-/* ---------- 6. Animações ---------- */
-function splitWords(el) {
-  const words = [];
-  const walk = (node) => {
-    [...node.childNodes].forEach((child) => {
-      if (child.nodeType === 3) {
-        const frag = document.createDocumentFragment();
-        child.textContent.split(/(\s+)/).forEach((part) => {
-          if (!part) return;
-          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
-          const span = document.createElement('span');
-          span.className = 'w';
-          span.textContent = part;
-          frag.appendChild(span);
-          words.push(span);
-        });
-        node.replaceChild(frag, child);
-      } else if (child.nodeType === 1 && child.tagName !== 'BR') {
-        walk(child);
-      }
-    });
-  };
-  walk(el);
-  return words;
-}
 
-function animateCounter(el) {
-  const target = +el.dataset.count;
-  const prefix = el.dataset.prefix || '';
-  const obj = { v: 0 };
-  el.textContent = `${prefix}0`;
-  window.gsap.to(obj, {
-    v: target, duration: 1.6, ease: 'power2.out',
-    scrollTrigger: { trigger: el, start: 'top 90%', once: true },
-    onUpdate: () => { el.textContent = prefix + Math.round(obj.v); },
+/* ---------- 6. Animações ----------
+   Regras: só transform e opacity, e nada se move para quem pediu
+   movimento reduzido (o conteúdo aparece no estado final). */
+const limitar = (v, min = 0, max = 1) => Math.max(min, Math.min(max, v));
+
+// Central da rolagem: um único requestAnimationFrame por quadro para todos
+// os efeitos guiados pela rolagem. Cada efeito mede a página só quando ela
+// muda de tamanho (nada de medir a cada quadro) e só roda enquanto está na tela.
+function criarRolagem() {
+  const itens = [];
+  let raf = 0;
+  const rodar = () => {
+    raf = 0;
+    const y = window.scrollY;
+    const vh = window.innerHeight;
+    itens.forEach((it) => { if (it.ativo) it.atualizar(y, vh); });
+  };
+  const pedir = () => { if (!raf) raf = requestAnimationFrame(rodar); };
+  const medirTudo = () => { itens.forEach((it) => it.medir && it.medir(window.innerHeight)); pedir(); };
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      const it = itens.find((i) => i.el === e.target);
+      if (!it) return;
+      it.ativo = e.isIntersecting;
+      if (it.ativo && it.aoEntrar) { it.aoEntrar(); it.aoEntrar = null; }
+    });
+    pedir();
+  }, { rootMargin: '160px 0px' });
+  let t = 0;
+  window.addEventListener('scroll', pedir, { passive: true });
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(medirTudo, 150); }, { passive: true });
+  if (document.fonts) document.fonts.ready.then(medirTudo);
+  window.addEventListener('load', medirTudo, { once: true });
+  return {
+    add(it) {
+      it.ativo = false;
+      itens.push(it);
+      if (it.medir) it.medir(window.innerHeight);
+      io.observe(it.el);
+    },
+    medirTudo,
+  };
+}
+const topoNaPagina = (el) => el.getBoundingClientRect().top + window.scrollY;
+
+// Hero: as duas linhas do título se afastam para os lados e o celular sobe
+// enquanto o hero sai da tela.
+function initHeroScroll(rolagem) {
+  const hero = $('#hero');
+  const linhas = $$('.hero__row', hero);
+  const celular = $('#heroFloat');
+  if (!hero || !celular) return;
+  let altura = 1;
+  rolagem.add({
+    el: hero,
+    medir: () => { altura = hero.offsetHeight || 1; }, // no celular o aparelho sobe por trás do texto e dos botões
+    atualizar: (y) => {
+      const p = limitar(y / altura);
+      linhas.forEach((l, i) => { l.style.transform = `translate3d(${(i ? 1 : -1) * p * 14}vw,0,0)`; });
+      celular.style.transform = `translate3d(0,${-p * 140}px,0)`;
+    },
   });
 }
 
-function initTilt(gsap) {
-  $$('.tilt').forEach((el) => {
-    const rx = gsap.quickTo(el, 'rotationX', { duration: 0.45, ease: 'power3.out' });
-    const ry = gsap.quickTo(el, 'rotationY', { duration: 0.45, ease: 'power3.out' });
-    gsap.set(el, { transformPerspective: 900 });
-    const tiltTo = (x, y) => {
+// Ímã (componente Magnet da referência: padding 150, força 3): o celular e os
+// selos puxam na direção do mouse quando ele chega perto. Só com mouse.
+function initMagnet() {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const els = $$('[data-magnet]');
+  if (!els.length) return;
+  const PADDING = 150;
+  const estado = new Map(els.map((el) => [el, { x: 0, y: 0 }]));
+  let px = -9999;
+  let py = -9999;
+  let raf = 0;
+  const rodar = () => {
+    raf = 0;
+    els.forEach((el) => {
       const r = el.getBoundingClientRect();
-      const px = (x - r.left) / r.width - 0.5;
-      const py = (y - r.top) / r.height - 0.5;
-      ry(px * 8);
-      rx(-py * 8);
+      const st = estado.get(el);
+      // centro sem o deslocamento atual (senão o ímã persegue a si mesmo)
+      const cx = r.left + r.width / 2 - st.x;
+      const cy = r.top + r.height / 2 - st.y;
+      const perto = Math.abs(px - cx) < r.width / 2 + PADDING && Math.abs(py - cy) < r.height / 2 + PADDING;
+      const forca = +el.dataset.magnet || 3;
+      st.x = perto ? (px - cx) / forca : 0;
+      st.y = perto ? (py - cy) / forca : 0;
+      el.classList.toggle('is-active', perto);
+      el.style.transform = `translate3d(${st.x.toFixed(1)}px,${st.y.toFixed(1)}px,0)`;
+    });
+  };
+  const hero = $('#hero');
+  let heroNaTela = true;
+  new IntersectionObserver(([e]) => { heroNaTela = e.isIntersecting; }).observe(hero);
+  window.addEventListener('pointermove', (e) => {
+    if (!heroNaTela) return;
+    px = e.clientX;
+    py = e.clientY;
+    if (!raf) raf = requestAnimationFrame(rodar);
+  }, { passive: true });
+  document.documentElement.addEventListener('pointerleave', () => { px = py = -9999; if (!raf) raf = requestAnimationFrame(rodar); });
+}
+
+// Faixa que corre com a rolagem. Enquanto a seção atravessa a tela, cada
+// fileira anda exatamente o que falta para mostrar todas as peças (assim nada
+// fica escondido no celular). Nunca mais devagar que a referência (x 0,3).
+// A primeira fileira vai para a esquerda e a segunda para a direita.
+function initMarquee(rolagem) {
+  const secao = $('#nichos');
+  if (!secao) return;
+  const fileiras = $$('.mq__row', secao).map((el) => ({ el, esquerda: el.dataset.dir !== '1', max: 0 }));
+  let topo = 0;
+  let curso = 1;
+  rolagem.add({
+    el: secao,
+    medir: (vh) => {
+      topo = topoNaPagina(secao);
+      curso = secao.offsetHeight + vh;
+      const largura = document.documentElement.clientWidth;
+      fileiras.forEach((f) => { f.max = Math.max(f.el.scrollWidth - largura, curso * 0.3); });
+    },
+    atualizar: (y, vh) => {
+      const p = limitar((y - topo + vh) / curso);
+      fileiras.forEach((f) => {
+        const x = f.esquerda ? -p * f.max : (p - 1) * f.max;
+        f.el.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
+      });
+    },
+  });
+}
+
+// Texto que acende letra por letra (AnimatedText da referência).
+// Começa quando o topo do parágrafo chega a 80% da tela e termina quando o
+// fim dele passa de 20%. O leitor de tela lê a cópia inteira (sr-only).
+// As letras só são separadas quando a seção está chegando perto.
+function initAnimatedText(rolagem) {
+  $$('[data-split]').forEach((el) => {
+    let letras = [];
+    let inicio = 0;
+    let fim = 1;
+    let antes = 0;
+    const RAMPA = 8; // quantas letras ficam acendendo ao mesmo tempo
+    const separar = () => {
+      const texto = el.textContent.trim().replace(/\s+/g, ' ');
+      const leitor = document.createElement('span');
+      leitor.className = 'sr-only';
+      leitor.textContent = texto;
+      const visivel = document.createElement('span');
+      visivel.setAttribute('aria-hidden', 'true');
+      texto.split(' ').forEach((palavra, i, todas) => {
+        const w = document.createElement('span');
+        w.className = 'w';
+        for (const c of palavra) {
+          const s = document.createElement('span');
+          s.className = 'ch';
+          s.textContent = c;
+          w.appendChild(s);
+          letras.push(s);
+        }
+        visivel.appendChild(w);
+        if (i < todas.length - 1) visivel.appendChild(document.createTextNode(' '));
+      });
+      el.textContent = '';
+      el.append(leitor, visivel);
+      antes = -RAMPA;
+      rolagem.medirTudo();
     };
-    const reset = () => { rx(0); ry(0); };
-    el.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') tiltTo(e.clientX, e.clientY); });
-    el.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') tiltTo(e.clientX, e.clientY); });
-    ['pointerleave', 'pointerup', 'pointercancel'].forEach((ev) => el.addEventListener(ev, reset));
+    rolagem.add({
+      el,
+      aoEntrar: separar,
+      medir: (vh) => {
+        const t = topoNaPagina(el);
+        inicio = t - vh * 0.8;
+        fim = t + el.offsetHeight - vh * 0.2;
+      },
+      atualizar: (y) => {
+        if (!letras.length) return;
+        const pos = limitar((y - inicio) / (fim - inicio || 1)) * (letras.length + RAMPA);
+        // só mexe nas letras que mudaram desde o último quadro
+        const de = Math.max(0, Math.floor(Math.min(antes, pos)) - RAMPA - 1);
+        const ate = Math.min(letras.length - 1, Math.ceil(Math.max(antes, pos)) + 1);
+        for (let i = de; i <= ate; i++) {
+          letras[i].style.opacity = (0.16 + 0.84 * limitar((pos - i) / RAMPA)).toFixed(3);
+        }
+        antes = pos;
+      },
+    });
+  });
+}
+
+// Selos decorativos do "Sobre" andam em velocidades diferentes (profundidade).
+function initParallax(rolagem) {
+  const secao = $('#sobre');
+  if (!secao) return;
+  const selos = $$('[data-speed]', secao);
+  let centro = 0;
+  let fator = 1;
+  rolagem.add({
+    el: secao,
+    medir: (vh) => {
+      centro = topoNaPagina(secao) + secao.offsetHeight / 2 - vh / 2;
+      fator = window.innerWidth < 1100 ? 0.35 : 1; // no celular o selo fica perto do texto: anda menos
+    },
+    atualizar: (y) => {
+      const d = (y - centro) * fator;
+      selos.forEach((s) => { s.style.transform = `translate3d(0,${(d * +s.dataset.speed).toFixed(1)}px,0)`; });
+    },
+  });
+}
+
+// Cartões que empilham no "Como funciona" (efeito 01 / Projects da referência).
+// Cada cartão gruda 28px abaixo do anterior; os de baixo encolhem 3% para cada
+// cartão que passa por cima (o primeiro de 4 termina em 91%) e escurecem.
+function initStack(rolagem) {
+  const lista = $('#steps');
+  if (!lista) return;
+  const cards = $$('.scard', lista);
+  let naturais = [];
+  let topos = [];
+  let alturas = [];
+
+  // Pegadinha do sticky: a posição natural é medida com o sticky desligado
+  const medir = () => {
+    cards.forEach((c) => { c.style.position = 'static'; });
+    naturais = cards.map((c) => topoNaPagina(c));
+    alturas = cards.map((c) => c.offsetHeight);
+    cards.forEach((c) => { c.style.position = ''; });
+    topos = cards.map((c) => parseFloat(getComputedStyle(c).top) || 0);
+  };
+  const atualizar = (y) => {
+    // quanto cada cartão já cobriu o anterior (0 a 1)
+    const coberto = cards.map((c, j) => {
+      if (!j) return 0;
+      const y0 = naturais[j] - topos[j - 1] - alturas[j - 1];
+      const y1 = naturais[j] - topos[j];
+      return limitar((y - y0) / (y1 - y0 || 1));
+    });
+    cards.forEach((c, i) => {
+      let soma = 0;
+      for (let j = i + 1; j < cards.length; j++) soma += coberto[j];
+      c.style.transform = soma ? `scale(${(1 - soma * 0.03).toFixed(4)})` : '';
+      c.style.setProperty('--dim', (soma * 0.16).toFixed(3));
+    });
+  };
+  rolagem.add({ el: lista, medir, atualizar });
+}
+
+// Luz que segue o mouse (efeito 12): o JS só escreve a posição em --x/--y,
+// o brilho é um degradê do CSS (.luz::before). Só com mouse de verdade.
+function initLight() {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  $$('.luz').forEach((el) => {
+    el.addEventListener('pointermove', (ev) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--x', `${ev.clientX - r.left}px`);
+      el.style.setProperty('--y', `${ev.clientY - r.top}px`);
+    });
   });
 }
 
@@ -429,82 +782,38 @@ function initTilt(gsap) {
 const yieldToMain = () => new Promise((r) => setTimeout(r, 0));
 
 async function initAnimations() {
-  const { gsap, ScrollTrigger } = window;
   if (reducedMotion) return;
-  if (!gsap || !ScrollTrigger) {
-    document.documentElement.classList.add('no-gsap');
-    return;
-  }
-  gsap.registerPlugin(ScrollTrigger);
+  const M = window.Motion;
 
-  // Fase 1: hero, o mockup "se monta" em camadas
-  const layers = $$('.hero__visual .layer');
-  const floats = $$('.hero__visual .float-card');
-  gsap.set(layers, { y: 18 });
-  gsap.timeline({ delay: 0.2, scrollTrigger: { trigger: '.hero__visual', start: 'top 90%', once: true } })
-    .to(layers, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out', stagger: 0.07 })
-    .add(() => {
-      floats.forEach((f, i) => gsap.to(f, { y: -8, duration: 2.6 + i * 0.4, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
-    });
-  gsap.to('.mock-wrap', {
-    yPercent: -6, ease: 'none',
-    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
-  });
-
-  await yieldToMain();
-
-  // Fase 2: blocos que entram ao rolar
-  const reveals = $$('.reveal');
-  gsap.set(reveals, { opacity: 0, y: 26 });
-  ScrollTrigger.batch(reveals, {
-    start: 'top 90%',
-    once: true,
-    onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.08, overwrite: true }),
-  });
-
-  await yieldToMain();
-
-  // Fase 3: títulos revelados palavra por palavra.
-  // Cada título só é quebrado em palavras quando chega perto da tela.
-  const prepareTitle = (el) => {
-    const words = splitWords(el);
-    gsap.set(words, { opacity: 0, yPercent: 45 });
-    ScrollTrigger.create({
-      trigger: el, start: 'top 88%', once: true,
-      onEnter: () => gsap.to(words, { opacity: 1, yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.045 }),
-    });
-  };
-  const titles = $$('.split');
-  if ('IntersectionObserver' in window) {
-    const near = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        near.unobserve(e.target);
-        prepareTitle(e.target);
-      });
-    }, { rootMargin: '0px 0px 400px 0px' });
-    titles.forEach((el) => near.observe(el));
+  // Rolagem suave (Lenis): a página desliza como um fluxo contínuo.
+  // No toque do celular a rolagem continua nativa (mais natural).
+  if (M && M.Lenis) {
+    const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 64;
+    window.lenis = new M.Lenis({ autoRaf: true, lerp: 0.1, anchors: { offset: -(headerH + 16) } });
   }
 
   await yieldToMain();
 
-  // Fase 4: linha vermelha entre os passos, contador e inclinação dos cards
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 961px)', () => {
-    gsap.fromTo('.steps__line', { scaleX: 0 }, {
-      scaleX: 1, ease: 'none',
-      scrollTrigger: { trigger: '.steps', start: 'top 80%', end: 'bottom 55%', scrub: 0.6 },
-    });
-  });
-  mm.add('(max-width: 640px)', () => {
-    gsap.fromTo('.steps__line', { scaleY: 0 }, {
-      scaleY: 1, ease: 'none',
-      scrollTrigger: { trigger: '.steps', start: 'top 75%', end: 'bottom 60%', scrub: 0.6 },
-    });
-  });
+  // Seções entram ao rolar (componente reutilizável em assets/js/reveal.js)
+  if (M) window.reveal('.reveal');
 
-  $$('[data-count]').forEach(animateCounter);
-  initTilt(gsap);
+  await yieldToMain();
+
+  // Barra fina de progresso de leitura, embaixo do menu
+  const bar = $('.scroll-progress');
+  if (M && bar) M.scroll(M.animate(bar, { transform: ['scaleX(0)', 'scaleX(1)'] }, { ease: 'linear' }));
+
+  const rolagem = criarRolagem();
+  initHeroScroll(rolagem);
+  initMarquee(rolagem);
+  initAnimatedText(rolagem);
+  initParallax(rolagem);
+  initStack(rolagem);
+
+  await yieldToMain();
+
+  initMagnet();
+  initLight();
 }
 
 initAnimations();
