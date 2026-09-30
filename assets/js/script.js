@@ -571,18 +571,13 @@ function initHeroScroll(rolagem) {
   const celular = $('#heroFloat');
   if (!hero || !celular) return;
   let altura = 1;
-  let sobe = false; // no celular o aparelho fica embaixo dos botões: não sobe
   rolagem.add({
     el: hero,
-    medir: () => {
-      altura = hero.offsetHeight || 1;
-      sobe = window.innerWidth >= 1024;
-      if (!sobe) celular.style.transform = '';
-    },
+    medir: () => { altura = hero.offsetHeight || 1; }, // no celular o aparelho sobe por trás do texto e dos botões
     atualizar: (y) => {
       const p = limitar(y / altura);
       linhas.forEach((l, i) => { l.style.transform = `translate3d(${(i ? 1 : -1) * p * 14}vw,0,0)`; });
-      if (sobe) celular.style.transform = `translate3d(0,${-p * 140}px,0)`;
+      celular.style.transform = `translate3d(0,${-p * 140}px,0)`;
     },
   });
 }
@@ -633,24 +628,23 @@ function initMagnet() {
 function initMarquee(rolagem) {
   const secao = $('#nichos');
   if (!secao) return;
-  const [a, b] = $$('.mq__row', secao);
+  const fileiras = $$('.mq__row', secao).map((el) => ({ el, esquerda: el.dataset.dir !== '1', max: 0 }));
   let topo = 0;
   let curso = 1;
-  let maxA = 0;
-  let maxB = 0;
   rolagem.add({
     el: secao,
     medir: (vh) => {
       topo = topoNaPagina(secao);
       curso = secao.offsetHeight + vh;
       const largura = document.documentElement.clientWidth;
-      maxA = Math.max(a.scrollWidth - largura, curso * 0.3);
-      maxB = Math.max(b.scrollWidth - largura, curso * 0.3);
+      fileiras.forEach((f) => { f.max = Math.max(f.el.scrollWidth - largura, curso * 0.3); });
     },
     atualizar: (y, vh) => {
       const p = limitar((y - topo + vh) / curso);
-      a.style.transform = `translate3d(${(-p * maxA).toFixed(1)}px,0,0)`;
-      b.style.transform = `translate3d(${((p - 1) * maxB).toFixed(1)}px,0,0)`;
+      fileiras.forEach((f) => {
+        const x = f.esquerda ? -p * f.max : (p - 1) * f.max;
+        f.el.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
+      });
     },
   });
 }

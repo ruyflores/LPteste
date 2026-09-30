@@ -354,7 +354,8 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .hero__row .grad { display: inline-block; margin-top: -.12em; animation: slide24 1s var(--ease-hero) both; }
 .hero__row--b .grad { display: block; animation-delay: .08s; }
 .hero__row--b .grad--red { animation-delay: .16s; }
-.hero__bottom { margin-top: 22px; }
+.hero__bottom { position: relative; z-index: 2; margin-top: 22px; }
+.hero__ctas .lbtn { background: rgba(18,18,20,.9); }
 .hero__desc { max-width: 30rem; font-size: 1rem; line-height: 1.6; color: rgba(255,255,255,.74); animation: slide24 .9s var(--ease-hero) .2s both; } /* só desliza: é o maior texto visível para o Lighthouse (LCP) */
 .hero__ctas { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 10px; animation: up16 .8s var(--ease-hero) .55s both; }
 .hero__stage { position: relative; flex: 1 0 250px; margin-top: 34px; animation: stageIn 1.2s var(--ease-hero) .3s both; }
@@ -459,13 +460,13 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 
 /* ---------- Faixa que corre com a rolagem ----------
    Duas fileiras em sentidos opostos. O JS só escreve translate3d. */
-.mq { position: relative; padding: 36px 0 96px; overflow: hidden; }
+.mq { position: relative; padding: 36px 0 40px; overflow: hidden; }
 .mq__label {
   display: flex; align-items: center; justify-content: center; gap: 14px; margin: 0 16px 28px; text-align: center;
   font-family: var(--font-body); font-size: .72rem; font-weight: 600; line-height: 1.4; letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
 }
 .mq__label::before, .mq__label::after { content: ""; flex: 0 0 32px; height: 1px; background: rgba(255,255,255,.22); }
-.mq__track + .mq__track { margin-top: 16px; }
+.mq__track + .mq__track { margin-top: 10px; }
 .mq__row { display: flex; gap: 10px; width: max-content; padding: 0 16px; will-change: transform; }
 .tile {
   flex: 0 0 auto; width: 178px; height: 136px; padding: 14px 16px; border-radius: 18px;
@@ -521,13 +522,11 @@ html:not(.anim) .mq__track::-webkit-scrollbar { display: none; }
 .dchip svg { width: 16px; height: 16px; color: var(--accent-text); }
 .dchip--3 svg { color: #25d366; }
 .dchip--4 b { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; line-height: 1; padding-top: 2px; color: var(--accent-text); }
-.dchip--1 { top: 34px; right: 16px; }
-.dchip--2, .dchip--3, .dchip--4 { display: none; }
+.dchip { display: none; }
 @media (min-width: 1100px) {
   .about { padding: 170px 0 180px; }
   .dchip { font-size: .88rem; padding: 12px 18px; }
-  .dchip--2, .dchip--3, .dchip--4 { display: inline-flex; }
-  .dchip--1 { top: 80px; left: 5%; right: auto; }
+  .dchip { display: inline-flex; }
   .dchip--2 { top: 30%; right: 3%; }
   .dchip--3 { bottom: 26%; left: 2.5%; }
   .dchip--4 { bottom: 70px; right: 7%; }
@@ -928,7 +927,7 @@ html.lenis, html.lenis body { height: auto; }
   .stage__top { gap: 22px; }
   .stage__ctas > * { flex: 1 1 100%; }
   .hero__ctas > * { flex: 1 1 100%; }
-  .about { padding: 100px 0 96px; }
+  .about { padding: 64px 0 96px; }
   .race { padding-bottom: 120px; }
   .svc { padding: 84px 0 130px; }
   .svc-item__go { align-self: stretch; justify-content: space-between; justify-self: stretch; }
