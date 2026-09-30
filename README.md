@@ -24,4 +24,4 @@ Configuração no topo de `assets/js/script.js`: `WHATSAPP_NUMBER`, `CAL_LINK`, 
 
 O Motion (motion.dev) e o Lenis (rolagem suave) ficam em `assets/vendor/motion.min.js`. Para gerar de novo depois de atualizar as versões: `npm install && npm run vendor`.
 
-O hero tem um vídeo de fundo em loop (mudo), carregado depois da página. Para trocar o vídeo, mude o `data-src` do `#heroVideo` no `index.html` (e tire a classe `vhero--invert` se o vídeo novo já for escuro).
+O hero tem título gigante em degradê e a prévia de um site num celular feito só com CSS (segue o mouse). A faixa de segmentos corre com a rolagem, o texto do "Sobre" acende letra por letra e os passos do "Como funciona" empilham. Com movimento reduzido, tudo aparece parado.

@@ -2,11 +2,12 @@
    AVANTTÁ | Landing Page (JS)
    1. Configuração
    2. Integrações (saveLead, trackConversion)
-   3. Interface (menu, vídeo do hero, WhatsApp, sanfonado, comparação)
+   3. Interface (menu, WhatsApp, sanfonado, comparação)
    4. Formulário em etapas + roteamento
    5. Cal.com (carregado só quando o lead chega na agenda)
    6. Animações (Motion + Lenis: assets/vendor/motion.min.js, assets/js/reveal.js)
-   A cena de abertura (arte do hero guiada pela rolagem) fica em assets/js/hero-scene.js
+      ímã do celular no hero, faixa guiada pela rolagem, texto que acende
+      letra a letra e cartões que empilham
    ========================================================= */
 
 /* ---------- 1. Configuração ---------- */
@@ -130,32 +131,13 @@ document.addEventListener('click', (e) => {
   if (nav.classList.contains('is-open') && !nav.contains(e.target)) toggleMenu(false);
 });
 
-// Vídeo do hero: toca sozinho, mudo e em loop, mas só começa a baixar
-// depois que a página carregou. Pausa quando sai da tela. Sem vídeo para
-// quem pediu movimento reduzido ou está em economia de dados.
-(function initHeroVideo() {
-  const video = $('#heroVideo');
-  if (!video) return;
-  const conn = navigator.connection || {};
-  const saveData = conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '');
-  if (reducedMotion || saveData) return;
-  const start = () => {
-    video.src = video.dataset.src;
-    video.muted = true;
-    video.addEventListener('playing', () => video.classList.add('is-playing'), { once: true });
-    const p = video.play();
-    if (p && p.catch) p.catch(() => { /* sem autoplay: fica o fundo em degradê */ });
-    new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { const q = video.play(); if (q && q.catch) q.catch(() => {}); }
-      else video.pause();
-    }).observe(video);
-  };
-  const go = () => ('requestIdleCallback' in window ? requestIdleCallback(start, { timeout: 1500 }) : setTimeout(start, 300));
-  if (document.readyState === 'complete') go();
-  else window.addEventListener('load', go, { once: true });
-})();
-
 window.addEventListener('keydown', (e) => e.key === 'Escape' && toggleMenu(false));
+
+// Sobre a seção clara (serviços), a faixa escura atrás das pílulas sai
+const secaoClara = $('#servicos');
+if (secaoClara && 'IntersectionObserver' in window) {
+  new IntersectionObserver(([e]) => header.classList.toggle('on-light', e.isIntersecting), { rootMargin: '0px 0px -90% 0px' }).observe(secaoClara);
+}
 
 // WhatsApp flutuante some quando há botões importantes na tela (hero, formulário, chamada final)
 const waFloat = $('.wa-float');
@@ -535,9 +517,245 @@ function loadCal(dados) {
   setTimeout(showFallback, 15000);
 }
 
+
 /* ---------- 6. Animações ----------
-   Motion (motion.dev) em JS puro. Regras: só transform e opacity,
-   400 a 700ms, e nada para quem pediu movimento reduzido. */
+   Regras: só transform e opacity, e nada se move para quem pediu
+   movimento reduzido (o conteúdo aparece no estado final). */
+const limitar = (v, min = 0, max = 1) => Math.max(min, Math.min(max, v));
+
+// Central da rolagem: um único requestAnimationFrame por quadro para todos
+// os efeitos guiados pela rolagem. Cada efeito mede a página só quando ela
+// muda de tamanho (nada de medir a cada quadro) e só roda enquanto está na tela.
+function criarRolagem() {
+  const itens = [];
+  let raf = 0;
+  const rodar = () => {
+    raf = 0;
+    const y = window.scrollY;
+    const vh = window.innerHeight;
+    itens.forEach((it) => { if (it.ativo) it.atualizar(y, vh); });
+  };
+  const pedir = () => { if (!raf) raf = requestAnimationFrame(rodar); };
+  const medirTudo = () => { itens.forEach((it) => it.medir && it.medir(window.innerHeight)); pedir(); };
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      const it = itens.find((i) => i.el === e.target);
+      if (!it) return;
+      it.ativo = e.isIntersecting;
+      if (it.ativo && it.aoEntrar) { it.aoEntrar(); it.aoEntrar = null; }
+    });
+    pedir();
+  }, { rootMargin: '160px 0px' });
+  let t = 0;
+  window.addEventListener('scroll', pedir, { passive: true });
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(medirTudo, 150); }, { passive: true });
+  if (document.fonts) document.fonts.ready.then(medirTudo);
+  window.addEventListener('load', medirTudo, { once: true });
+  return {
+    add(it) {
+      it.ativo = false;
+      itens.push(it);
+      if (it.medir) it.medir(window.innerHeight);
+      io.observe(it.el);
+    },
+    medirTudo,
+  };
+}
+const topoNaPagina = (el) => el.getBoundingClientRect().top + window.scrollY;
+
+// Hero: as duas linhas do título se afastam para os lados e o celular sobe
+// enquanto o hero sai da tela.
+function initHeroScroll(rolagem) {
+  const hero = $('#hero');
+  const linhas = $$('.hero__row', hero);
+  const celular = $('#heroFloat');
+  if (!hero || !celular) return;
+  let altura = 1;
+  rolagem.add({
+    el: hero,
+    medir: () => { altura = hero.offsetHeight || 1; },
+    atualizar: (y) => {
+      const p = limitar(y / altura);
+      linhas.forEach((l, i) => { l.style.transform = `translate3d(${(i ? 1 : -1) * p * 14}vw,0,0)`; });
+      celular.style.transform = `translate3d(0,${-p * 140}px,0)`;
+    },
+  });
+}
+
+// Ímã (componente Magnet da referência: padding 150, força 3): o celular e os
+// selos puxam na direção do mouse quando ele chega perto. Só com mouse.
+function initMagnet() {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const els = $$('[data-magnet]');
+  if (!els.length) return;
+  const PADDING = 150;
+  const estado = new Map(els.map((el) => [el, { x: 0, y: 0 }]));
+  let px = -9999;
+  let py = -9999;
+  let raf = 0;
+  const rodar = () => {
+    raf = 0;
+    els.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      const st = estado.get(el);
+      // centro sem o deslocamento atual (senão o ímã persegue a si mesmo)
+      const cx = r.left + r.width / 2 - st.x;
+      const cy = r.top + r.height / 2 - st.y;
+      const perto = Math.abs(px - cx) < r.width / 2 + PADDING && Math.abs(py - cy) < r.height / 2 + PADDING;
+      const forca = +el.dataset.magnet || 3;
+      st.x = perto ? (px - cx) / forca : 0;
+      st.y = perto ? (py - cy) / forca : 0;
+      el.classList.toggle('is-active', perto);
+      el.style.transform = `translate3d(${st.x.toFixed(1)}px,${st.y.toFixed(1)}px,0)`;
+    });
+  };
+  const hero = $('#hero');
+  let heroNaTela = true;
+  new IntersectionObserver(([e]) => { heroNaTela = e.isIntersecting; }).observe(hero);
+  window.addEventListener('pointermove', (e) => {
+    if (!heroNaTela) return;
+    px = e.clientX;
+    py = e.clientY;
+    if (!raf) raf = requestAnimationFrame(rodar);
+  }, { passive: true });
+  document.documentElement.addEventListener('pointerleave', () => { px = py = -9999; if (!raf) raf = requestAnimationFrame(rodar); });
+}
+
+// Faixa que corre com a rolagem: deslocamento = (rolagem - topo da seção + altura da tela) x 0,3.
+// A primeira fileira vai para a esquerda e a segunda para a direita.
+function initMarquee(rolagem) {
+  const secao = $('#nichos');
+  if (!secao) return;
+  const [a, b] = $$('.mq__row', secao);
+  let topo = 0;
+  let max = 0;
+  rolagem.add({
+    el: secao,
+    medir: (vh) => { topo = topoNaPagina(secao); max = (secao.offsetHeight + vh) * 0.3; },
+    atualizar: (y, vh) => {
+      const off = limitar((y - topo + vh) * 0.3, 0, max);
+      a.style.transform = `translate3d(${-off.toFixed(1)}px,0,0)`;
+      b.style.transform = `translate3d(${(off - max).toFixed(1)}px,0,0)`;
+    },
+  });
+}
+
+// Texto que acende letra por letra (AnimatedText da referência).
+// Começa quando o topo do parágrafo chega a 80% da tela e termina quando o
+// fim dele passa de 20%. O leitor de tela lê a cópia inteira (sr-only).
+// As letras só são separadas quando a seção está chegando perto.
+function initAnimatedText(rolagem) {
+  $$('[data-split]').forEach((el) => {
+    let letras = [];
+    let inicio = 0;
+    let fim = 1;
+    let antes = 0;
+    const RAMPA = 8; // quantas letras ficam acendendo ao mesmo tempo
+    const separar = () => {
+      const texto = el.textContent.trim().replace(/\s+/g, ' ');
+      const leitor = document.createElement('span');
+      leitor.className = 'sr-only';
+      leitor.textContent = texto;
+      const visivel = document.createElement('span');
+      visivel.setAttribute('aria-hidden', 'true');
+      texto.split(' ').forEach((palavra, i, todas) => {
+        const w = document.createElement('span');
+        w.className = 'w';
+        for (const c of palavra) {
+          const s = document.createElement('span');
+          s.className = 'ch';
+          s.textContent = c;
+          w.appendChild(s);
+          letras.push(s);
+        }
+        visivel.appendChild(w);
+        if (i < todas.length - 1) visivel.appendChild(document.createTextNode(' '));
+      });
+      el.textContent = '';
+      el.append(leitor, visivel);
+      antes = -RAMPA;
+      rolagem.medirTudo();
+    };
+    rolagem.add({
+      el,
+      aoEntrar: separar,
+      medir: (vh) => {
+        const t = topoNaPagina(el);
+        inicio = t - vh * 0.8;
+        fim = t + el.offsetHeight - vh * 0.2;
+      },
+      atualizar: (y) => {
+        if (!letras.length) return;
+        const pos = limitar((y - inicio) / (fim - inicio || 1)) * (letras.length + RAMPA);
+        // só mexe nas letras que mudaram desde o último quadro
+        const de = Math.max(0, Math.floor(Math.min(antes, pos)) - RAMPA - 1);
+        const ate = Math.min(letras.length - 1, Math.ceil(Math.max(antes, pos)) + 1);
+        for (let i = de; i <= ate; i++) {
+          letras[i].style.opacity = (0.16 + 0.84 * limitar((pos - i) / RAMPA)).toFixed(3);
+        }
+        antes = pos;
+      },
+    });
+  });
+}
+
+// Selos decorativos do "Sobre" andam em velocidades diferentes (profundidade).
+function initParallax(rolagem) {
+  const secao = $('#sobre');
+  if (!secao) return;
+  const selos = $$('[data-speed]', secao);
+  let centro = 0;
+  let fator = 1;
+  rolagem.add({
+    el: secao,
+    medir: (vh) => {
+      centro = topoNaPagina(secao) + secao.offsetHeight / 2 - vh / 2;
+      fator = window.innerWidth < 1100 ? 0.35 : 1; // no celular o selo fica perto do texto: anda menos
+    },
+    atualizar: (y) => {
+      const d = (y - centro) * fator;
+      selos.forEach((s) => { s.style.transform = `translate3d(0,${(d * +s.dataset.speed).toFixed(1)}px,0)`; });
+    },
+  });
+}
+
+// Cartões que empilham no "Como funciona" (efeito 01 / Projects da referência).
+// Cada cartão gruda 28px abaixo do anterior; os de baixo encolhem 3% para cada
+// cartão que passa por cima (o primeiro de 4 termina em 91%) e escurecem.
+function initStack(rolagem) {
+  const lista = $('#steps');
+  if (!lista) return;
+  const cards = $$('.scard', lista);
+  let naturais = [];
+  let topos = [];
+  let alturas = [];
+
+  // Pegadinha do sticky: a posição natural é medida com o sticky desligado
+  const medir = () => {
+    cards.forEach((c) => { c.style.position = 'static'; });
+    naturais = cards.map((c) => topoNaPagina(c));
+    alturas = cards.map((c) => c.offsetHeight);
+    cards.forEach((c) => { c.style.position = ''; });
+    topos = cards.map((c) => parseFloat(getComputedStyle(c).top) || 0);
+  };
+  const atualizar = (y) => {
+    // quanto cada cartão já cobriu o anterior (0 a 1)
+    const coberto = cards.map((c, j) => {
+      if (!j) return 0;
+      const y0 = naturais[j] - topos[j - 1] - alturas[j - 1];
+      const y1 = naturais[j] - topos[j];
+      return limitar((y - y0) / (y1 - y0 || 1));
+    });
+    cards.forEach((c, i) => {
+      let soma = 0;
+      for (let j = i + 1; j < cards.length; j++) soma += coberto[j];
+      c.style.transform = soma ? `scale(${(1 - soma * 0.03).toFixed(4)})` : '';
+      c.style.setProperty('--dim', (soma * 0.16).toFixed(3));
+    });
+  };
+  rolagem.add({ el: lista, medir, atualizar });
+}
+
 // Luz que segue o mouse (efeito 12): o JS só escreve a posição em --x/--y,
 // o brilho é um degradê do CSS (.luz::before). Só com mouse de verdade.
 function initLight() {
@@ -551,62 +769,16 @@ function initLight() {
   });
 }
 
-// Cartões que empilham (efeito 01) no "Como funciona".
-// Cada passo gruda no topo; os que ficam por baixo encolhem e escurecem.
-function initStack() {
-  const list = $('#steps');
-  if (!list) return;
-  const cards = $$('.step', list);
-  const limitar = (v, min, max) => Math.max(min, Math.min(max, v));
-  let naturais = [];
-  let topo = 0;
-
-  // Pegadinha do sticky: a posição natural é medida com o sticky desligado
-  const medir = () => {
-    topo = parseFloat(getComputedStyle(cards[0]).top) || 0;
-    naturais = cards.map((c) => {
-      const antes = c.style.position;
-      c.style.position = 'static';
-      const y = c.getBoundingClientRect().top + window.scrollY;
-      c.style.position = antes;
-      return y;
-    });
-  };
-
-  let raf = 0;
-  let ativo = false;
-  const passo = () => {
-    raf = 0;
-    cards.forEach((c, i) => {
-      if (i === cards.length - 1) return; // o último não fica por baixo de ninguém
-      const vao = c.offsetHeight + 18;
-      // quanto o próximo cartão já subiu por cima deste
-      const coberto = limitar((window.scrollY + topo - naturais[i + 1] + vao) / vao, 0, 1);
-      c.style.transform = `scale(${1 - coberto * 0.08})`;
-      c.style.setProperty('--dim', (coberto * 0.55).toFixed(3));
-    });
-  };
-  const pedir = () => { if (ativo && !raf) raf = requestAnimationFrame(passo); };
-
-  medir();
-  window.addEventListener('resize', () => { medir(); pedir(); }, { passive: true });
-  window.addEventListener('scroll', pedir, { passive: true });
-  // só trabalha enquanto a lista está na tela
-  new IntersectionObserver(([e]) => { ativo = e.isIntersecting; pedir(); }, { rootMargin: '200px 0px' }).observe(list);
-  if (document.fonts) document.fonts.ready.then(() => { medir(); pedir(); });
-}
-
 // devolve o controle ao navegador entre fases (evita tarefas longas no carregamento)
 const yieldToMain = () => new Promise((r) => setTimeout(r, 0));
 
 async function initAnimations() {
-  const M = window.Motion;
   if (reducedMotion) return;
-  if (!M) { document.documentElement.classList.add('no-motion'); return; }
+  const M = window.Motion;
 
   // Rolagem suave (Lenis): a página desliza como um fluxo contínuo.
   // No toque do celular a rolagem continua nativa (mais natural).
-  if (M.Lenis) {
+  if (M && M.Lenis) {
     const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 64;
     window.lenis = new M.Lenis({ autoRaf: true, lerp: 0.1, anchors: { offset: -(headerH + 16) } });
   }
@@ -614,16 +786,24 @@ async function initAnimations() {
   await yieldToMain();
 
   // Seções entram ao rolar (componente reutilizável em assets/js/reveal.js)
-  window.reveal('.reveal');
+  if (M) window.reveal('.reveal');
 
   await yieldToMain();
 
   // Barra fina de progresso de leitura, embaixo do menu
   const bar = $('.scroll-progress');
-  if (bar) M.scroll(M.animate(bar, { transform: ['scaleX(0)', 'scaleX(1)'] }, { ease: 'linear' }));
+  if (M && bar) M.scroll(M.animate(bar, { transform: ['scaleX(0)', 'scaleX(1)'] }, { ease: 'linear' }));
 
-  initStack();
+  const rolagem = criarRolagem();
+  initHeroScroll(rolagem);
+  initMarquee(rolagem);
+  initAnimatedText(rolagem);
+  initParallax(rolagem);
+  initStack(rolagem);
 
+  await yieldToMain();
+
+  initMagnet();
   initLight();
 }
 

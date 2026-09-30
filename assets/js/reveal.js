@@ -6,7 +6,7 @@
    Uso no JS:    window.reveal(elementoOuSeletor, { y, duration, delay })
 
    - fade + subida de 32px, uma vez só, quando 15% do bloco entra na tela
-   - 700ms (mesmo ritmo do hero de referência)
+   - 700ms, curva [0.25, 0.1, 0.25, 1] (FadeIn da referência)
    - sem data-delay, irmãos entram em cascata curta
    - com prefers-reduced-motion: nada se move, o conteúdo só aparece
    - depende de window.Motion (assets/vendor/motion.min.js); sem ele,
@@ -14,7 +14,7 @@
    ========================================================= */
 (function () {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const EASE = [0.22, 1, 0.36, 1];
+  const EASE = [0.25, 0.1, 0.25, 1]; // curva do FadeIn da referência
 
   function toList(targets) {
     if (typeof targets === 'string') return [...document.querySelectorAll(targets)];

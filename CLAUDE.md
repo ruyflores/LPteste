@@ -14,10 +14,17 @@ Leia este arquivo antes de mexer no projeto. Ele vale para todas as sessões.
 
 ## Estrutura da página (enxuta: só o que qualifica e converte)
 
-1. **Hero com vídeo** (`#hero`, `.vhero`): vídeo de fundo em loop (mudo) e o texto no rodapé do hero, sobre um degradê que vai para o preto. Navegação em pílulas por cima (`.topbar`): logo, pílula "Menu" (abre o menu em painel em todas as telas), pílula de destaques e pílula "Quero minha prévia".
-2. **Resto da página** (`.flow`): "Sua situação" (`#situacao`, sanfonado com 3 situações num painel de vidro) → comparação dos celulares → serviços (4 cartões + linha de manutenção) → como funciona + o que você recebe → formulário → 5 dúvidas → rodapé.
+A versão atual se baseia na referência "Jack, 3D Creator" (portfólio), adaptada ao preto e vermelho da marca e à realidade da Avanttá (sem fotos de terceiros nem trabalhos de outras empresas).
 
-Sistema visual: selo com filete vermelho à esquerda (`.badge`), pílulas (`.pill--primary` vermelha, `.pill--glass`, `.vbtn`), painéis de vidro (`.glass-panel`), curva de animação [0.16, 1, 0.3, 1] no hero. O hero veio de uma referência em preto e branco sobre fundo branco e foi adaptado para o fundo preto da marca. Títulos em Bebas Neue, o resto em Inter.
+1. **Hero** (`#hero`): título gigante em degradê ("Seu negócio merece ser visto."), a prévia de um site num celular feito só com CSS no centro (segue o mouse, efeito ímã: padding 150, força 3) com selos em volta, e embaixo o texto e os botões. Navegação em pílulas por cima (`.topbar`): logo, pílula "Menu" no celular (abre o painel), links na pílula do meio a partir de 1024px e pílula "Quero minha prévia".
+2. **Faixa que corre com a rolagem** (`#nichos`): duas fileiras em sentidos opostos (segmentos atendidos e o que todo site tem). Deslocamento = (rolagem - topo da seção + altura da tela) x 0,3.
+3. **Sobre** (`#sobre`): "Quem não é visto não é lembrado." e um parágrafo que acende letra por letra com a rolagem (de 80% a 20% da tela). Selos decorativos em volta, com profundidade.
+4. **Sua situação** (`#situacao`, sanfonado com 3 situações) → **comparação dos celulares** (`#comparacao`).
+5. **Serviços** (`#servicos`): folha clara com cantos arredondados e 5 itens numerados (site completo, página de vendas, loja virtual, reforma, manutenção).
+6. **Como funciona** (`#processo`): 4 cartões que empilham (28px de degrau, os de baixo encolhem 3% por cartão) + o que você recebe.
+7. **Formulário** (`#contato`) → **5 dúvidas** (`#faq`) → **chamada final** → rodapé com a marca gigante em degradê.
+
+Sistema visual: fundo `#0C0C0C`, títulos em degradê (`.grad`, cinza para branco; `.grad--red` para o destaque), botão de contato em degradê vermelho com seta num círculo branco (`.cbtn`), botão de contorno (`.lbtn`), selo com filete vermelho (`.badge`), curva [0.16, 1, 0.3, 1] no hero e [0.25, 0.1, 0.25, 1] nas entradas (`.reveal`). Títulos em Bebas Neue, o resto em Inter (a referência usa Kanit; mantivemos a identidade da marca).
 
 ## Objetivo da página
 
@@ -42,7 +49,7 @@ HTML, CSS e JS puro, sem framework e sem build. O `package.json` só existe para
 index.html              página única (a ordem das seções está nos comentários)
 preto-e-branco.html     atalho para index.html?tema=pb (só para comparação; noindex)
 assets/css/style.css    estilos, temas (red / mono) e responsivo
-assets/js/script.js     configuração, integrações, interface, formulário, Cal.com, animações
+assets/js/script.js     configuração, integrações, interface, formulário, Cal.com, animações (ímã, faixa, texto letra a letra, cartões)
 assets/js/reveal.js     componente de entrada suave das seções (classe .reveal)
 assets/vendor/motion.min.js  Motion (animate, inView, scroll, stagger) + Lenis (rolagem suave), global window.Motion
 tools/motion-entry.js   entrada do pacote acima ("npm install && npm run vendor" gera de novo)
@@ -133,16 +140,15 @@ A checagem não pega trios de verbos e adjetivos: releia as frases novas.
 - Animar **apenas `transform` e `opacity`**. Nada de animar `box-shadow`, `filter`, `width` ou `top`, e nada de `filter: blur` em elementos grandes.
 - Respeitar `prefers-reduced-motion`: sem movimento, o conteúdo só aparece (a comparação dos celulares mostra o estado final).
 - Conteúdo que troca sozinho precisa de controle: a comparação tem botões de troca e "Repetir", e troca sozinha uma única vez.
-- Transição entre seções sem bordas nem quebras: fundos em degradê que emendam, e a barra fina de progresso de leitura no menu.
-- **Vídeo do hero** (`#heroVideo`, lógica em `script.js`): toca sozinho, mudo e em loop (exceção à regra de "nada de autoplay", pedida pelo dono). Só começa a baixar depois do `load` + momento livre, pausa fora da tela e não carrega com `prefers-reduced-motion` nem com economia de dados. No celular ocupa 80% da tela, centralizado; a partir de 768px, a tela toda. As bordas têm máscara em degradê para o vídeo se misturar ao fundo.
-- **Vídeo em negativo:** o vídeo provisório foi feito para fundo branco; a classe `vhero--invert` o deixa em negativo (o branco vira o preto da página) e `.vhero__tint` aplica o vermelho. Com um vídeo próprio já escuro, tire a classe. O vídeo está no CloudFront de outra empresa (pode sair do ar); para trocar, mude o `data-src`.
-- **O rodapé do hero só desliza** (sem sumir): o título precisa estar visível desde a primeira pintura. Quando o bloco inteiro entrava com opacidade zero, o Lighthouse às vezes não achava o maior elemento da tela e zerava a nota de Performance.
-- **Tentativas anteriores no hero** (no histórico do Git): vídeo guiado pela rolagem com cortina (`fd6634e`; não aparecia no celular, porque o iPhone não carrega vídeo que não está tocando) e arte do celular abrindo em faixas (`7e60a9b`).
+- Transição entre seções sem bordas nem quebras: fundos em degradê que emendam, e a barra fina de progresso de leitura no menu. A exceção proposital é a folha clara dos serviços, que entra com cantos arredondados e é coberta pelo "Como funciona" (sobre ela, a faixa escura atrás do menu some).
+- **Efeitos guiados pela rolagem** (faixa, título do hero, texto letra a letra, selos do "Sobre" e cartões) passam por uma central única em `script.js` (`criarRolagem`): um `requestAnimationFrame` por quadro, medidas só quando a página muda de tamanho e cada efeito só roda com a seção na tela.
+- **O hero não depende de JS nem de opacidade para aparecer:** o título e o parágrafo só deslizam. Texto em degradê (`color: transparent`) não conta como maior elemento para o Lighthouse, e texto com opacidade zero também não: quando isso aconteceu, a nota de Performance zerou (NO_LCP). O parágrafo do hero é quem segura essa medida.
+- **Texto que acende letra por letra:** as letras só são separadas quando a seção chega perto da tela; o leitor de tela lê uma cópia inteira (`.sr-only`).
+- **Tentativas anteriores no hero** (no histórico do Git): vídeo em loop do CloudFront de outra empresa (`467504d`), vídeo guiado pela rolagem com cortina (`fd6634e`; não aparecia no celular) e arte do celular abrindo em faixas (`7e60a9b`).
 - **Efeitos do Não Codei em uso:** 01 cartões que empilham ("Como funciona"; o escurecimento é uma camada com `opacity`, não `filter`), 10 inércia (feito pelo Lenis na página inteira) e 12 luz que segue o mouse (cartões `.luz`). **Fora de propósito:** 09 cursor personalizado (atrapalha quem quer clicar e contratar), 23 painéis que expandem e 21 galeria com filtro (animam largura, não transform), 08 cubo e 02 galeria horizontal (alongam a página e não ajudam a vender), 05 máscara (anima `clip-path`). O 06 faixas chegou a ser usado com uma arte estática no hero, mas voltamos ao vídeo com a transição em cortina.
 - **Rolagem suave (Lenis)** dá a sensação de site contínuo; é desligada com `prefers-reduced-motion`. Para rolar por código, use `scrollToEl()` (funciona com e sem Lenis).
-- O texto do hero nunca depende de JS para aparecer: as entradas são CSS, e o `<h1>` só desliza, sem mudar a opacidade (LCP).
 - O script do Cal.com só carrega quando o contato chega à agenda.
-- Nada de vídeo em autoplay, fora o vídeo do hero (mudo, em loop, carregado depois da página). Imagens em WebP ou AVIF com `loading="lazy"` e `width`/`height` definidos.
+- Nada de vídeo em autoplay. Imagens em WebP ou AVIF com `loading="lazy"` e `width`/`height` definidos.
 - Fontes em woff2 locais com `font-display: swap` e `preload` só das duas usadas acima da dobra.
 - **Zero rolagem lateral no celular** (testar em 375px).
 - O WhatsApp flutuante some quando o hero, o formulário ou a chamada final estão na tela (`data-hide-wa`).
@@ -156,7 +162,6 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 
 ## Pendências
 
-- [ ] **Vídeo próprio do hero** (MP4 hospedado no próprio site), no lugar do vídeo provisório do CloudFront de outra empresa; conferir se ainda precisa da classe `vhero--invert`
 - [ ] **Cal.com**: confirmar os identificadores das perguntas (telefone e empresa) e ajustar `CAL_PHONE_FIELDS` / `CAL_COMPANY_FIELD`
 - [ ] **Domínio**: trocar o endereço provisório da Vercel em canonical, Open Graph, JSON-LD, sitemap.xml, robots.txt e llms.txt
 - [ ] **Depoimentos reais** (destaque "Feedbacks" do Instagram) para reativar a seção Feedbacks
