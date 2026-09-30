@@ -26,6 +26,12 @@ const CAL_PHONE_FIELDS = ['attendeePhoneNumber', 'whatsapp'];
 const CAL_COMPANY_FIELD = 'empresa';
 const BRAND_RED = '#e10600';
 
+// Supabase: onde os contatos ficam guardados (tabela "leads", ver supabase/leads.sql).
+// A chave "anon public" é feita para ficar no site: a tabela só aceita inserir
+// linhas (ninguém consegue ler nem alterar pelo site). Sem a chave, nada é enviado.
+const SUPABASE_URL = 'https://dfkmvqfuuvhwlgdjkjqz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRma212cWZ1dXZod2xnZGpranF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDI5NDYsImV4cCI6MjA3MjQxODk0Nn0.qzAVgM9hQCrXohxcvOkVd1mS27_FbK5oJyAY2pXl95M'; // Project Settings > API Keys > anon public
+
 // Quem responde "Até R$ 800" vai para o WhatsApp em vez da agenda
 const LOW_BUDGET = 'Até R$ 800';
 
@@ -40,14 +46,30 @@ const EASE = [0.22, 1, 0.36, 1]; // curva padrão das animações
    Quando o Supabase, o Pixel e o GA estiverem prontos, é só completar aqui. */
 
 /**
- * Salva o contato. É chamada duas vezes com o mesmo lead_id:
+ * Salva o contato no Supabase. É chamada duas vezes com o mesmo lead_id:
  *   etapa "contatos"  → assim que a pessoa passa do passo 1 (ninguém se perde)
  *   etapa "completo"  → ao terminar o formulário
- * Futuro (Supabase): upsert pelo lead_id
- *   await supabase.from('leads').upsert(dados, { onConflict: 'lead_id' });
+ * Cada etapa vira uma linha nova (só inserir é mais seguro que atualizar pelo
+ * site). Para ver o contato mais completo, use a visão "leads_ultimos".
+ * keepalive: o envio termina mesmo se a pessoa sair da página logo depois.
  */
 async function saveLead(dados) {
-  console.info('[Avanttá] Lead salvo:', dados);
+  if (!SUPABASE_ANON_KEY) {
+    console.info('[Avanttá] Supabase sem chave, contato não enviado:', dados);
+    return { ok: false };
+  }
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+    method: 'POST',
+    keepalive: true,
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify(dados),
+  });
+  if (!res.ok) throw new Error(`Supabase ${res.status}: ${await res.text()}`);
   return { ok: true };
 }
 

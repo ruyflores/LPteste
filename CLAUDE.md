@@ -62,12 +62,13 @@ Constantes no topo de `assets/js/script.js`:
 - `WHATSAPP_NUMBER` = `5561995905615`
 - `CAL_LINK` = `avantta/avantta`
 - `CAL_PHONE_FIELDS` = `['attendeePhoneNumber', 'whatsapp']` e `CAL_COMPANY_FIELD` = `'empresa'`: identificadores das perguntas do evento no Cal.com (**confirmar** e deixar só os certos)
-- `saveLead(dados)`: hoje só faz `console.info`. É o ponto único para ligar o Supabase (upsert por `lead_id`).
+- `SUPABASE_URL` / `SUPABASE_ANON_KEY` e `saveLead(dados)`: grava cada etapa como uma linha nova na tabela `leads` do Supabase (só inserir; o site não lê nem altera nada). Sem a chave, não envia. A tabela, a segurança e a visão `leads_ultimos` (uma linha por contato) estão em `supabase/leads.sql`.
+- `supabase/functions/aviso-contato`: e-mail de aviso (Resend) a cada linha nova, chamado por um Database Webhook do Supabase. Segredos no painel: `RESEND_API_KEY`, `AVISO_PARA`, `AVISO_DE`, `WEBHOOK_SEGREDO`.
 - `trackConversion(evento)`: `Lead` e `Schedule`, cada um uma vez por visita. É o ponto único para o Pixel da Meta e o GA4.
 
 As seções **Cases** e **Feedbacks** estão comentadas no HTML (conteúdo fictício). Só reative com material real e devolva os links ao menu.
 
-**Endereço provisório:** canonical, Open Graph, JSON-LD, `sitemap.xml`, `robots.txt` e `llms.txt` usam `https://lpteste-liard.vercel.app/`. Quando o domínio chegar, trocar em todos.
+**Endereço oficial:** `https://avanttasites.com.br/` (canonical, Open Graph, JSON-LD, `sitemap.xml`, `robots.txt` e `llms.txt`). Publicação: a Vercel publica a branch `claude/avantta-landing-page-ymxayi` (não existe `main`); as mudanças passam antes pela `lp-v2` (prévia).
 
 ## Regra de comunicação
 
@@ -163,11 +164,11 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 ## Pendências
 
 - [ ] **Cal.com**: confirmar os identificadores das perguntas (telefone e empresa) e ajustar `CAL_PHONE_FIELDS` / `CAL_COMPANY_FIELD`
-- [ ] **Domínio**: trocar o endereço provisório da Vercel em canonical, Open Graph, JSON-LD, sitemap.xml, robots.txt e llms.txt
+- [x] **Domínio**: avanttasites.com.br
 - [ ] **Depoimentos reais** (destaque "Feedbacks" do Instagram) para reativar a seção Feedbacks
 - [ ] **Prints dos cases** (WebP/AVIF, lazy load) para reativar a seção Cases
 - [ ] **Logo original** em SVG (hoje é uma aproximação desenhada em código)
-- [ ] **Supabase**: implementar `saveLead()` com upsert por `lead_id`
-- [ ] **Resend**: e-mail de aviso de novo contato para a equipe
+- [x] **Supabase**: código pronto; tabela criada e chave anon no código (conferir o primeiro contato real em leads_ultimos)
+- [ ] **Resend**: função pronta (`supabase/functions/aviso-contato`); falta criar a conta, a função e o webhook no painel
 - [ ] **Sentry**: monitorar erros de JS em produção
 - [ ] **Pixel da Meta e GA4**: implementar `trackConversion()` (`Lead` e `Schedule`)
