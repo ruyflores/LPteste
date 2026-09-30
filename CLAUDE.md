@@ -168,7 +168,7 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 - [ ] **Depoimentos reais** (destaque "Feedbacks" do Instagram) para reativar a seção Feedbacks
 - [ ] **Prints dos cases** (WebP/AVIF, lazy load) para reativar a seção Cases
 - [ ] **Logo original** em SVG (hoje é uma aproximação desenhada em código)
-- [ ] **Supabase**: código pronto; falta rodar `supabase/leads.sql` e colar a chave anon em `SUPABASE_ANON_KEY`
+- [x] **Supabase**: código pronto; tabela criada e chave anon no código (conferir o primeiro contato real em leads_ultimos)
 - [ ] **Resend**: função pronta (`supabase/functions/aviso-contato`); falta criar a conta, a função e o webhook no painel
 - [ ] **Sentry**: monitorar erros de JS em produção
 - [ ] **Pixel da Meta e GA4**: implementar `trackConversion()` (`Lead` e `Schedule`)

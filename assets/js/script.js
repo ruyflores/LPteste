@@ -30,7 +30,7 @@ const BRAND_RED = '#e10600';
 // A chave "anon public" é feita para ficar no site: a tabela só aceita inserir
 // linhas (ninguém consegue ler nem alterar pelo site). Sem a chave, nada é enviado.
 const SUPABASE_URL = 'https://dfkmvqfuuvhwlgdjkjqz.supabase.co';
-const SUPABASE_ANON_KEY = ''; // Project Settings > API Keys > anon public
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRma212cWZ1dXZod2xnZGpranF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDI5NDYsImV4cCI6MjA3MjQxODk0Nn0.qzAVgM9hQCrXohxcvOkVd1mS27_FbK5oJyAY2pXl95M'; // Project Settings > API Keys > anon public
 
 // Quem responde "Até R$ 800" vai para o WhatsApp em vez da agenda
 const LOW_BUDGET = 'Até R$ 800';
