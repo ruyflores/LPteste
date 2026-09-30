@@ -18,7 +18,7 @@ O contexto do projeto, as regras de copy, as regras de performance e as pendênc
 3. As demais faixas veem a agenda do Cal.com (`avantta/avantta`) embutida na página, já preenchida.
 4. O agendamento confirmado mostra a tela "Reunião confirmada".
 
-Configuração no topo de `assets/js/script.js`: `WHATSAPP_NUMBER`, `CAL_LINK`, `CAL_PHONE_FIELDS`, `CAL_COMPANY_FIELD`, `saveLead()` e `trackConversion()`.
+Configuração no topo de `assets/js/script.js`: `WHATSAPP_NUMBER`, `CAL_LINK`, `CAL_PHONE_FIELDS`, `SUPABASE_ANON_KEY`, `saveLead()` e `trackConversion()`.
 
 ## Animações
 

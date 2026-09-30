@@ -17,13 +17,12 @@ const CAL_LINK = 'avantta/avantta';               // evento do Cal.com (usuario/
 const CAL_ORIGIN = 'https://cal.com';
 const CAL_EMBED_SRC = 'https://app.cal.com/embed/embed.js';
 const CAL_NAMESPACE = 'avantta';
-// Perguntas do evento no Cal.com que recebem dados já preenchidos.
-// A chave é o identificador da pergunta em Cal.com > Event Types > avantta >
-// Advanced > Booking Questions. Mandar um identificador que não existe não
-// quebra nada: o Cal.com só ignora. Por isso o telefone vai nos dois nomes
-// mais comuns até você confirmar qual é o seu.
-const CAL_PHONE_FIELDS = ['attendeePhoneNumber', 'whatsapp'];
-const CAL_COMPANY_FIELD = 'empresa';
+// Perguntas do evento no Cal.com que recebem dados já preenchidos (identificadores
+// confirmados em Cal.com > evento > Formulário de reserva). O evento pede só
+// 3 coisas: nome (name), e-mail (email) e WhatsApp (attendeePhoneNumber).
+// O resumo vai em notes; se "Observações adicionais" estiver escondido, o
+// Cal.com ignora, e as respostas continuam salvas no Supabase.
+const CAL_PHONE_FIELDS = ['attendeePhoneNumber'];
 const BRAND_RED = '#e10600';
 
 // Supabase: onde os contatos ficam guardados (tabela "leads", ver supabase/leads.sql).
@@ -490,7 +489,6 @@ function calPrefill(dados) {
     name: dados.nome,
     email: dados.email,
     notes: leadSummary(dados).join(' | '),
-    [CAL_COMPANY_FIELD]: dados.empresa,
   };
   CAL_PHONE_FIELDS.forEach((f) => { fields[f] = phone; });
   ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach((k) => { if (dados[k]) fields[k] = dados[k]; });

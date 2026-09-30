@@ -38,7 +38,7 @@ Formulário (`#leadForm`, um passo por tela):
 
 Depois do envio:
 - **"Até R$ 800"** → agradecimento + botão de WhatsApp com as respostas.
-- **Demais faixas** → Cal.com embutido no lugar do formulário, **já preenchido** (nome, e-mail, telefone, empresa, resumo em `notes` e UTMs). Tem o botão "Prefiro falar pelo WhatsApp". No evento `bookingSuccessful`, mostra "Reunião confirmada" e dispara `Schedule`.
+- **Demais faixas** → Cal.com embutido no lugar do formulário, **já preenchido** (nome, e-mail, WhatsApp, resumo em `notes` e UTMs). Tem o botão "Prefiro falar pelo WhatsApp". No evento `bookingSuccessful`, mostra "Reunião confirmada" e dispara `Schedule`.
 - A origem da visita (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`, `fbclid`, página de origem e referrer) é capturada ao entrar e guardada durante a visita (`sessionStorage`).
 
 ## Estrutura
@@ -61,7 +61,7 @@ robots.txt, sitemap.xml, llms.txt
 Constantes no topo de `assets/js/script.js`:
 - `WHATSAPP_NUMBER` = `5561995905615`
 - `CAL_LINK` = `avantta/avantta`
-- `CAL_PHONE_FIELDS` = `['attendeePhoneNumber', 'whatsapp']` e `CAL_COMPANY_FIELD` = `'empresa'`: identificadores das perguntas do evento no Cal.com (**confirmar** e deixar só os certos)
+- `CAL_PHONE_FIELDS` = `['attendeePhoneNumber']`: o evento do Cal.com pede só nome (`name`), e-mail (`email`) e WhatsApp (`attendeePhoneNumber`), para ter menos atrito. O resumo vai em `notes`.
 - `SUPABASE_URL` / `SUPABASE_ANON_KEY` e `saveLead(dados)`: grava cada etapa como uma linha nova na tabela `leads` do Supabase (só inserir; o site não lê nem altera nada). Sem a chave, não envia. A tabela, a segurança e a visão `leads_ultimos` (uma linha por contato) estão em `supabase/leads.sql`.
 - `supabase/functions/aviso-contato`: e-mail de aviso (Resend) a cada linha nova, chamado por um Database Webhook do Supabase. Segredos no painel: `RESEND_API_KEY`, `AVISO_PARA`, `AVISO_DE`, `WEBHOOK_SEGREDO`.
 - `trackConversion(evento)`: `Lead` e `Schedule`, cada um uma vez por visita. É o ponto único para o Pixel da Meta e o GA4.
@@ -163,7 +163,7 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 
 ## Pendências
 
-- [ ] **Cal.com**: confirmar os identificadores das perguntas (telefone e empresa) e ajustar `CAL_PHONE_FIELDS` / `CAL_COMPANY_FIELD`
+- [x] **Cal.com**: identificadores confirmados (name, email, attendeePhoneNumber)
 - [x] **Domínio**: avanttasites.com.br
 - [ ] **Depoimentos reais** (destaque "Feedbacks" do Instagram) para reativar a seção Feedbacks
 - [ ] **Prints dos cases** (WebP/AVIF, lazy load) para reativar a seção Cases
