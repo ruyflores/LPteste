@@ -2,7 +2,7 @@
    AVANTTÁ | Landing Page (JS)
    1. Configuração
    2. Integrações (saveLead, trackConversion)
-   3. Interface (menu, WhatsApp, sanfonado, comparação)
+   3. Interface (menu, WhatsApp, barra fixa no celular, sanfonado)
    4. Formulário em etapas + roteamento
    5. Cal.com (carregado só quando o lead chega na agenda)
    6. Animações (Motion + Lenis: assets/vendor/motion.min.js, assets/js/reveal.js)
@@ -160,13 +160,17 @@ if (secaoClara && 'IntersectionObserver' in window) {
   new IntersectionObserver(([e]) => header.classList.toggle('on-light', e.isIntersecting), { rootMargin: '0px 0px -90% 0px' }).observe(secaoClara);
 }
 
-// WhatsApp flutuante some quando há botões importantes na tela (hero, formulário, chamada final)
+// WhatsApp flutuante (computador) e barra fixa (celular) somem quando já há
+// botões importantes na tela: hero, formulário, chamada final e rodapé.
 const waFloat = $('.wa-float');
+const mbar = $('#mbar');
 if ('IntersectionObserver' in window) {
   const visiveis = new Set();
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => (e.isIntersecting ? visiveis.add(e.target) : visiveis.delete(e.target)));
-    waFloat.classList.toggle('is-hidden', visiveis.size > 0);
+    const esconder = visiveis.size > 0;
+    waFloat.classList.toggle('is-hidden', esconder);
+    if (mbar) mbar.classList.toggle('is-visible', !esconder);
   }, { rootMargin: '0px 0px -15% 0px' });
   $$('[data-hide-wa]').forEach((el) => io.observe(el));
 }
@@ -191,89 +195,6 @@ sitButtons.forEach((btn) => {
     });
   });
 });
-
-// Comparação animada "site comum x site Avanttá"
-// Cada etapa entra a cada 0,6s; no fim, o contador sobe. No celular aparece
-// um aparelho por vez: o comum toca primeiro e troca uma vez para o da Avanttá.
-(function initRace() {
-  const race = $('#comparacao');
-  if (!race) return;
-  const stage = $('.race__stage', race);
-  const phones = { comum: $('[data-phone="comum"]', race), avantta: $('[data-phone="avantta"]', race) };
-  const switches = $$('.race__sw', race);
-  const mobile = window.matchMedia('(max-width: 760px)');
-  const STEP = 0.6;
-  let timers = [];
-  let controls = [];
-
-  const stopAll = () => {
-    timers.forEach(clearTimeout);
-    timers = [];
-    controls.forEach((c) => c && c.stop && c.stop());
-    controls = [];
-  };
-  const show = (which) => {
-    stage.dataset.active = which;
-    switches.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.show === which)));
-  };
-  const finalState = (phone) => {
-    $$('.pstep', phone).forEach((s) => { s.style.opacity = ''; s.style.transform = ''; });
-    const count = $('.phone__count', phone);
-    count.style.opacity = '';
-    const num = $('strong', count);
-    num.textContent = num.dataset.to;
-  };
-  // devolve quanto tempo (s) a sequência deste aparelho leva
-  const playPhone = (phone) => {
-    const M = window.Motion;
-    const steps = $$('.pstep', phone);
-    const count = $('.phone__count', phone);
-    const num = $('strong', count);
-    steps.forEach((s) => { s.style.opacity = '0'; s.style.transform = 'translateY(10px)'; });
-    count.style.opacity = '0';
-    num.textContent = '0';
-    steps.forEach((s, i) => {
-      controls.push(M.animate(s, { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0px)'] }, { duration: 0.45, delay: 0.2 + i * STEP, ease: EASE }));
-    });
-    const end = 0.2 + steps.length * STEP;
-    controls.push(M.animate(count, { opacity: [0, 1] }, { duration: 0.4, delay: end }));
-    timers.push(setTimeout(() => {
-      controls.push(M.animate(0, +num.dataset.to, { duration: 1.2, ease: EASE, onUpdate: (v) => { num.textContent = Math.round(v); } }));
-    }, end * 1000));
-    return end + 1.2;
-  };
-  const canAnimate = () => window.Motion && !reducedMotion;
-
-  const play = () => {
-    stopAll();
-    if (!canAnimate()) { finalState(phones.comum); finalState(phones.avantta); return; }
-    if (mobile.matches) {
-      show('comum');
-      finalState(phones.avantta);
-      const dur = playPhone(phones.comum);
-      timers.push(setTimeout(() => { show('avantta'); playPhone(phones.avantta); }, (dur + 1) * 1000));
-    } else {
-      playPhone(phones.comum);
-      playPhone(phones.avantta);
-    }
-  };
-
-  // troca manual (celular): mostra o escolhido e toca só ele
-  switches.forEach((b) => b.addEventListener('click', () => {
-    stopAll();
-    finalState(phones.comum);
-    finalState(phones.avantta);
-    show(b.dataset.show);
-    if (canAnimate()) playPhone(phones[b.dataset.show]);
-  }));
-  $('#raceReplay').addEventListener('click', play);
-
-  if (canAnimate()) {
-    // esconde antes de entrar na tela e toca uma vez quando aparece
-    $$('.pstep, .phone__count', race).forEach((el) => { el.style.opacity = '0'; });
-    const stop = window.Motion.inView(stage, () => { stop(); play(); }, { amount: 0.3 });
-  }
-})();
 
 /* ---------- 4. Formulário em etapas ----------
    Passo 1: contatos (salvos na hora) · 2: investimento · 3: urgência · 4: o que precisa */
@@ -641,37 +562,50 @@ function initMagnet() {
   document.documentElement.addEventListener('pointerleave', () => { px = py = -9999; if (!raf) raf = requestAnimationFrame(rodar); });
 }
 
-// Faixa que corre com a rolagem. Enquanto a seção atravessa a tela, cada
-// fileira anda exatamente o que falta para mostrar todas as peças (assim nada
-// fica escondido no celular). Nunca mais devagar que a referência (x 0,3).
-// A primeira fileira vai para a esquerda e a segunda para a direita.
-function initMarquee(rolagem) {
+// Faixa dos ramos: corre devagar em loop (todos os ramos passam na frente de
+// quem está olhando, inclusive o primeiro e o último) e a rolagem dá um empurrão
+// na mesma direção. As peças são duplicadas (cópia escondida do leitor de tela)
+// para o loop não ter emenda. Só anima com a seção na tela; com o mouse em cima,
+// para, para dar tempo de ler.
+function initMarquee() {
   const secao = $('#nichos');
-  if (!secao) return;
-  const fileiras = $$('.mq__row', secao).map((el) => ({ el, esquerda: el.dataset.dir !== '1', max: 0 }));
-  let topo = 0;
-  let curso = 1;
-  rolagem.add({
-    el: secao,
-    medir: (vh) => {
-      topo = topoNaPagina(secao);
-      curso = secao.offsetHeight + vh;
-      const largura = document.documentElement.clientWidth;
-      fileiras.forEach((f) => { f.max = Math.max(f.el.scrollWidth - largura, curso * 0.3); });
-    },
-    atualizar: (y, vh) => {
-      const p = limitar((y - topo + vh) / curso);
-      fileiras.forEach((f) => {
-        const x = f.esquerda ? -p * f.max : (p - 1) * f.max;
-        f.el.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
-      });
-    },
+  const fileira = secao && $('.mq__row', secao);
+  if (!fileira) return;
+  const originais = [...fileira.children];
+  originais.forEach((li) => {
+    const copia = li.cloneNode(true);
+    copia.setAttribute('aria-hidden', 'true');
+    fileira.appendChild(copia);
   });
+  const primeiraCopia = fileira.children[originais.length];
+  let volta = 1;      // largura de uma volta (metade da fileira)
+  let andou = 0;      // quanto o tempo já andou (px)
+  let ultimo = 0;
+  let raf = 0;
+  let parado = false;
+  const medir = () => { volta = primeiraCopia.offsetLeft - originais[0].offsetLeft || 1; };
+  const quadro = (t) => {
+    const velocidade = window.innerWidth < 768 ? 34 : 48; // px por segundo
+    if (ultimo && !parado) andou += (Math.min(t - ultimo, 64) / 1000) * velocidade;
+    ultimo = t;
+    const x = ((andou + window.scrollY * 0.35) % volta + volta) % volta;
+    fileira.style.transform = `translate3d(${(-x).toFixed(1)}px,0,0)`;
+    raf = requestAnimationFrame(quadro);
+  };
+  medir();
+  window.addEventListener('resize', medir, { passive: true });
+  if (document.fonts) document.fonts.ready.then(medir);
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !raf) { ultimo = 0; raf = requestAnimationFrame(quadro); }
+    else if (!e.isIntersecting && raf) { cancelAnimationFrame(raf); raf = 0; }
+  }).observe(secao);
+  fileira.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') parado = true; });
+  fileira.addEventListener('pointerleave', () => { parado = false; });
 }
 
 // Texto que acende letra por letra (AnimatedText da referência).
-// Começa quando o topo do parágrafo chega a 80% da tela e termina quando o
-// fim dele passa de 20%. O leitor de tela lê a cópia inteira (sr-only).
+// Começa quando o topo do parágrafo chega a 90% da tela e termina quando o
+// fim dele passa de 60% (acende cedo: quem para para ler já lê tudo). O leitor de tela lê a cópia inteira (sr-only).
 // As letras só são separadas quando a seção está chegando perto.
 function initAnimatedText(rolagem) {
   $$('[data-split]').forEach((el) => {
@@ -710,8 +644,8 @@ function initAnimatedText(rolagem) {
       aoEntrar: separar,
       medir: (vh) => {
         const t = topoNaPagina(el);
-        inicio = t - vh * 0.8;
-        fim = t + el.offsetHeight - vh * 0.2;
+        inicio = t - vh * 0.9;
+        fim = t + el.offsetHeight - vh * 0.6;
       },
       atualizar: (y) => {
         if (!letras.length) return;
@@ -720,7 +654,7 @@ function initAnimatedText(rolagem) {
         const de = Math.max(0, Math.floor(Math.min(antes, pos)) - RAMPA - 1);
         const ate = Math.min(letras.length - 1, Math.ceil(Math.max(antes, pos)) + 1);
         for (let i = de; i <= ate; i++) {
-          letras[i].style.opacity = (0.16 + 0.84 * limitar((pos - i) / RAMPA)).toFixed(3);
+          letras[i].style.opacity = (0.26 + 0.74 * limitar((pos - i) / RAMPA)).toFixed(3);
         }
         antes = pos;
       },
@@ -825,7 +759,7 @@ async function initAnimations() {
 
   const rolagem = criarRolagem();
   initHeroScroll(rolagem);
-  initMarquee(rolagem);
+  initMarquee();
   initAnimatedText(rolagem);
   initParallax(rolagem);
   initStack(rolagem);

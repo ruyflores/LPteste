@@ -348,14 +348,19 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .hero__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--glow); }
 .hero__title {
   margin: 14px 0 0; font-family: var(--font-display); font-weight: 400; text-transform: uppercase;
-  font-size: clamp(3.4rem, 18.4vw, 7rem); line-height: .86; letter-spacing: .005em;
+  font-size: clamp(3rem, calc((100vw - 32px) / 5.3), 7rem); line-height: .86; /* "antes de pagar." mede 5,25 vezes o tamanho da letra: cabe numa linha */ letter-spacing: .005em;
 }
 .hero__row { display: block; will-change: transform; }
-.hero__row .grad { display: inline-block; margin-top: -.12em; animation: slide24 1s var(--ease-hero) both; }
-.hero__row--b .grad { display: block; animation-delay: .08s; }
-.hero__row--b .grad--red { animation-delay: .16s; }
+.hero__row .grad { display: inline-block; white-space: nowrap; margin-top: -.12em; animation: slide24 1s var(--ease-hero) both; }
+.hero__row--a .grad { display: block; }
+.hero__row--a .grad + .grad { animation-delay: .08s; }
+.hero__row--b .grad { animation-delay: .16s; }
 .hero__bottom { position: relative; z-index: 2; margin-top: 22px; }
 .hero__ctas .lbtn { background: rgba(18,18,20,.9); }
+.hero__copy { max-width: 30rem; }
+.hero__trust { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 16px; animation: up16 .8s var(--ease-hero) .5s both; }
+.hero__trust li { display: inline-flex; align-items: center; gap: 7px; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.86); }
+.hero__trust svg { width: 15px; height: 15px; color: var(--accent-text); flex-shrink: 0; }
 .hero__desc { max-width: 30rem; font-size: 1rem; line-height: 1.6; color: rgba(255,255,255,.74); animation: slide24 .9s var(--ease-hero) .2s both; } /* só desliza: é o maior texto visível para o Lighthouse (LCP) */
 .hero__ctas { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 10px; animation: up16 .8s var(--ease-hero) .55s both; }
 .hero__stage { position: relative; flex: 1 0 250px; margin-top: 34px; animation: stageIn 1.2s var(--ease-hero) .3s both; }
@@ -405,10 +410,9 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 }
 .hchip svg { width: 14px; height: 14px; color: var(--accent-text); }
 @media (max-width: 767px) { .hchip { padding: 7px 11px; font-size: .66rem; gap: 6px; } .hchip svg { width: 12px; height: 12px; } }
-.hchip--g { left: -44px; top: 22px; }
-.hchip--sale { right: -40px; top: 78px; }
-.hchip--wa { left: -44px; top: 134px; }
-.hchip--lead { right: -40px; top: 190px; }
+.hchip--g, .hchip--wa { display: none; }
+.hchip--sale { right: -40px; top: 12px; }
+.hchip--lead { left: -44px; top: 214px; }
 .hchip--wa svg, .hchip--sale svg { color: #25d366; }
 
 @keyframes up16 { from { opacity: 0; transform: translateY(16px); } }
@@ -417,14 +421,15 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 
 @media (min-width: 768px) {
   .hero__inner { padding: calc(var(--header-h) + 22px) 32px 0; }
-  .hero__title { font-size: min(14vw, 26vh, 15rem); }
-  .hero__row--b .grad { display: inline-block; }
+  .hero__title { font-size: min(12.4vw, 23vh, 13.5rem); }
+  .hero__row--a .grad { display: inline-block; }
   .hero__float { width: 270px; }
   .hchip { font-size: .8rem; padding: 11px 16px; }
+  .hchip--g, .hchip--wa { display: inline-flex; }
   .hchip--g { left: -150px; top: 80px; }
   .hchip--sale { right: -150px; top: 150px; }
   .hchip--wa { left: -120px; top: 260px; }
-  .hchip--lead { right: -160px; top: 330px; }
+  .hchip--lead { left: auto; right: -160px; top: 330px; }
 }
 /* computador: título em cima; texto, celular e botões lado a lado embaixo */
 @media (min-width: 1024px) {
@@ -434,23 +439,23 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   }
   .hero__eyebrow, .hero__title { grid-column: 1 / -1; }
   .hero__bottom { display: contents; }
-  .hero__desc { grid-column: 1; grid-row: 3; align-self: end; margin-bottom: 44px; max-width: 24rem; }
+  .hero__copy { grid-column: 1; grid-row: 3; align-self: end; margin-bottom: 44px; max-width: 26rem; }
   .hero__ctas { grid-column: 3; grid-row: 3; align-self: end; justify-self: end; justify-content: flex-end; margin: 0 0 44px; }
   .hero__stage { grid-column: 2; grid-row: 3; width: 290px; margin-top: 18px; min-height: 280px; }
   .hero__float { width: 290px; }
   .hchip--g { left: -130px; top: 140px; }
   .hchip--sale { right: -130px; top: 50px; }
   .hchip--wa { left: -110px; top: 250px; }
-  .hchip--lead { right: -150px; top: 150px; }
+  .hchip--lead { left: auto; right: -150px; top: 150px; }
 }
-@media (min-width: 1024px) and (max-width: 1279px) {
+@media (min-width: 1024px) and (max-width: 1439px) {
   .hchip--g, .hchip--wa { display: none; }
 }
 @media (min-width: 1024px) and (max-width: 1439px) {
   .hchip--lead { display: none; }
 }
 @media (min-width: 1024px) and (max-width: 1439px) {
-  .hero__desc { max-width: 20rem; }
+  .hero__copy { max-width: 21rem; }
 }
 
 /* ---------- Seções ---------- */
@@ -492,7 +497,7 @@ html:not(.anim) .mq__track { overflow-x: auto; scrollbar-width: none; }
 html:not(.anim) .mq__track::-webkit-scrollbar { display: none; }
 
 @media (min-width: 768px) {
-  .mq { padding: 48px 0 120px; }
+  .mq { padding: 48px 0 80px; }
   .mq__row { gap: 16px; }
   .tile { width: 320px; height: 210px; padding: 24px; border-radius: 24px; }
   .tile__t { font-size: 2.6rem; }
@@ -510,7 +515,7 @@ html:not(.anim) .mq__track::-webkit-scrollbar { display: none; }
 .about__title { font-family: var(--font-display); font-weight: 400; text-transform: uppercase; font-size: clamp(3rem, 10vw, 7.6rem); line-height: .9; margin-bottom: 36px; }
 .about__text { font-size: clamp(1.4rem, 3.1vw, 2.55rem); line-height: 1.32; font-weight: 500; letter-spacing: -.012em; color: #f5f5f6; }
 .about__text .w { white-space: nowrap; }
-.about__text .ch { opacity: .16; }
+.about__text .ch { opacity: .26; }
 .about__cta { margin-top: 44px; }
 .about__deco { position: absolute; inset: 0; pointer-events: none; }
 .dchip {
@@ -524,7 +529,7 @@ html:not(.anim) .mq__track::-webkit-scrollbar { display: none; }
 .dchip--4 b { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; line-height: 1; padding-top: 2px; color: var(--accent-text); }
 .dchip { display: none; }
 @media (min-width: 1100px) {
-  .about { padding: 170px 0 180px; }
+  .about { padding: 110px 0 170px; }
   .dchip { font-size: .88rem; padding: 12px 18px; }
   .dchip { display: inline-flex; }
   .dchip--2 { top: 30%; right: 3%; }
@@ -575,59 +580,17 @@ html:not(.anim) .mq__track::-webkit-scrollbar { display: none; }
   .stage__bottom--wide { gap: 64px; }
 }
 
-/* ---------- Comparação animada: dois celulares ---------- */
-.race { overflow: hidden; padding-bottom: 150px; }
-.race__switch { display: none; }
-.race__stage { display: grid; grid-template-columns: minmax(0, 360px) auto minmax(0, 360px); justify-content: center; align-items: start; gap: 28px; }
-.race__vs { align-self: center; font-family: var(--font-display); font-size: 2.6rem; color: var(--muted); }
-.phone { margin: 0; }
-.phone__label { text-align: center; font-family: var(--font-display); font-size: 1.7rem; letter-spacing: .03em; text-transform: uppercase; margin-bottom: 14px; color: var(--muted); }
-.phone--avantta .phone__label { color: var(--accent-text); }
-.phone__frame {
-  position: relative; padding: 34px 12px 14px; border-radius: 38px;
-  background: #0a0a0b; border: 8px solid #222226;
-  box-shadow: 0 30px 60px -30px rgba(0,0,0,.9);
-}
-.phone--avantta .phone__frame { border-color: #2a0b0a; box-shadow: 0 30px 80px -30px var(--glow); }
-.phone__notch { position: absolute; top: 10px; left: 50%; width: 76px; height: 14px; margin-left: -38px; border-radius: 10px; background: #222226; }
-.phone__steps { display: grid; gap: 8px; }
-.pstep { display: grid; grid-template-columns: 34px 1fr 22px; gap: 10px; align-items: center; padding: 10px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); }
-.pstep__ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--surface-2); color: var(--muted); }
-.pstep__ico svg { width: 18px; height: 18px; }
-.pstep__txt b { display: block; font-size: .74rem; font-weight: 700; letter-spacing: .02em; color: var(--muted); line-height: 1.3; }
-.pstep__txt span { display: block; font-size: .92rem; font-weight: 600; line-height: 1.35; margin-top: 2px; }
-.pstep__wait { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; }
-.pstep__st svg { width: 20px; height: 20px; }
-.phone--comum .pstep__txt span { color: #b9b9be; }
-.phone--comum .pstep__st { color: #ff6b62; }
-.phone--avantta .pstep { border-color: rgba(225,6,0,.35); }
-.phone--avantta .pstep__ico { background: var(--glow-soft); color: var(--accent-text); }
-.phone--avantta .pstep__st { color: #3ddc84; }
-.pstep--wa { background: #0f2a1a !important; border-color: #1f7a45 !important; }
-.pstep--wa .pstep__ico { background: #25d366 !important; color: #06301a !important; }
-.pstep--wa .pstep__txt span { color: #eafff2; }
-.phone__count { margin-top: 10px; padding: 14px 16px; border-radius: 14px; text-align: center; background: var(--surface-2); border: 1px dashed var(--border-strong); }
-.phone__count span { display: block; font-size: .8rem; color: var(--muted); }
-.phone__count strong { display: block; font-family: var(--font-display); font-weight: 400; font-size: 3.2rem; line-height: 1; color: var(--muted); }
-.phone--avantta .phone__count strong { color: var(--accent-text); }
-.phone__count small { display: inline-block; margin-top: 2px; font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #8e8e96; }
-.race__note { margin-top: 22px; text-align: center; font-size: .85rem; color: #8e8e96; }
-.race__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 22px; }
-.race__sw {
-  flex: 1; min-height: 48px; padding: 10px 14px; border-radius: 999px; border: 0; cursor: pointer;
-  background: transparent; color: var(--muted); font-weight: 700; font-size: .95rem;
-  transition: background-color .2s, color .2s;
-}
-.race__sw[aria-pressed="true"] { background: var(--btn-a); color: var(--on-accent); }
-.race__sw[data-show="comum"][aria-pressed="true"] { background: #3a3a40; color: #fff; }
-.race__sw:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
-
 /* ---------- Serviços: folha clara com cantos arredondados, 5 itens numerados ---------- */
 .svc { background: var(--paper); color: var(--ink); border-radius: 40px 40px 0 0; padding: 120px 0 170px; }
 .svc__head { max-width: 860px; margin-bottom: 56px; }
 .svc__title { font-family: var(--font-display); font-weight: 400; text-transform: uppercase; font-size: clamp(2.8rem, 7vw, 6rem); line-height: .92; letter-spacing: .005em; }
 .svc__title .hl { color: var(--ink-red); }
 .svc__lead { margin-top: 20px; max-width: 34rem; font-size: 1.08rem; color: var(--ink-muted); }
+.svc__inc { margin-top: 28px; }
+.svc__inc-t { font-size: .72rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 12px; }
+.svc__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.svc__chips li { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: #fff; border: 1px solid rgba(0,0,0,.1); font-size: .86rem; font-weight: 600; color: var(--ink); }
+.svc__chips svg { width: 16px; height: 16px; color: var(--ink-red); flex-shrink: 0; }
 .svc__list { border-top: 1px solid rgba(0,0,0,.14); }
 .svc-item {
   display: grid; grid-template-columns: 1fr; gap: 14px; padding: 30px 0;
@@ -887,6 +850,23 @@ html:not(.anim) .mq__track::-webkit-scrollbar { display: none; }
 .wa-float.is-hidden { opacity: 0; transform: translateY(20px) scale(.8); pointer-events: none; }
 .wa-float.is-hidden::before { animation: none; }
 
+/* ---------- Barra fixa no celular (botão + WhatsApp) ----------
+   Aparece depois do hero e some quando o formulário, a chamada final ou o
+   rodapé estão na tela. No celular substitui o WhatsApp flutuante. */
+.mbar {
+  position: fixed; z-index: 60; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom));
+  display: flex; align-items: center; gap: 10px;
+  transform: translateY(150%); visibility: hidden;
+  transition: transform .45s var(--ease), visibility .45s;
+}
+.mbar.is-visible { transform: none; visibility: visible; }
+.mbar__cta { flex: 1; min-height: 56px; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 18px 40px -12px rgba(0,0,0,.95), 0 10px 30px -12px rgba(225,6,0,.8); }
+.mbar__wa { width: 56px; height: 56px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; background: var(--wa); color: var(--on-wa); box-shadow: 0 18px 40px -12px rgba(0,0,0,.95); }
+.mbar__wa svg { width: 28px; height: 28px; }
+.mbar__wa:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+@media (min-width: 768px) { .mbar { display: none; } }
+@media (max-width: 767px) { .wa-float, .about__cta { display: none; } } /* no celular a barra fixa já faz o papel do botão do "Sobre" */
+
 /* ---------- Rolagem suave (Lenis) ---------- */
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
@@ -896,14 +876,6 @@ html.lenis, html.lenis body { height: auto; }
 /* =========================================================
    RESPONSIVO
    ========================================================= */
-@media (max-width: 760px) {
-  /* celular: um aparelho por vez, com botões para trocar */
-  .race__switch { display: flex; gap: 4px; max-width: 360px; margin: 0 auto 20px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border-strong); }
-  .race__stage { grid-template-columns: minmax(0, 360px); }
-  .race__vs { display: none; }
-  .race__stage[data-active="comum"] .phone--avantta, .race__stage[data-active="avantta"] .phone--comum { display: none; }
-  .race__actions { flex-direction: column-reverse; align-items: stretch; max-width: 360px; margin-left: auto; margin-right: auto; }
-}
 
 @media (max-width: 960px) {
   :root { --header-h: 76px; }
@@ -928,7 +900,6 @@ html.lenis, html.lenis body { height: auto; }
   .stage__ctas > * { flex: 1 1 100%; }
   .hero__ctas > * { flex: 1 1 100%; }
   .about { padding: 64px 0 96px; }
-  .race { padding-bottom: 120px; }
   .svc { padding: 84px 0 130px; }
   .svc-item__go { align-self: stretch; justify-content: space-between; justify-self: stretch; }
   .perks { padding: 24px 18px; }

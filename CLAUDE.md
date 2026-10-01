@@ -16,13 +16,16 @@ Leia este arquivo antes de mexer no projeto. Ele vale para todas as sessões.
 
 A versão atual se baseia na referência "Jack, 3D Creator" (portfólio), adaptada ao preto e vermelho da marca e à realidade da Avanttá (sem fotos de terceiros nem trabalhos de outras empresas).
 
-1. **Hero** (`#hero`): título gigante em degradê ("Seu negócio merece ser visto."), a prévia de um site num celular feito só com CSS no centro (segue o mouse, efeito ímã: padding 150, força 3) com selos em volta ("Pronto para o Google", "Venda realizada", "Nova mensagem de cliente", "Novo contato de cliente"; no celular o aparelho sobe por trás do texto e dos botões ao rolar), e embaixo o texto e os botões. Navegação em pílulas por cima (`.topbar`): logo, pílula "Menu" no celular (abre o painel), links na pílula do meio a partir de 1024px e pílula "Quero minha prévia".
-2. **Faixa que corre com a rolagem** (`#nichos`): três fileiras em sentidos alternados (10 segmentos atendidos e, em duas linhas, o que todo site tem). Enquanto a seção atravessa a tela, cada fileira anda o que falta para mostrar todas as peças (no celular as peças são menores para dar para ler).
-3. **Sobre** (`#sobre`): "Quem não é visto não é lembrado." e um parágrafo que acende letra por letra com a rolagem (de 80% a 20% da tela). Selos decorativos em volta, com profundidade (só no computador).
-4. **Sua situação** (`#situacao`, sanfonado com 3 situações) → **comparação dos celulares** (`#comparacao`).
-5. **Serviços** (`#servicos`): folha clara com cantos arredondados e 5 itens numerados (site completo, página de vendas, loja virtual, reforma, manutenção).
+1. **Hero** (`#hero`): título gigante em degradê com o diferencial ("Veja seu site pronto antes de pagar."), texto curto, três selos de confiança (conversa de 45 min por vídeo, só paga se gostar da prévia, site e endereço no seu nome), a prévia de um site num celular feito só com CSS no centro (segue o mouse, efeito ímã: padding 150, força 3) com balões em volta ("Pronto para o Google", "Venda realizada", "Nova mensagem de cliente", "Novo contato de cliente"; no celular só "Venda realizada" e "Novo contato de cliente", e o aparelho sobe por trás do texto e dos botões ao rolar), e embaixo o texto e os botões. Navegação em pílulas por cima (`.topbar`): logo, pílula "Menu" no celular (abre o painel), links na pílula do meio a partir de 1024px e pílula "Quero minha prévia".
+2. **Faixa dos ramos** (`#nichos`): uma fileira com os 10 segmentos atendidos, correndo devagar em loop (34 px/s no celular, 48 no computador) e com um empurrão da rolagem. Assim todos passam inteiros pela tela, do primeiro ao último. Só anima com a seção na tela; com o mouse em cima, para.
+3. **Sobre** (`#sobre`): "Quem não é visto não é lembrado." e um parágrafo curto que acende letra por letra com a rolagem (de 90% a 60% da tela, para quem para para ler já ler tudo). Selos decorativos em volta, com profundidade (só no computador).
+4. **Sua situação** (`#situacao`, sanfonado com 3 situações). A comparação dos celulares saiu para encurtar a página (repetia o mesmo problema; está no histórico do Git, commit `15e13a7`).
+5. **Serviços** (`#servicos`): folha clara com cantos arredondados, a lista parada "Todo site sai com" (Google, IAs, celular, WhatsApp, abre na hora, endereço próprio, medição) e 5 itens numerados (site completo, página de vendas, loja virtual, reforma, manutenção).
 6. **Como funciona** (`#processo`): 4 cartões que empilham (28px de degrau, os de baixo encolhem 3% por cartão) + o que você recebe.
-7. **Formulário** (`#contato`) → **5 dúvidas** (`#faq`) → **chamada final** → rodapé com a marca gigante em degradê.
+7. **Formulário** (`#contato`) → **7 dúvidas** (`#faq`, com as objeções: prévia grátis, "já me arrependi", parcelar, textos e fotos; a de preço saiu) → **chamada final** → rodapé com a marca gigante em degradê.
+8. **Barra fixa no celular** (`#mbar`): botão "Quero minha prévia grátis" + WhatsApp. Aparece depois do hero e some no formulário, na chamada final e no rodapé (`data-hide-wa`). No computador continua o WhatsApp flutuante.
+
+A conversa por vídeo dura **45 minutos** (configurado no Cal.com). O número aparece no hero, no "Como funciona", no formulário, na agenda e no FAQ: se mudar no Cal.com, mude na página também.
 
 Sistema visual: fundo `#0C0C0C`, títulos em degradê (`.grad`, cinza para branco; `.grad--red` para o destaque), botão de contato em degradê vermelho com seta num círculo branco (`.cbtn`), botão de contorno (`.lbtn`), selo com filete vermelho (`.badge`), curva [0.16, 1, 0.3, 1] no hero e [0.25, 0.1, 0.25, 1] nas entradas (`.reveal`). Títulos em Bebas Neue, o resto em Inter (a referência usa Kanit; mantivemos a identidade da marca).
 
@@ -32,8 +35,8 @@ Uma única conversão: o contato preenche o formulário e **agenda a conversa no
 
 Formulário (`#leadForm`, um passo por tela):
 1. **Contatos:** nome, empresa, WhatsApp (máscara + validação), e-mail (obrigatório, o Cal.com exige) e aceite de contato. **O contato é salvo aqui** (`saveLead` com `etapa: "contatos"`) e o evento `Lead` dispara.
-2. Investimento (avança sozinho)
-3. Para quando (avança sozinho)
+2. Investimento (avança sozinho): até R$ 800, R$ 800 a 2.000, R$ 2.000 a 4.000, R$ 4.000 ou mais, "Ainda não sei" (vai para a agenda)
+3. Para quando (avança sozinho): o quanto antes, este mês, sem pressa
 4. O que precisa + site/Instagram opcional. Salva de novo (`etapa: "completo"`, mesmo `lead_id`).
 
 Depois do envio:
@@ -139,10 +142,11 @@ A checagem não pega trios de verbos e adjetivos: releia as frases novas.
 - Animações com **Motion** (`assets/vendor/motion.min.js`, carregado com `defer`). Não usar GSAP.
 - Entrada das seções: classe `.reveal` (fade + leve subida, 600ms, uma vez). Movimento discreto: 400 a 700ms, nada que atrase a leitura.
 - Animar **apenas `transform` e `opacity`**. Nada de animar `box-shadow`, `filter`, `width` ou `top`, e nada de `filter: blur` em elementos grandes.
-- Respeitar `prefers-reduced-motion`: sem movimento, o conteúdo só aparece (a comparação dos celulares mostra o estado final).
-- Conteúdo que troca sozinho precisa de controle: a comparação tem botões de troca e "Repetir", e troca sozinha uma única vez.
+- Respeitar `prefers-reduced-motion`: sem movimento, o conteúdo só aparece (a faixa vira uma lista que rola de lado).
+- Conteúdo que se mexe sozinho precisa de controle: a faixa dos ramos para com o mouse em cima e não anima com movimento reduzido.
+- **Menos é mais:** animação que ajuda a entender fica; animação que só enfeita sai primeiro. No celular, no máximo 2 balões no hero e 1 fileira na faixa.
 - Transição entre seções sem bordas nem quebras: fundos em degradê que emendam, e a barra fina de progresso de leitura no menu. A exceção proposital é a folha clara dos serviços, que entra com cantos arredondados e é coberta pelo "Como funciona" (sobre ela, a faixa escura atrás do menu some).
-- **Efeitos guiados pela rolagem** (faixa, título do hero, texto letra a letra, selos do "Sobre" e cartões) passam por uma central única em `script.js` (`criarRolagem`): um `requestAnimationFrame` por quadro, medidas só quando a página muda de tamanho e cada efeito só roda com a seção na tela.
+- **Efeitos guiados pela rolagem** (título do hero, texto letra a letra, selos do "Sobre" e cartões) passam por uma central única em `script.js` (`criarRolagem`): um `requestAnimationFrame` por quadro, medidas só quando a página muda de tamanho e cada efeito só roda com a seção na tela.
 - **O hero não depende de JS nem de opacidade para aparecer:** o título e o parágrafo só deslizam. Texto em degradê (`color: transparent`) não conta como maior elemento para o Lighthouse, e texto com opacidade zero também não: quando isso aconteceu, a nota de Performance zerou (NO_LCP). O parágrafo do hero é quem segura essa medida.
 - **Texto que acende letra por letra:** as letras só são separadas quando a seção chega perto da tela; o leitor de tela lê uma cópia inteira (`.sr-only`).
 - **Tentativas anteriores no hero** (no histórico do Git): vídeo em loop do CloudFront de outra empresa (`467504d`), vídeo guiado pela rolagem com cortina (`fd6634e`; não aparecia no celular) e arte do celular abrindo em faixas (`7e60a9b`).
@@ -152,7 +156,7 @@ A checagem não pega trios de verbos e adjetivos: releia as frases novas.
 - Nada de vídeo em autoplay. Imagens em WebP ou AVIF com `loading="lazy"` e `width`/`height` definidos.
 - Fontes em woff2 locais com `font-display: swap` e `preload` só das duas usadas acima da dobra.
 - **Zero rolagem lateral no celular** (testar em 375px).
-- O WhatsApp flutuante some quando o hero, o formulário ou a chamada final estão na tela (`data-hide-wa`).
+- O WhatsApp flutuante (computador) e a barra fixa (celular) somem quando o hero, o formulário, a chamada final ou o rodapé estão na tela (`data-hide-wa`).
 
 Como medir localmente:
 ```bash
