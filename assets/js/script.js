@@ -562,32 +562,45 @@ function initMagnet() {
   document.documentElement.addEventListener('pointerleave', () => { px = py = -9999; if (!raf) raf = requestAnimationFrame(rodar); });
 }
 
-// Faixa que corre com a rolagem. Enquanto a seção atravessa a tela, cada
-// fileira anda exatamente o que falta para mostrar todas as peças (assim nada
-// fica escondido no celular). Nunca mais devagar que a referência (x 0,3).
-// A primeira fileira vai para a esquerda e a segunda para a direita.
-function initMarquee(rolagem) {
+// Faixa dos ramos: corre devagar em loop (todos os ramos passam na frente de
+// quem está olhando, inclusive o primeiro e o último) e a rolagem dá um empurrão
+// na mesma direção. As peças são duplicadas (cópia escondida do leitor de tela)
+// para o loop não ter emenda. Só anima com a seção na tela; com o mouse em cima,
+// para, para dar tempo de ler.
+function initMarquee() {
   const secao = $('#nichos');
-  if (!secao) return;
-  const fileiras = $$('.mq__row', secao).map((el) => ({ el, esquerda: el.dataset.dir !== '1', max: 0 }));
-  let topo = 0;
-  let curso = 1;
-  rolagem.add({
-    el: secao,
-    medir: (vh) => {
-      topo = topoNaPagina(secao);
-      curso = secao.offsetHeight + vh;
-      const largura = document.documentElement.clientWidth;
-      fileiras.forEach((f) => { f.max = Math.max(f.el.scrollWidth - largura, curso * 0.3); });
-    },
-    atualizar: (y, vh) => {
-      const p = limitar((y - topo + vh) / curso);
-      fileiras.forEach((f) => {
-        const x = f.esquerda ? -p * f.max : (p - 1) * f.max;
-        f.el.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
-      });
-    },
+  const fileira = secao && $('.mq__row', secao);
+  if (!fileira) return;
+  const originais = [...fileira.children];
+  originais.forEach((li) => {
+    const copia = li.cloneNode(true);
+    copia.setAttribute('aria-hidden', 'true');
+    fileira.appendChild(copia);
   });
+  const primeiraCopia = fileira.children[originais.length];
+  let volta = 1;      // largura de uma volta (metade da fileira)
+  let andou = 0;      // quanto o tempo já andou (px)
+  let ultimo = 0;
+  let raf = 0;
+  let parado = false;
+  const medir = () => { volta = primeiraCopia.offsetLeft - originais[0].offsetLeft || 1; };
+  const quadro = (t) => {
+    const velocidade = window.innerWidth < 768 ? 34 : 48; // px por segundo
+    if (ultimo && !parado) andou += (Math.min(t - ultimo, 64) / 1000) * velocidade;
+    ultimo = t;
+    const x = ((andou + window.scrollY * 0.35) % volta + volta) % volta;
+    fileira.style.transform = `translate3d(${(-x).toFixed(1)}px,0,0)`;
+    raf = requestAnimationFrame(quadro);
+  };
+  medir();
+  window.addEventListener('resize', medir, { passive: true });
+  if (document.fonts) document.fonts.ready.then(medir);
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting && !raf) { ultimo = 0; raf = requestAnimationFrame(quadro); }
+    else if (!e.isIntersecting && raf) { cancelAnimationFrame(raf); raf = 0; }
+  }).observe(secao);
+  fileira.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') parado = true; });
+  fileira.addEventListener('pointerleave', () => { parado = false; });
 }
 
 // Texto que acende letra por letra (AnimatedText da referência).
@@ -746,7 +759,7 @@ async function initAnimations() {
 
   const rolagem = criarRolagem();
   initHeroScroll(rolagem);
-  initMarquee(rolagem);
+  initMarquee();
   initAnimatedText(rolagem);
   initParallax(rolagem);
   initStack(rolagem);
