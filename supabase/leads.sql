@@ -10,6 +10,7 @@ create table if not exists public.leads (
   empresa         text,
   whatsapp        text,
   email           text,
+  faturamento     text,
   aceite_contato  boolean,
   investimento    text,
   urgencia        text,
@@ -49,3 +50,6 @@ with (security_invoker = true) as
 select distinct on (lead_id) *
 from public.leads
 order by lead_id, (etapa = 'completo') desc, recebido_em desc;
+
+-- Atualização (formulário com faturamento): se a tabela já existia, rode só esta linha.
+alter table public.leads add column if not exists faturamento text;
