@@ -57,7 +57,8 @@ assets/js/reveal.js     componente de entrada suave das seções (classe .reveal
 assets/vendor/motion.min.js  Motion (animate, inView, scroll, stagger) + Lenis (rolagem suave), global window.Motion
 tools/motion-entry.js   entrada do pacote acima ("npm install && npm run vendor" gera de novo)
 assets/fonts/           Bebas Neue e Inter em woff2 (subset latin)
-assets/img/             favicon.svg e og-image.jpg (1200x630, compartilhamento)
+assets/img/             logo.webp (logo oficial, 160px), logo-512.png (dados para o Google), favicon-32.png, icon-192.png, apple-touch-icon.png e og-image.jpg (1200x630, compartilhamento)
+favicon.ico             na raiz (16, 32 e 48px), para o Google e navegadores antigos
 robots.txt, sitemap.xml, llms.txt
 ```
 
@@ -171,7 +172,7 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 - [x] **Domínio**: avanttasites.com.br
 - [ ] **Depoimentos reais** (destaque "Feedbacks" do Instagram) para reativar a seção Feedbacks
 - [ ] **Prints dos cases** (WebP/AVIF, lazy load) para reativar a seção Cases
-- [ ] **Logo original** em SVG (hoje é uma aproximação desenhada em código)
+- [x] **Logo original**: imagem oficial em `assets/img` (gerada a partir do arquivo enviado; se vier em SVG, trocar `logo.webp`)
 - [x] **Supabase**: código pronto; tabela criada e chave anon no código (conferir o primeiro contato real em leads_ultimos)
 - [ ] **Resend**: função pronta (`supabase/functions/aviso-contato`); falta criar a conta, a função e o webhook no painel
 - [ ] **Sentry**: monitorar erros de JS em produção

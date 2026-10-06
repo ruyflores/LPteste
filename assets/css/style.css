@@ -73,8 +73,6 @@
   --ink-muted: #4a4a50;
   --ink-red: #c40500;
 
-  --logo-a: #7a0000;
-  --logo-b: #ff1a1a;
 
   --wa: #25d366;
   --on-wa: #06301a;
@@ -108,8 +106,6 @@
 
   --ink-red: #0c0c0c;
 
-  --logo-a: #6b6b6b;
-  --logo-b: #ffffff;
 
   --wa: #ffffff;
   --on-wa: #050505;
@@ -258,12 +254,7 @@ fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .topbar__left { display: flex; align-items: center; gap: 8px; }
 .topbar a, .topbar button, .nav, .links-pill { pointer-events: auto; }
 .brand { display: inline-flex; align-items: center; gap: 10px; margin-right: 6px; }
-.brand__mark {
-  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0;
-  background: var(--bg); border: 2px solid var(--accent);
-  box-shadow: 0 0 18px -2px var(--glow), inset 0 0 12px -4px var(--glow);
-}
-.brand__mark svg { width: 62%; height: 62%; }
+.brand__mark { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; } /* logo oficial (assets/img/logo.webp), já com o anel vermelho */
 .brand__name { display: none; font-family: var(--font-display); font-size: 1.7rem; letter-spacing: 0.04em; line-height: 1; padding-top: 3px; }
 
 .menu-pill {
