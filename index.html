@@ -261,7 +261,7 @@
       <nav class="links-pill" aria-label="Seções">
         <a href="#sobre">Sobre</a>
         <a href="#servicos">Serviços</a>
-        <a href="#processo">Como funciona</a>
+        <a href="#resultados">Resultados</a>
         <a href="#faq">Dúvidas</a>
       </nav>
       <a href="#contato" class="cta-pill" aria-label="Quero minha prévia grátis">
@@ -274,7 +274,7 @@
       <a href="#sobre">Sobre a Avanttá</a>
       <a href="#situacao">Sua situação</a>
       <a href="#servicos">Serviços</a>
-      <a href="#processo">Como funciona</a>
+      <a href="#resultados">Resultados</a>
       <a href="#faq">Dúvidas</a>
       <a href="#contato" class="cbtn nav__cta">Quero minha prévia grátis <span class="cbtn__arrow" aria-hidden="true"><svg><use href="#i-up-right" /></svg></span></a>
     </nav>
@@ -306,7 +306,7 @@
           </div>
           <div class="hero__ctas">
             <a href="#contato" class="cbtn">Quero ver minha prévia grátis <span class="cbtn__arrow" aria-hidden="true"><svg><use href="#i-up-right" /></svg></span></a>
-            <a href="#processo" class="lbtn">Como funciona</a>
+            <a href="#resultados" class="lbtn">Ver resultados</a>
           </div>
         </div>
 
@@ -536,81 +536,29 @@
       </div>
     </section>
 
-    <!-- ===================== COMO FUNCIONA (cartões que empilham) =====================
-         Cada cartão gruda no topo (28px abaixo do anterior) e os de baixo
-         encolhem 3% por cartão por cima, conforme a rolagem. -->
-    <section class="section process" id="processo">
+    <!-- ===================== NOSSOS NÚMEROS (prova social) =====================
+         Número grande em contador de rolo (os dígitos giram até parar), números
+         menores que contam do zero e linhas que se desenham. Sem movimento, os
+         números já aparecem prontos (estão escritos no HTML). -->
+    <section class="section process stats" id="resultados">
+      <div class="stats__glow" aria-hidden="true"></div>
       <div class="container">
-        <header class="section-head">
-          <p class="badge reveal">Como funciona</p>
-          <h2 class="display display--md reveal" data-delay="100">Do formulário ao site no ar <span class="hl">em 4 passos.</span></h2>
+        <header class="stats__head">
+          <p class="badge reveal">Nossos números</p>
+          <h2 class="stats__title reveal" data-delay="80"><span class="grad">Resultado a gente</span> <span class="grad grad--red">mostra em número.</span></h2>
         </header>
 
-        <ol class="stack" id="steps">
-          <li class="scard" style="--i:0">
-            <div class="scard__txt">
-              <span class="scard__n">01</span>
-              <h3>Você deixa seus contatos</h3>
-              <p>E responde 2 perguntas rápidas. Leva menos de um minuto, e a agenda já abre em seguida.</p>
-            </div>
-            <div class="scard__vis" aria-hidden="true">
-              <div class="mock mock--form">
-                <span class="mock__label">Passo 1 de 3</span>
-                <span class="mock__bar"><i></i></span>
-                <span class="mock__field">Seu nome</span>
-                <span class="mock__field">WhatsApp com DDD</span>
-                <span class="mock__field">E-mail</span>
-                <span class="mock__btn">Continuar</span>
-              </div>
-            </div>
-          </li>
-          <li class="scard" style="--i:1">
-            <div class="scard__txt">
-              <span class="scard__n">02</span>
-              <h3>A gente monta sua prévia</h3>
-              <p>Uma prévia do seu site, com a cara da sua empresa, que você já consegue abrir e clicar. Grátis.</p>
-            </div>
-            <div class="scard__vis" aria-hidden="true">
-              <div class="mock mock--site">
-                <span class="mock__dots"><i></i><i></i><i></i></span>
-                <span class="mock__hero"><b>Sua empresa</b><i></i><i class="s"></i></span>
-                <span class="mock__cols"><i></i><i></i><i></i></span>
-                <span class="mock__chip">Prévia grátis</span>
-                <svg class="mock__cursor"><use href="#i-cursor" /></svg>
-              </div>
-            </div>
-          </li>
-          <li class="scard" style="--i:2">
-            <div class="scard__txt">
-              <span class="scard__n">03</span>
-              <h3>Conversa de 45 minutos</h3>
-              <p>Por vídeo, pelo Google Meet, de onde você estiver. Você passeia pela prévia com a gente e, se fizer sentido, já sai com a proposta.</p>
-            </div>
-            <div class="scard__vis" aria-hidden="true">
-              <div class="mock mock--call">
-                <span class="mock__cam"><i></i></span>
-                <span class="mock__cam mock__cam--b"><i></i></span>
-                <span class="mock__tools"><i></i><i></i><i class="r"></i></span>
-                <span class="mock__chip mock__chip--ok"><svg><use href="#i-check" /></svg> Proposta na mão</span>
-              </div>
-            </div>
-          </li>
-          <li class="scard" style="--i:3">
-            <div class="scard__txt">
-              <span class="scard__n">04</span>
-              <h3>Site no ar</h3>
-              <p>Com a sua aprovação, a gente finaliza e publica. Entrega ágil, com prazo definido na proposta.</p>
-              <a href="#contato" class="cbtn cbtn--sm">Quero começar <span class="cbtn__arrow" aria-hidden="true"><svg><use href="#i-up-right" /></svg></span></a>
-            </div>
-            <div class="scard__vis" aria-hidden="true">
-              <div class="mock mock--live">
-                <span class="mock__url"><svg><use href="#i-lock" /></svg> suaempresa.com.br <em>No ar</em></span>
-                <span class="mock__result"><b>Sua Empresa | Site oficial</b><i></i><i class="s"></i></span>
-                <span class="mock__result mock__result--dim"><b></b><i></i><i class="s"></i></span>
-              </div>
-            </div>
-          </li>
-        </ol>
+        <div class="stats__hero">
+          <p class="stats__big"><span class="sr-only">Mais de 15 milhões de reais</span><span aria-hidden="true"><span class="stats__cur">R$</span><span class="odo" data-odo="15">15</span><span class="stats__suf">M+</span></span></p>
+          <p class="stats__big-d">em vendas geradas pelos sites que a Avanttá entregou para os clientes</p>
+        </div>
+
+        <ul class="stats__grid">
+          <li class="stat"><b class="stat__n"><span data-count="250">250</span>+</b><span class="stat__d">sites entregues em todo o Brasil</span></li>
+          <li class="stat"><b class="stat__n"><span data-count="3">3</span>x</b><span class="stat__d">mais contatos no WhatsApp, em média, nos 3 primeiros meses</span></li>
+          <li class="stat"><b class="stat__n"><span data-count="40">40</span>+</b><span class="stat__d">ramos de negócio atendidos</span></li>
+          <li class="stat"><b class="stat__n"><span data-count="22">22</span></b><span class="stat__d">estados com cliente Avanttá</span></li>
+        </ul>
 
         <div class="perks luz reveal">
           <p class="perks__title">Ao agendar, você recebe</p>

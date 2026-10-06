@@ -21,11 +21,11 @@ A versão atual se baseia na referência "Jack, 3D Creator" (portfólio), adapta
 3. **Sobre** (`#sobre`): "Quem não é visto não é lembrado." e um parágrafo curto que acende letra por letra com a rolagem (de 90% a 60% da tela, para quem para para ler já ler tudo). Selos decorativos em volta, com profundidade (só no computador).
 4. **Sua situação** (`#situacao`, sanfonado com 3 situações). A comparação dos celulares saiu para encurtar a página (repetia o mesmo problema; está no histórico do Git, commit `15e13a7`).
 5. **Serviços** (`#servicos`): folha clara com cantos arredondados, a lista parada "Todo site sai com" (Google, IAs, celular, WhatsApp, abre na hora, endereço próprio, medição) e 5 itens numerados (site completo, página de vendas, loja virtual, reforma, manutenção).
-6. **Como funciona** (`#processo`): 4 cartões que empilham (28px de degrau, os de baixo encolhem 3% por cartão) + o que você recebe.
+6. **Nossos números** (`#resultados`, no lugar dos 4 cartões do "Como funciona", que estão no histórico do Git, commit `f2f175a`): "Resultado a gente mostra em número.", o número grande **R$ 15M+** em vendas geradas pelos sites entregues (contador de rolo: cada dígito gira uma volta e para) e 4 números menores que contam do zero com linhas que se desenham: **250+** sites entregues, **3x** mais contatos no WhatsApp em média nos 3 primeiros meses, **40+** ramos atendidos, **22** estados. Números definidos pelo dono, que se responsabiliza por eles. Depois vem o "O que você recebe". O menu e o botão secundário do hero ("Ver resultados") apontam para cá.
 7. **Formulário** (`#contato`) → **7 dúvidas** (`#faq`, com as objeções: prévia grátis, "já me arrependi", parcelar, textos e fotos; a de preço saiu) → **chamada final** → rodapé com a marca gigante em degradê.
 8. **Barra fixa no celular** (`#mbar`): botão "Quero minha prévia grátis" + WhatsApp. Aparece depois do hero e some no formulário, na chamada final e no rodapé (`data-hide-wa`). No computador continua o WhatsApp flutuante.
 
-A conversa por vídeo dura **45 minutos** (configurado no Cal.com). O número aparece no hero, no "Como funciona", no formulário, na agenda e no FAQ: se mudar no Cal.com, mude na página também.
+A conversa por vídeo dura **45 minutos** (configurado no Cal.com). O número aparece no hero, no formulário, na agenda e no FAQ: se mudar no Cal.com, mude na página também.
 
 Sistema visual: fundo `#0C0C0C`, títulos em degradê (`.grad`, cinza para branco; `.grad--red` para o destaque), botão de contato em degradê vermelho com seta num círculo branco (`.cbtn`), botão de contorno (`.lbtn`), selo com filete vermelho (`.badge`), curva [0.16, 1, 0.3, 1] no hero e [0.25, 0.1, 0.25, 1] nas entradas (`.reveal`). Títulos em Bebas Neue, o resto em Inter (a referência usa Kanit; mantivemos a identidade da marca).
 
@@ -116,7 +116,7 @@ O público são donos de pequenas e médias empresas (clínicas, escritórios, e
   - pontos de exclamação em excesso.
 - Nunca usar "sem compromisso". Usar "prévia grátis" / "prévia gratuita" e deixar claro que, se fizer sentido, a conversa já sai com proposta.
 - Nunca mencionar prazos em dias. Usar "entrega ágil" e "prazo definido na proposta".
-- **Nunca inventar** números, resultados, depoimentos ou clientes. Ilustrações (como a comparação dos celulares) levam o selo "simulação".
+- **Nunca inventar** números, resultados, depoimentos ou clientes (os números da seção "Nossos números" foram definidos pelo dono, que responde por eles; mudar só com a palavra dele). Ilustrações (como a comparação dos celulares) levam o selo "simulação".
 - O FAQ visível e o `FAQPage` do JSON-LD precisam ter o mesmo texto.
 - Antes de cada commit, rodar a checagem abaixo e corrigir tudo o que aparecer:
 
@@ -146,12 +146,12 @@ A checagem não pega trios de verbos e adjetivos: releia as frases novas.
 - Respeitar `prefers-reduced-motion`: sem movimento, o conteúdo só aparece (a faixa vira uma lista que rola de lado).
 - Conteúdo que se mexe sozinho precisa de controle: a faixa dos ramos para com o mouse em cima e não anima com movimento reduzido.
 - **Menos é mais:** animação que ajuda a entender fica; animação que só enfeita sai primeiro. No celular, no máximo 2 balões no hero e 1 fileira na faixa.
-- Transição entre seções sem bordas nem quebras: fundos em degradê que emendam, e a barra fina de progresso de leitura no menu. A exceção proposital é a folha clara dos serviços, que entra com cantos arredondados e é coberta pelo "Como funciona" (sobre ela, a faixa escura atrás do menu some).
-- **Efeitos guiados pela rolagem** (título do hero, texto letra a letra, selos do "Sobre" e cartões) passam por uma central única em `script.js` (`criarRolagem`): um `requestAnimationFrame` por quadro, medidas só quando a página muda de tamanho e cada efeito só roda com a seção na tela.
+- Transição entre seções sem bordas nem quebras: fundos em degradê que emendam, e a barra fina de progresso de leitura no menu. A exceção proposital é a folha clara dos serviços, que entra com cantos arredondados e é coberta pelo "Nossos números" (sobre ela, a faixa escura atrás do menu some).
+- **Efeitos guiados pela rolagem** (título do hero, texto letra a letra e selos do "Sobre") passam por uma central única em `script.js` (`criarRolagem`): um `requestAnimationFrame` por quadro, medidas só quando a página muda de tamanho e cada efeito só roda com a seção na tela.
 - **O hero não depende de JS nem de opacidade para aparecer:** o título e o parágrafo só deslizam. Texto em degradê (`color: transparent`) não conta como maior elemento para o Lighthouse, e texto com opacidade zero também não: quando isso aconteceu, a nota de Performance zerou (NO_LCP). O parágrafo do hero é quem segura essa medida.
 - **Texto que acende letra por letra:** as letras só são separadas quando a seção chega perto da tela; o leitor de tela lê uma cópia inteira (`.sr-only`).
 - **Tentativas anteriores no hero** (no histórico do Git): vídeo em loop do CloudFront de outra empresa (`467504d`), vídeo guiado pela rolagem com cortina (`fd6634e`; não aparecia no celular) e arte do celular abrindo em faixas (`7e60a9b`).
-- **Efeitos do Não Codei em uso:** 01 cartões que empilham ("Como funciona"; o escurecimento é uma camada com `opacity`, não `filter`), 10 inércia (feito pelo Lenis na página inteira) e 12 luz que segue o mouse (cartões `.luz`). **Fora de propósito:** 09 cursor personalizado (atrapalha quem quer clicar e contratar), 23 painéis que expandem e 21 galeria com filtro (animam largura, não transform), 08 cubo e 02 galeria horizontal (alongam a página e não ajudam a vender), 05 máscara (anima `clip-path`). O 06 faixas chegou a ser usado com uma arte estática no hero, mas voltamos ao vídeo com a transição em cortina.
+- **Efeitos do Não Codei em uso:** 10 inércia (feito pelo Lenis na página inteira) e 12 luz que segue o mouse (cartões `.luz`). **Fora de propósito:** 09 cursor personalizado (atrapalha quem quer clicar e contratar), 23 painéis que expandem e 21 galeria com filtro (animam largura, não transform), 08 cubo e 02 galeria horizontal (alongam a página e não ajudam a vender), 05 máscara (anima `clip-path`). O 06 faixas e o 01 cartões que empilham já foram usados e saíram (histórico do Git).
 - **Rolagem suave (Lenis)** dá a sensação de site contínuo; é desligada com `prefers-reduced-motion`. Para rolar por código, use `scrollToEl()` (funciona com e sem Lenis).
 - O script do Cal.com só carrega quando o contato chega à agenda.
 - Nada de vídeo em autoplay. Imagens em WebP ou AVIF com `loading="lazy"` e `width`/`height` definidos.

@@ -611,72 +611,60 @@ html:not(.anim) .mq__track::-webkit-scrollbar { display: none; }
   .svc-item__go { align-self: center; }
 }
 
-/* ---------- Como funciona: cartões que empilham ----------
-   Cada cartão gruda 28px abaixo do anterior. Os de baixo encolhem 3% a cada
-   cartão que passa por cima e escurecem (camada com opacity, não filter). */
+/* ---------- Nossos números (prova social) ----------
+   A seção escura cobre o fim da folha clara dos serviços (cantos arredondados).
+   Animações: contador de rolo no número grande, contagem nos menores, linhas
+   que se desenham e uma luz vermelha que acende atrás. Só transform e opacity. */
 .process { margin-top: -48px; border-radius: 40px 40px 0 0; background: var(--bg); z-index: 1; }
-.stack { display: grid; gap: 28px; max-width: 1100px; margin: 0 auto; }
-.scard {
-  --i: 0; --dim: 0;
-  position: sticky; top: calc(var(--header-h) + 12px + var(--i) * 20px);
-  display: grid; grid-template-columns: 1fr; gap: 22px; padding: 24px 20px; border-radius: 24px;
-  background: linear-gradient(150deg, #1f1f23, #0f0f11 70%); border: 1px solid rgba(255,255,255,.12);
-  box-shadow: 0 -20px 50px rgba(0,0,0,.55); transform-origin: center top; will-change: transform;
+.stats { overflow: hidden; }
+.stats .container { position: relative; }
+.stats__glow {
+  position: absolute; left: -20%; top: 12%; width: 90%; height: 70%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(225,6,0,.34), rgba(225,6,0,.08) 60%, transparent);
+  opacity: 0; transform: scale(.85); transition: opacity 1.4s ease, transform 1.8s var(--ease-hero);
 }
-.scard::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; background: #000; opacity: var(--dim); pointer-events: none; }
-.scard:nth-child(2) { background: linear-gradient(150deg, #241a1b, #100c0c 70%); }
-.scard:nth-child(3) { background: linear-gradient(150deg, #2b1616, #120a0a 70%); }
-.scard:nth-child(4) { background: linear-gradient(150deg, #3a1210, #150707 70%); border-color: rgba(225,6,0,.45); }
-.scard__txt { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.scard__n { font-family: var(--font-display); font-size: 3.4rem; line-height: .85; color: var(--accent-text); }
-.scard h3 { font-family: var(--font-display); font-weight: 400; text-transform: uppercase; font-size: clamp(2rem, 4vw, 3.4rem); line-height: .95; }
-.scard p { color: var(--muted); font-size: 1rem; max-width: 30rem; }
-.scard .cbtn { margin-top: 8px; }
-.scard__vis {
-  position: relative; height: 200px; border-radius: 18px; overflow: hidden; display: grid; place-items: center;
-  background: radial-gradient(70% 80% at 70% 20%, rgba(225,6,0,.28), transparent 70%), #0b0b0c; border: 1px solid rgba(255,255,255,.06);
+.stats.is-in .stats__glow, html:not(.anim) .stats__glow { opacity: 1; transform: none; }
+[data-theme="mono"] .stats__glow { background: radial-gradient(closest-side, rgba(255,255,255,.12), transparent); }
+.stats__title { font-family: var(--font-display); font-weight: 400; text-transform: uppercase; font-size: clamp(2.6rem, 7vw, 5.6rem); line-height: .92; }
+.stats__title .grad { display: inline-block; margin-top: -.16em; }
+.stats__hero { margin-top: 34px; }
+.stats__big {
+  display: flex; align-items: flex-start; font-family: var(--font-display); font-weight: 400;
+  position: relative; isolation: isolate;
+  font-size: clamp(7rem, 34vw, 18rem); line-height: .86; letter-spacing: .005em; color: #fff;
 }
-/* mini ilustrações dos passos (só CSS) */
-.mock { position: relative; width: min(86%, 320px); padding: 16px; border-radius: 16px; background: #141416; border: 1px solid rgba(255,255,255,.12); display: flex; flex-direction: column; gap: 8px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.9); }
-.mock i { display: block; }
-.mock__label { font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-.mock__bar { height: 5px; border-radius: 5px; background: #26262a; overflow: hidden; }
-.mock__bar i { width: 25%; height: 100%; background: var(--accent); }
-.mock__field { padding: 8px 10px; border-radius: 8px; background: #0c0c0c; border: 1px solid rgba(255,255,255,.12); font-size: .7rem; color: #8e8e96; }
-.mock__btn { align-self: stretch; padding: 8px; border-radius: 999px; text-align: center; background: var(--cbtn); color: #fff; font-size: .7rem; font-weight: 700; }
-.mock__dots { display: flex; gap: 5px; }
-.mock__dots i { width: 7px; height: 7px; border-radius: 50%; background: #3a3a3f; }
-.mock__hero { display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 10px; background: linear-gradient(150deg, #4a0f0c, #170808); }
-.mock__hero b { font-family: var(--font-display); font-weight: 400; font-size: 1.4rem; line-height: 1; text-transform: uppercase; color: #fff; }
-.mock__hero i, .mock__result i { height: 5px; width: 90%; border-radius: 5px; background: rgba(255,255,255,.22); }
-.mock__hero i.s, .mock__result i.s { width: 60%; }
-.mock__cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.mock__cols i { height: 34px; border-radius: 8px; background: #1f1f23; }
-.mock__chip { position: absolute; top: -12px; right: -10px; display: inline-flex; align-items: center; gap: 5px; padding: 6px 11px; border-radius: 999px; background: var(--accent); color: #fff; font-size: .66rem; font-weight: 700; box-shadow: 0 10px 24px -10px var(--glow); }
-.mock__chip svg { width: 12px; height: 12px; }
-.mock__chip--ok { top: auto; bottom: -12px; background: #25d366; color: #06301a; }
-.mock__cursor { position: absolute; width: 22px; height: 22px; right: 26%; bottom: 22%; color: #fff; }
-.mock--call { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.mock__cam { aspect-ratio: 4 / 3; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(160deg, #26262b, #151517); }
-.mock__cam i { width: 34px; height: 34px; border-radius: 50%; background: #3a3a40; }
-.mock__cam--b { background: linear-gradient(160deg, #3a0f0c, #160808); }
-.mock__cam--b i { background: rgba(255,90,80,.55); }
-.mock__tools { grid-column: 1 / -1; display: flex; justify-content: center; gap: 8px; }
-.mock__tools i { width: 22px; height: 22px; border-radius: 50%; background: #2a2a2f; }
-.mock__tools i.r { background: var(--accent); }
-.mock__url { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 999px; background: #0c0c0c; border: 1px solid rgba(255,255,255,.1); font-size: .7rem; color: rgba(255,255,255,.8); }
-.mock__url svg { width: 10px; height: 10px; color: #3ddc84; }
-.mock__url em { margin-left: auto; display: inline-flex; align-items: center; gap: 5px; font-style: normal; font-weight: 700; color: #3ddc84; }
-.mock__url em::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #3ddc84; box-shadow: 0 0 8px #3ddc84; }
-.mock__result { display: flex; flex-direction: column; gap: 5px; padding: 10px; border-radius: 10px; background: #1a1a1d; border-left: 2px solid var(--accent); }
-.mock__result b { font-size: .78rem; font-weight: 600; color: #9ec1ff; }
-.mock__result--dim { opacity: .45; border-left-color: transparent; }
-.mock__result--dim b { height: 8px; width: 55%; border-radius: 4px; background: rgba(158,193,255,.4); }
+/* brilho vermelho atrás do número (camada própria: o rolo dos dígitos corta sombra de texto) */
+.stats__big::before {
+  content: ""; position: absolute; z-index: -1; left: 5%; top: 10%; width: 90%; height: 80%;
+  background: radial-gradient(closest-side, rgba(225,6,0,.55), transparent); pointer-events: none;
+}
+.stats__big > span { display: flex; align-items: flex-start; }
+.stats__cur { font-size: .4em; line-height: 1; margin: .14em .08em 0 0; color: var(--accent-text); }
+.stats__suf { color: var(--accent-text); }
+.odo { display: inline-flex; }
+.odo__col { display: inline-block; height: .86em; overflow: hidden; }
+.odo__strip { display: flex; flex-direction: column; will-change: transform; }
+.odo__strip span { display: block; height: .86em; line-height: .86em; }
+.stats__big-d { margin-top: 14px; max-width: 26rem; font-size: 1.05rem; line-height: 1.55; color: rgba(255,255,255,.74); }
+.stats__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px 20px; margin-top: 56px; }
+.stat { position: relative; padding-top: 22px; }
+.stat::before, .stat::after { content: ""; position: absolute; left: 0; top: 0; height: 1px; transform-origin: left center; }
+.stat::before { right: 0; background: rgba(255,255,255,.16); }
+.stat::after { top: -1px; width: 56px; height: 3px; background: var(--accent); }
+.stat__n { display: block; font-family: var(--font-display); font-weight: 400; font-size: clamp(3.4rem, 11vw, 5.6rem); line-height: .9; color: #fff; }
+.stat__d { display: block; margin-top: 8px; max-width: 16rem; font-size: .9rem; line-height: 1.5; color: var(--muted); }
+/* entrada: cada número sobe e as linhas se desenham, em cascata */
+.anim .stat { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .8s var(--ease-hero); }
+.anim .stat::before, .anim .stat::after { transform: scaleX(0); transition: transform 1.1s var(--ease-hero); }
+.stats__grid.is-in .stat { opacity: 1; transform: none; }
+.stats__grid.is-in .stat::before, .stats__grid.is-in .stat::after { transform: scaleX(1); }
+.stats__grid .stat:nth-child(2), .stats__grid .stat:nth-child(2)::before, .stats__grid .stat:nth-child(2)::after { transition-delay: .12s; }
+.stats__grid .stat:nth-child(3), .stats__grid .stat:nth-child(3)::before, .stats__grid .stat:nth-child(3)::after { transition-delay: .24s; }
+.stats__grid .stat:nth-child(4), .stats__grid .stat:nth-child(4)::before, .stats__grid .stat:nth-child(4)::after { transition-delay: .36s; }
 @media (min-width: 900px) {
-  .scard { top: calc(var(--header-h) + 16px + var(--i) * 28px); grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; min-height: 420px; padding: 44px; border-radius: 30px; }
-  .scard__n { font-size: 5rem; }
-  .scard__vis { height: 330px; }
-  .mock { padding: 20px; gap: 10px; }
+  .stats__hero { display: flex; align-items: flex-end; gap: 40px; }
+  .stats__big-d { margin: 0 0 1.4rem; }
+  .stats__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; margin-top: 72px; }
 }
 
 /* O que você recebe */

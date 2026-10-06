@@ -24,4 +24,4 @@ Configuração no topo de `assets/js/script.js`: `WHATSAPP_NUMBER`, `CAL_LINK`, 
 
 O Motion (motion.dev) e o Lenis (rolagem suave) ficam em `assets/vendor/motion.min.js`. Para gerar de novo depois de atualizar as versões: `npm install && npm run vendor`.
 
-O hero tem título gigante em degradê e a prévia de um site num celular feito só com CSS (segue o mouse). A faixa de segmentos corre com a rolagem, o texto do "Sobre" acende letra por letra e os passos do "Como funciona" empilham. Com movimento reduzido, tudo aparece parado.
+O hero tem título gigante em degradê e a prévia de um site num celular feito só com CSS (segue o mouse). A faixa de segmentos corre com a rolagem, o texto do "Sobre" acende letra por letra e os números da seção "Nossos números" giram e contam do zero. Com movimento reduzido, tudo aparece parado.
