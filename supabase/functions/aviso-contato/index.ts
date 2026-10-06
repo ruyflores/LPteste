@@ -15,13 +15,13 @@ Deno.serve(async (req) => {
 
   const completo = r.etapa === "completo";
   const assunto = completo
-    ? `Contato completo: ${r.nome} (${r.empresa}) | ${r.investimento}`
-    : `Novo contato no site: ${r.nome} (${r.empresa})`;
+    ? `Foi para a agenda: ${r.nome} (${r.empresa}) | ${r.investimento}`
+    : `Novo contato no site: ${r.nome} (${r.empresa}) | fatura ${r.faturamento || "?"}`;
   const whats = String(r.whatsapp ?? "").replace(/\D/g, "");
   const linhas: [string, unknown][] = [
-    ["Nome", r.nome], ["Empresa", r.empresa], ["WhatsApp", r.whatsapp], ["E-mail", r.email],
-    ["Investimento", r.investimento], ["Para quando", r.urgencia], ["Precisa de", r.servico],
-    ["Site ou Instagram", r.link], ["Caminho", r.rota === "agenda" ? "foi para a agenda" : r.rota === "whatsapp" ? "foi para o WhatsApp" : ""],
+    ["Nome", r.nome], ["Instagram ou empresa", r.empresa], ["WhatsApp", r.whatsapp], ["E-mail", r.email],
+    ["Faturamento por mês", r.faturamento], ["Investimento", r.investimento], ["Para quando", r.urgencia],
+    ["Serviço que chamou atenção", r.servico], ["Obs.", r.link], ["Caminho", r.rota === "agenda" ? "foi para a agenda" : ""],
     ["Origem", [r.utm_source, r.utm_medium, r.utm_campaign].filter(Boolean).join(" / ")],
   ];
   const html = `

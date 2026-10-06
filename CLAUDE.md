@@ -33,15 +33,15 @@ Sistema visual: fundo `#0C0C0C`, títulos em degradê (`.grad`, cinza para branc
 
 Uma única conversão: o contato preenche o formulário e **agenda a conversa no Cal.com**. O WhatsApp é a saída secundária.
 
-Formulário (`#leadForm`, um passo por tela):
-1. **Contatos:** nome, empresa, WhatsApp (máscara + validação), e-mail (obrigatório, o Cal.com exige) e aceite de contato. **O contato é salvo aqui** (`saveLead` com `etapa: "contatos"`) e o evento `Lead` dispara.
-2. Investimento (avança sozinho): até R$ 800, R$ 800 a 2.000, R$ 2.000 a 4.000, R$ 4.000 ou mais, "Ainda não sei" (vai para a agenda)
-3. Para quando (avança sozinho): o quanto antes, este mês, sem pressa
-4. O que precisa + site/Instagram opcional. Salva de novo (`etapa: "completo"`, mesmo `lead_id`).
+Formulário (`#leadForm`, um passo por tela, 3 passos):
+1. **Contatos e faturamento**, nesta ordem: nome, WhatsApp (máscara + validação), e-mail (obrigatório, o Cal.com exige), @ do Instagram ou nome da empresa (campo `empresa`) e faturamento por mês (ainda não fatura, até 5 mil, 5 a 15 mil, 15 a 30 mil, 30 a 50 mil, 50 a 100 mil, 100 a 200 mil, 200 a 300 mil, 300 a 500 mil, 500 mil ou mais). O aceite de contato já vem marcado. **O contato é salvo aqui** (`saveLead` com `etapa: "contatos"`) e o evento `Lead` dispara.
+2. Investimento (avança sozinho): até R$ 500, R$ 500 a 2.000, R$ 2.000 a 4.000, R$ 4.000 ou mais, "Ainda não sei".
+3. Para quando (ao escolher, já abre a agenda): o quanto antes, este mês, sem pressa. Salva de novo (`etapa: "completo"`, mesmo `lead_id`).
 
 Depois do envio:
-- **"Até R$ 800"** → agradecimento + botão de WhatsApp com as respostas.
-- **Demais faixas** → Cal.com embutido no lugar do formulário, **já preenchido** (nome, e-mail, WhatsApp, resumo em `notes` e UTMs). Tem o botão "Prefiro falar pelo WhatsApp". No evento `bookingSuccessful`, mostra "Reunião confirmada" e dispara `Schedule`.
+- **Todo mundo vai para a agenda,** qualquer que seja a resposta: Cal.com embutido no lugar do formulário, **já preenchido** (nome, e-mail, WhatsApp, resumo em `notes` e UTMs). Não há WhatsApp nessa tela, para não desviar do agendamento.
+- No evento `bookingSuccessful`, mostra "Reunião confirmada", dispara `Schedule` e só então aparece o botão "Chamar no WhatsApp" (`#bookedWa`, mensagem pronta com nome e empresa).
+- O serviço clicado nos cartões de Serviços fica num campo escondido (`servico`) e vai no resumo.
 - A origem da visita (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`, `fbclid`, página de origem e referrer) é capturada ao entrar e guardada durante a visita (`sessionStorage`).
 
 ## Estrutura
@@ -66,7 +66,7 @@ Constantes no topo de `assets/js/script.js`:
 - `WHATSAPP_NUMBER` = `5561995905615`
 - `CAL_LINK` = `avantta/avantta`
 - `CAL_PHONE_FIELDS` = `['attendeePhoneNumber']`: o evento do Cal.com pede só nome (`name`), e-mail (`email`) e WhatsApp (`attendeePhoneNumber`), para ter menos atrito. O resumo vai em `notes`.
-- `SUPABASE_URL` / `SUPABASE_ANON_KEY` e `saveLead(dados)`: grava cada etapa como uma linha nova na tabela `leads` do Supabase (só inserir; o site não lê nem altera nada). Sem a chave, não envia. A tabela, a segurança e a visão `leads_ultimos` (uma linha por contato) estão em `supabase/leads.sql`.
+- `SUPABASE_URL` / `SUPABASE_ANON_KEY` e `saveLead(dados)`: grava cada etapa como uma linha nova na tabela `leads` do Supabase (só inserir; o site não lê nem altera nada). Sem a chave, não envia. Se a coluna `faturamento` não existir, reenvia com o faturamento na coluna `link` (ninguém se perde). A tabela, a segurança e a visão `leads_ultimos` (uma linha por contato) estão em `supabase/leads.sql`.
 - `supabase/functions/aviso-contato`: e-mail de aviso (Resend) a cada linha nova, chamado por um Database Webhook do Supabase. Segredos no painel: `RESEND_API_KEY`, `AVISO_PARA`, `AVISO_DE`, `WEBHOOK_SEGREDO`.
 - `trackConversion(evento)`: `Lead` e `Schedule`, cada um uma vez por visita. É o ponto único para o Pixel da Meta e o GA4.
 

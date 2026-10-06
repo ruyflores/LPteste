@@ -31,9 +31,6 @@ const BRAND_RED = '#e10600';
 const SUPABASE_URL = 'https://dfkmvqfuuvhwlgdjkjqz.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRma212cWZ1dXZod2xnZGpranF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4NDI5NDYsImV4cCI6MjA3MjQxODk0Nn0.qzAVgM9hQCrXohxcvOkVd1mS27_FbK5oJyAY2pXl95M'; // Project Settings > API Keys > anon public
 
-// Quem responde "Até R$ 800" vai para o WhatsApp em vez da agenda
-const LOW_BUDGET = 'Até R$ 800';
-
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -57,7 +54,7 @@ async function saveLead(dados) {
     console.info('[Avanttá] Supabase sem chave, contato não enviado:', dados);
     return { ok: false };
   }
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+  const enviar = (corpo) => fetch(`${SUPABASE_URL}/rest/v1/leads`, {
     method: 'POST',
     keepalive: true,
     headers: {
@@ -66,9 +63,20 @@ async function saveLead(dados) {
       'Content-Type': 'application/json',
       Prefer: 'return=minimal',
     },
-    body: JSON.stringify(dados),
+    body: JSON.stringify(corpo),
   });
-  if (!res.ok) throw new Error(`Supabase ${res.status}: ${await res.text()}`);
+  let res = await enviar(dados);
+  if (!res.ok) {
+    const erro = await res.text();
+    // Rede de segurança: se a coluna "faturamento" ainda não existir na tabela,
+    // manda de novo com o faturamento guardado na coluna "link" (ninguém se perde).
+    if (/faturamento/i.test(erro)) {
+      const { faturamento, ...resto } = dados;
+      res = await enviar({ ...resto, link: `Faturamento: ${faturamento}` });
+      if (res.ok) return { ok: true, semColunaFaturamento: true };
+    }
+    throw new Error(`Supabase ${res.status}: ${erro}`);
+  }
   return { ok: true };
 }
 
@@ -197,14 +205,16 @@ sitButtons.forEach((btn) => {
 });
 
 /* ---------- 4. Formulário em etapas ----------
-   Passo 1: contatos (salvos na hora) · 2: investimento · 3: urgência · 4: o que precisa */
+   Passo 1: contatos e faturamento (salvos na hora) · 2: investimento · 3: urgência.
+   Ao escolher a urgência, a agenda abre (qualquer resposta). O WhatsApp só
+   aparece depois que a conversa é marcada. */
 const form = $('#leadForm');
 const steps = $$('.form__step', form);
 const TOTAL = steps.length;
 const progress = $('.form__progress', form);
 const progressBar = $('#progressBar');
 const stepLabel = $('#stepLabel');
-const STEP_NAMES = ['Seus contatos', 'Investimento', 'Prazo', 'O que você precisa'];
+const STEP_NAMES = ['Seus contatos', 'Investimento', 'Prazo'];
 const leadId = newId();
 let current = 1;
 
@@ -228,24 +238,25 @@ function goToStep(n) {
   if (legend) { legend.tabIndex = -1; legend.focus({ preventScroll: true }); }
 }
 
-// Passos 2 e 3: avança sozinho ao escolher uma opção
+// Passos 2 e 3: avança sozinho ao escolher uma opção (no último, já abre a agenda)
 $$('[data-auto]', form).forEach((group) => {
   group.addEventListener('change', (e) => {
     if (e.target.type !== 'radio') return;
     const step = e.target.closest('.form__step');
     step.classList.remove('has-error');
     const n = +step.dataset.step;
-    setTimeout(() => { if (current === n) goToStep(n + 1); }, 280);
+    setTimeout(() => {
+      if (current !== n) return;
+      if (n < TOTAL) goToStep(n + 1);
+      else form.requestSubmit ? form.requestSubmit() : $('#submitBtn').click();
+    }, 280);
   });
 });
 $$('.js-prev', form).forEach((b) => b.addEventListener('click', () => goToStep(current - 1)));
 
-// Botões dos cartões de serviço já deixam o passo 4 marcado
+// Botões dos cartões de serviço guardam qual serviço chamou a atenção (vai no resumo)
 $$('[data-service]').forEach((btn) =>
-  btn.addEventListener('click', () => {
-    const radio = $(`input[name="servico"][value="${btn.dataset.service}"]`, form);
-    if (radio) radio.checked = true;
-  })
+  btn.addEventListener('click', () => { $('#servico').value = btn.dataset.service; })
 );
 
 // Máscara (00) 00000-0000
@@ -287,17 +298,19 @@ function validateContact() {
   const empresa = $('#empresa');
   const whatsapp = $('#whatsapp');
   const email = $('#email');
+  const faturamento = $('#faturamento');
   const lgpd = $('#lgpd');
   const checks = [
     setError(nome, nome.value.trim().length < 2),
-    setError(empresa, !empresa.value.trim()),
     setError(whatsapp, !isValidPhone(whatsapp.value)),
     setError(email, !isValidEmail(email.value.trim())),
+    setError(empresa, !empresa.value.trim()),
+    setError(faturamento, !faturamento.value),
     setError(lgpd, !lgpd.checked),
   ];
   const ok = checks.every(Boolean);
   if (!ok) {
-    const firstErr = $('.has-error input', steps[0]);
+    const firstErr = $('.has-error input, .has-error select', steps[0]);
     if (firstErr) firstErr.focus();
   }
   return ok;
@@ -310,31 +323,29 @@ form.addEventListener('input', (e) => {
 });
 form.addEventListener('change', (e) => {
   if (e.target.id === 'lgpd' && e.target.checked) setError(e.target, false);
-  if (e.target.name === 'servico') steps[TOTAL - 1].classList.remove('has-error');
+  if (e.target.id === 'faturamento' && e.target.value) setError(e.target, false);
 });
-// Enter no passo 1 avança; no campo do site/Instagram não envia sem querer
+// Enter no passo 1 avança
 form.addEventListener('keydown', (e) => {
   if (e.key !== 'Enter' || e.target.tagName !== 'INPUT' || e.target.type === 'checkbox') return;
   if (current === 1) { e.preventDefault(); $('#toStep2').click(); }
-  else if (e.target.id === 'link') e.preventDefault();
 });
 
 function collectData(etapa) {
   const fd = new FormData(form);
-  const inv = fd.get('investimento') || '';
   return {
     lead_id: leadId,
     etapa,
     nome: (fd.get('nome') || '').trim(),
-    empresa: (fd.get('empresa') || '').trim(),
+    empresa: (fd.get('empresa') || '').trim(), // @ do Instagram ou nome da empresa
     whatsapp: fd.get('whatsapp') || '',
     email: (fd.get('email') || '').trim(),
+    faturamento: fd.get('faturamento') || '',
     aceite_contato: $('#lgpd').checked,
-    investimento: inv,
+    investimento: fd.get('investimento') || '',
     urgencia: fd.get('urgencia') || '',
     servico: fd.get('servico') || '',
-    link: (fd.get('link') || '').trim(),
-    rota: etapa === 'completo' ? (inv === LOW_BUDGET ? 'whatsapp' : 'agenda') : '',
+    rota: etapa === 'completo' ? 'agenda' : '',
     ...origem,
     criado_em: new Date().toISOString(),
   };
@@ -342,12 +353,12 @@ function collectData(etapa) {
 
 function leadSummary(d) {
   return [
-    `Empresa: ${d.empresa}`,
+    `Instagram ou empresa: ${d.empresa}`,
     `WhatsApp: ${d.whatsapp}`,
+    `Faturamento por mês: ${d.faturamento}`,
     `Investimento: ${d.investimento}`,
     `Para quando: ${d.urgencia}`,
-    `Precisa de: ${d.servico}`,
-    d.link && `Site ou Instagram: ${d.link}`,
+    d.servico && `Serviço que chamou atenção: ${d.servico}`,
   ].filter(Boolean);
 }
 
@@ -379,17 +390,10 @@ form.addEventListener('submit', async (e) => {
   try { await saveLead(dados); } catch (err) { console.warn('[Avanttá] Falha ao salvar o contato:', err); }
   trackConversion('Lead', { etapa: 'completo' }); // não duplica: já disparou no passo 1
 
-  const primeiroNome = dados.nome.split(' ')[0];
-  if (dados.investimento === LOW_BUDGET) {
-    const msg = [`Oi, sou ${dados.nome}, da ${dados.empresa}. Vim pelo formulário do site da Avanttá.`, '', ...leadSummary(dados)].join('\n');
-    $('#thanksWa').href = waLink(msg);
-    $$('[data-fill="nome"]').forEach((el) => { el.textContent = primeiroNome; });
-    showPanel('panelThanks');
-  } else {
-    $('#calWa').href = waLink(`Oi, sou ${dados.nome}, da ${dados.empresa}. Preenchi o formulário do site da Avanttá e prefiro falar por aqui.`);
-    showPanel('panelCal');
-    loadCal(dados);
-  }
+  // Todos vão para a agenda. O WhatsApp fica pronto para depois do agendamento.
+  $('#bookedWa').href = waLink(`Oi, sou ${dados.nome} (${dados.empresa}). Acabei de marcar a conversa da prévia pelo site da Avanttá.`);
+  showPanel('panelCal');
+  loadCal(dados);
 });
 
 /* ---------- 5. Cal.com ---------- */
