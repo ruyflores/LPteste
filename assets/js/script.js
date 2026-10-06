@@ -686,41 +686,61 @@ function initParallax(rolagem) {
   });
 }
 
-// Cartões que empilham no "Como funciona" (efeito 01 / Projects da referência).
-// Cada cartão gruda 28px abaixo do anterior; os de baixo encolhem 3% para cada
-// cartão que passa por cima (o primeiro de 4 termina em 91%) e escurecem.
-function initStack(rolagem) {
-  const lista = $('#steps');
-  if (!lista) return;
-  const cards = $$('.scard', lista);
-  let naturais = [];
-  let topos = [];
-  let alturas = [];
+// Nossos números: o número grande gira como um contador de rolo (cada dígito
+// dá uma volta inteira antes de parar, o da direita gira mais tempo) e os
+// menores contam do zero. Os números finais já estão no HTML: sem JS ou com
+// movimento reduzido, eles só aparecem.
+function initStats(M) {
+  const secao = $('#resultados');
+  if (!secao) return;
+  const hero = $('.stats__hero', secao);
+  const grade = $('.stats__grid', secao);
+  const odo = $('.odo', secao);
+  const quandoAparecer = (el, fn) => {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      fn();
+    }, { threshold: 0.35 });
+    io.observe(el);
+  };
+  // sem o Motion, só as entradas em CSS (os números já estão prontos)
+  if (!M) {
+    quandoAparecer(hero, () => secao.classList.add('is-in'));
+    quandoAparecer(grade, () => grade.classList.add('is-in'));
+    return;
+  }
+  const tiras = [...odo.dataset.odo].map((d) => {
+    const col = document.createElement('span');
+    col.className = 'odo__col';
+    const tira = document.createElement('span');
+    tira.className = 'odo__strip';
+    for (let k = 0; k < 20; k++) {
+      const s = document.createElement('span');
+      s.textContent = k % 10;
+      tira.appendChild(s);
+    }
+    col.appendChild(tira);
+    return { col, tira, para: 10 + Number(d) };
+  });
+  odo.textContent = '';
+  tiras.forEach((t) => odo.appendChild(t.col));
+  const contadores = $$('[data-count]', grade);
+  contadores.forEach((el) => { el.textContent = '0'; });
 
-  // Pegadinha do sticky: a posição natural é medida com o sticky desligado
-  const medir = () => {
-    cards.forEach((c) => { c.style.position = 'static'; });
-    naturais = cards.map((c) => topoNaPagina(c));
-    alturas = cards.map((c) => c.offsetHeight);
-    cards.forEach((c) => { c.style.position = ''; });
-    topos = cards.map((c) => parseFloat(getComputedStyle(c).top) || 0);
-  };
-  const atualizar = (y) => {
-    // quanto cada cartão já cobriu o anterior (0 a 1)
-    const coberto = cards.map((c, j) => {
-      if (!j) return 0;
-      const y0 = naturais[j] - topos[j - 1] - alturas[j - 1];
-      const y1 = naturais[j] - topos[j];
-      return limitar((y - y0) / (y1 - y0 || 1));
+  quandoAparecer(hero, () => {
+    secao.classList.add('is-in');
+    tiras.forEach((t, i) => {
+      M.animate(t.tira, { transform: ['translateY(0%)', `translateY(-${t.para * 5}%)`] }, { duration: 1.6 + i * 0.45, ease: [0.16, 1, 0.3, 1] });
     });
-    cards.forEach((c, i) => {
-      let soma = 0;
-      for (let j = i + 1; j < cards.length; j++) soma += coberto[j];
-      c.style.transform = soma ? `scale(${(1 - soma * 0.03).toFixed(4)})` : '';
-      c.style.setProperty('--dim', (soma * 0.16).toFixed(3));
+  });
+  quandoAparecer(grade, () => {
+    grade.classList.add('is-in');
+    contadores.forEach((el, i) => {
+      const fim = Number(el.dataset.count);
+      M.animate(0, fim, { duration: 1.6, delay: 0.15 + i * 0.12, ease: [0.16, 1, 0.3, 1], onUpdate: (v) => { el.textContent = Math.round(v); } });
     });
-  };
-  rolagem.add({ el: lista, medir, atualizar });
+  });
 }
 
 // Luz que segue o mouse (efeito 12): o JS só escreve a posição em --x/--y,
@@ -766,7 +786,7 @@ async function initAnimations() {
   initMarquee();
   initAnimatedText(rolagem);
   initParallax(rolagem);
-  initStack(rolagem);
+  initStats(M);
 
   await yieldToMain();
 
