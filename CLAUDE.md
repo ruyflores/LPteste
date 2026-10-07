@@ -8,6 +8,7 @@ Leia este arquivo antes de mexer no projeto. Ele vale para todas as sessões.
 - **Diferencial principal:** o cliente recebe uma **prévia grátis** do próprio site, apresentada numa conversa por vídeo (**Google Meet**). Se fizer sentido, a conversa já sai com proposta.
 - **Todo site sai preparado para aparecer no Google e nas respostas das inteligências artificiais** (ChatGPT, Gemini, Perplexity e outras).
 - **+250 sites entregues** (número real, pode ser usado).
+- **Nome da marca na busca:** "Avanttá Sites" (título da página, og:site_name, JSON-LD com `alternateName`: Avanttá, Avantta Sites, Avantta, Avanttasites). Favicon de 48px em `/favicon.ico` primeiro, que é o que o Google mostra ao lado do resultado.
 - Tickets a partir de R$ 800. **Preços e prazos exatos nunca aparecem na página.**
 - **Bônus atual:** 1 mês de manutenção grátis após a entrega do site, por tempo limitado.
 - O público chega pelo **Instagram** (orgânico e anúncios): **o celular é a prioridade absoluta** (testar em 375px).
