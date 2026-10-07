@@ -9,7 +9,7 @@ Leia este arquivo antes de mexer no projeto. Ele vale para todas as sessões.
 - **Todo site sai preparado para aparecer no Google e nas respostas das inteligências artificiais** (ChatGPT, Gemini, Perplexity e outras).
 - **+250 sites entregues** (número real, pode ser usado).
 - Tickets a partir de R$ 800. **Preços e prazos exatos nunca aparecem na página.**
-- **Bônus atual:** 2 meses de manutenção grátis após a entrega do site, por tempo limitado.
+- **Bônus atual:** 1 mês de manutenção grátis após a entrega do site, por tempo limitado.
 - O público chega pelo **Instagram** (orgânico e anúncios): **o celular é a prioridade absoluta** (testar em 375px).
 
 ## Estrutura da página (enxuta: só o que qualifica e converte)
@@ -21,7 +21,7 @@ A versão atual se baseia na referência "Jack, 3D Creator" (portfólio), adapta
 3. **Sobre** (`#sobre`): "Quem não é visto não é lembrado." e um parágrafo curto que acende letra por letra com a rolagem (de 90% a 60% da tela, para quem para para ler já ler tudo). Selos decorativos em volta, com profundidade (só no computador).
 4. **Sua situação** (`#situacao`, sanfonado com 3 situações). A comparação dos celulares saiu para encurtar a página (repetia o mesmo problema; está no histórico do Git, commit `15e13a7`).
 5. **Serviços** (`#servicos`): folha clara com cantos arredondados, a lista parada "Todo site sai com" (Google, IAs, celular, WhatsApp, abre na hora, endereço próprio, medição) e 5 itens numerados (site completo, página de vendas, loja virtual, reforma, manutenção).
-6. **Nossos números** (`#resultados`, no lugar dos 4 cartões do "Como funciona", que estão no histórico do Git, commit `f2f175a`): "Resultado a gente mostra em número.", o número grande **R$ 15M+** em vendas geradas pelos sites entregues (contador de rolo: cada dígito gira uma volta e para) e 4 números menores que contam do zero com linhas que se desenham: **250+** sites entregues, **3x** mais contatos no WhatsApp em média nos 3 primeiros meses, **40+** ramos atendidos, **22** estados. Números definidos pelo dono, que se responsabiliza por eles. Depois vem o "O que você recebe". O menu e o botão secundário do hero ("Ver resultados") apontam para cá.
+6. **Nossos números** (`#resultados`, no lugar dos 4 cartões do "Como funciona", que estão no histórico do Git, commit `f2f175a`): "Resultado a gente mostra em número.", o número grande **R$ 15M+** em vendas geradas pelos sites entregues (contador de rolo: cada dígito gira uma volta e para) e 4 números menores que contam do zero com linhas que se desenham: **250+** sites entregues, **3x** mais contatos captados que viram clientes, em média, nos 3 primeiros meses, **40+** ramos atendidos, **22** estados. Números definidos pelo dono, que se responsabiliza por eles. Depois vem o "O que você recebe". O menu e o botão secundário do hero ("Ver resultados") apontam para cá.
 7. **Formulário** (`#contato`) → **7 dúvidas** (`#faq`, com as objeções: prévia grátis, "já me arrependi", parcelar, textos e fotos; a de preço saiu) → **chamada final** → rodapé com a marca gigante em degradê.
 8. **Barra fixa no celular** (`#mbar`): botão "Quero minha prévia grátis" + WhatsApp. Aparece depois do hero e some no formulário, na chamada final e no rodapé (`data-hide-wa`). No computador continua o WhatsApp flutuante.
 
@@ -35,7 +35,7 @@ Uma única conversão: o contato preenche o formulário e **agenda a conversa no
 
 Formulário (`#leadForm`, um passo por tela, 3 passos):
 1. **Contatos e faturamento**, nesta ordem: nome, WhatsApp (máscara + validação), e-mail (obrigatório, o Cal.com exige), @ do Instagram ou nome da empresa (campo `empresa`) e faturamento por mês (ainda não fatura, até 5 mil, 5 a 15 mil, 15 a 30 mil, 30 a 50 mil, 50 a 100 mil, 100 a 200 mil, 200 a 300 mil, 300 a 500 mil, 500 mil ou mais). O aceite de contato já vem marcado. **O contato é salvo aqui** (`saveLead` com `etapa: "contatos"`) e o evento `Lead` dispara.
-2. Investimento (avança sozinho): até R$ 500, R$ 500 a 2.000, R$ 2.000 a 4.000, R$ 4.000 ou mais, "Ainda não sei".
+2. Investimento (obrigatório, avança sozinho): até R$ 500, R$ 500 a 2.000, R$ 2.000 a 4.000, R$ 4.000 ou mais.
 3. Para quando (ao escolher, já abre a agenda): o quanto antes, este mês, sem pressa. Salva de novo (`etapa: "completo"`, mesmo `lead_id`).
 
 Depois do envio:
