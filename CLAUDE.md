@@ -177,6 +177,6 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 - [x] **Logo original**: imagem oficial em `assets/img` (gerada a partir do arquivo enviado; se vier em SVG, trocar `logo.webp`)
 - [x] **Supabase**: código pronto; tabela criada e chave anon no código (conferir o primeiro contato real em leads_ultimos)
 - [ ] **Resend**: função pronta (`supabase/functions/aviso-contato`); falta criar a conta, a função e o webhook no painel
-- [x] **Busca**: Google Search Console e Bing Webmaster Tools com sitemap; Perfil da Empresa no Google criado (falta pôr o link no `sameAs` do JSON-LD); IndexNow: depois de publicar mudanças, abrir `https://api.indexnow.org/indexnow?url=https://avanttasites.com.br/&key=17262d87fa89d68e2d20201dd552adf4`
+- [x] **Busca**: Google Search Console e Bing Webmaster Tools com sitemap; Perfil da Empresa no Google criado e ligado no `sameAs` do JSON-LD (`https://share.google/1A1ICpwCt5qCnmUPw`; se o perfil ganhar endereço do Maps fixo, trocar por ele); IndexNow: depois de publicar mudanças, abrir `https://api.indexnow.org/indexnow?url=https://avanttasites.com.br/&key=17262d87fa89d68e2d20201dd552adf4`
 - [ ] **Sentry**: monitorar erros de JS em produção
 - [ ] **Pixel da Meta e GA4**: implementar `trackConversion()` (`Lead` e `Schedule`)
