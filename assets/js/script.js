@@ -84,14 +84,20 @@ async function saveLead(dados) {
  * Eventos de conversão. Cada um dispara uma vez por visita.
  *   'Lead'     → contatos enviados (fim do passo 1)
  *   'Schedule' → conversa agendada no Cal.com
- * Futuro:
- *   if (window.fbq) fbq('track', evento, dados);
+ * Pixel da Meta: instalado no <head> do index.html. Só o nome do evento vai
+ * para a Meta (nome, e-mail e WhatsApp nunca saem por aqui).
+ * Futuro (GA4):
  *   if (window.gtag) gtag('event', evento === 'Schedule' ? 'schedule_meeting' : 'generate_lead', dados);
  */
 const tracked = new Set();
 function trackConversion(evento, dados = {}) {
   if (tracked.has(evento)) return;
   tracked.add(evento);
+  try {
+    if (typeof window.fbq === 'function') {
+      window.fbq('track', evento, { content_name: evento === 'Schedule' ? 'Conversa agendada' : 'Prévia grátis' });
+    }
+  } catch (e) { /* bloqueador de anúncios: segue sem medir */ }
   console.info('[Avanttá] Conversão:', evento, dados);
 }
 
