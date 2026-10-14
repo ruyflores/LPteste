@@ -57,6 +57,7 @@
     evs.forEach(function(x){f.addEventListener(x,carrega,{once:!0,passive:!0})});
     f.addEventListener('load',function(){setTimeout(carrega,6000)});
     }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq.disablePushState=!0; // os links do menu (#contato etc.) não contam como nova visita
     fbq('init','1083689322498802');
     fbq('track','PageView');
   </script>
