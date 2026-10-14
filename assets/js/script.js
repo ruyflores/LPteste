@@ -85,7 +85,8 @@ async function saveLead(dados) {
  *   'Lead'     → contatos enviados (fim do passo 1)
  *   'Schedule' → conversa agendada no Cal.com
  * Pixel da Meta: instalado no <head> do index.html. Só o nome do evento vai
- * para a Meta (nome, e-mail e WhatsApp nunca saem por aqui).
+ * para a Meta por aqui. A correspondência avançada automática (ligada no painel
+ * da Meta) lê e-mail e WhatsApp do formulário e envia embaralhados; o aceite avisa.
  * Futuro (GA4):
  *   if (window.gtag) gtag('event', evento === 'Schedule' ? 'schedule_meeting' : 'generate_lead', dados);
  */
