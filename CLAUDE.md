@@ -70,7 +70,8 @@ Constantes no topo de `assets/js/script.js`:
 - `CAL_PHONE_FIELDS` = `['attendeePhoneNumber']`: o evento do Cal.com pede só nome (`name`), e-mail (`email`) e WhatsApp (`attendeePhoneNumber`), para ter menos atrito. O resumo vai em `notes`.
 - `SUPABASE_URL` / `SUPABASE_ANON_KEY` e `saveLead(dados)`: grava cada etapa como uma linha nova na tabela `leads` do Supabase (só inserir; o site não lê nem altera nada). Sem a chave, não envia. Se a coluna `faturamento` não existir, reenvia com o faturamento na coluna `link` (ninguém se perde). A tabela, a segurança e a visão `leads_ultimos` (uma linha por contato) estão em `supabase/leads.sql`.
 - `supabase/functions/aviso-contato`: e-mail de aviso (Resend) a cada linha nova, chamado por um Database Webhook do Supabase. Segredos no painel: `RESEND_API_KEY`, `AVISO_PARA`, `AVISO_DE`, `WEBHOOK_SEGREDO`.
-- `trackConversion(evento)`: `Lead` e `Schedule`, cada um uma vez por visita. É o ponto único para o Pixel da Meta e o GA4.
+- `trackConversion(evento)`: `Lead` e `Schedule`, cada um uma vez por visita. É o ponto único para o Pixel da Meta e o GA4. Só o nome do evento vai para a Meta, nunca nome, e-mail ou WhatsApp.
+- **Pixel da Meta** (`1083689322498802`): no `<head>` do `index.html`. A fila e o `PageView` ficam prontos na hora; o arquivo da Meta só baixa no primeiro toque ou rolagem, ou 6 s depois de a página abrir (com menos tempo, a nota de Performance caiu para 90). O `<noscript>` fica logo no início do `<body>`.
 
 As seções **Cases** e **Feedbacks** estão comentadas no HTML (conteúdo fictício). Só reative com material real e devolva os links ao menu.
 
@@ -179,4 +180,5 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 - [ ] **Resend**: função pronta (`supabase/functions/aviso-contato`); falta criar a conta, a função e o webhook no painel
 - [x] **Busca**: Google Search Console e Bing Webmaster Tools com sitemap; Perfil da Empresa no Google criado e ligado no `sameAs` do JSON-LD (`https://share.google/1A1ICpwCt5qCnmUPw`; se o perfil ganhar endereço do Maps fixo, trocar por ele); IndexNow: depois de publicar mudanças, abrir `https://api.indexnow.org/indexnow?url=https://avanttasites.com.br/&key=17262d87fa89d68e2d20201dd552adf4`
 - [ ] **Sentry**: monitorar erros de JS em produção
-- [ ] **Pixel da Meta e GA4**: implementar `trackConversion()` (`Lead` e `Schedule`)
+- [x] **Pixel da Meta**: instalado (`PageView`, `Lead`, `Schedule`); conferir no Gerenciador de Eventos > Testar eventos
+- [ ] **GA4**: falta o ID (G-XXXXXXX) para ligar em `trackConversion()`
