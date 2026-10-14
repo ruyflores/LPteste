@@ -36,7 +36,7 @@ Uma única conversão: o contato preenche o formulário e **agenda a conversa no
 
 Formulário (`#leadForm`, um passo por tela, 3 passos):
 1. **Contatos e faturamento**, nesta ordem: nome, WhatsApp (máscara + validação), e-mail (obrigatório, o Cal.com exige), @ do Instagram ou nome da empresa (campo `empresa`) e faturamento por mês (ainda não fatura, até 5 mil, 5 a 15 mil, 15 a 30 mil, 30 a 50 mil, 50 a 100 mil, 100 a 200 mil, 200 a 300 mil, 300 a 500 mil, 500 mil ou mais). O aceite de contato já vem marcado. **O contato é salvo aqui** (`saveLead` com `etapa: "contatos"`) e o evento `Lead` dispara.
-2. Investimento (obrigatório, avança sozinho): até R$ 500, R$ 500 a 2.000, R$ 2.000 a 4.000, R$ 4.000 ou mais.
+2. Investimento (obrigatório, avança sozinho): até R$ 1.000, R$ 1.000 a 2.000, R$ 2.000 a 4.000, R$ 4.000 ou mais.
 3. Para quando (ao escolher, já abre a agenda): o quanto antes, este mês, sem pressa. Salva de novo (`etapa: "completo"`, mesmo `lead_id`).
 
 Depois do envio:

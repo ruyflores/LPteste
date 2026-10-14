@@ -135,10 +135,9 @@ function scrollToEl(el) {
 
 const waLink = (msg) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 
-// Cada botão diz de qual seção a pessoa clicou
+// Mensagem pronta igual em todos os botões (sem dizer de qual parte da página veio)
 $$('.js-whatsapp').forEach((a) => {
-  const secao = a.dataset.section || 'Site';
-  a.href = waLink(`Oi, vim pelo site da Avanttá (seção: ${secao}) e quero saber mais sobre a prévia do meu site.`);
+  a.href = waLink('Oi, vim pelo site da Avanttá e quero saber mais sobre a prévia do meu site.');
   a.target = '_blank';
   a.rel = 'noopener';
 });
