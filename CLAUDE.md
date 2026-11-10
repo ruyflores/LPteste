@@ -5,10 +5,12 @@ Leia este arquivo antes de mexer no projeto. Ele vale para todas as sessões.
 ## Contexto do negócio
 
 - **Desde novembro de 2026** a Avanttá é uma **assessoria para quem vende em Shopee, Mercado Livre, Shein e TikTok Shop** (sellers de marketplace). Antes vendia sites para empresas locais; essa versão está no histórico do Git (commit `d00bbbb` e anteriores).
-- **Oferta de entrada:** **raio-X grátis de 2 anúncios**. A Avanttá analisa dois anúncios da loja e mostra a versão melhorada numa **conversa por vídeo de 30 minutos** (Google Meet). Se fizer sentido, a conversa já sai com proposta. Se não fizer, as melhorias ficam com o vendedor.
+- **Oferta de entrada:** **raio-X grátis da operação toda**. Primeiro a Avanttá acha o gargalo e a trava da operação; depois refaz a precificação, cria a oferta, refaz anúncios e imagens e organiza o que falta para escalar. O vendedor vê isso numa **conversa por vídeo de 30 minutos** (Google Meet), com os próprios números. Se fizer sentido, a conversa já sai com proposta.
+- **Bônus Painel Avanttá** (seção `#painel`): painel montado com os dados da loja para as marcas assessoradas: margem real de cada anúncio atualizada todo dia, calculadora de preço com as taxas de cada marketplace, vendas de todas as lojas num lugar só e alerta de produto vendendo no prejuízo. No raio-X já se mostra uma amostra com os números do cliente. O painel ainda precisa ser construído (pendência abaixo).
+- **Tom (pedido do dono, nov/2026):** oferta agressiva, batendo nas dores do seller (vende muito e não lucra, anúncio some na busca, dependência da plataforma, faz tudo sozinho). Provocar sem mentir e sem prometer resultado.
 - **A conta continua do vendedor:** o acesso é dado como colaborador, nunca com senha.
 - **Planos por fase da loja:** Loja Pronta (até R$ 10 mil/mês), Anúncio que Vende (projeto único, R$ 10 a 50 mil), Plano Essencial (mensal, R$ 20 a 50 mil), Plano Vitrine (a partir de R$ 50 mil), Plano Dois Canais (a partir de R$ 100 mil, selo "Mais completo"), Plano Escala (acima de R$ 300 mil ou várias lojas). Loja a mais em outro marketplace entra pela metade do valor. **Preços e prazos nunca aparecem na página** (as faixas em R$ são o faturamento do cliente, não o preço).
-- **Números definidos pelo dono, que responde por eles:** R$ 1,3M+ faturados com o e-commerce próprio do fundador, 100+ lojas virtuais atendidas, 250+ projetos digitais entregues, no marketing digital desde 2018, 22 estados. Mudar só com a palavra dele.
+- **Números definidos pelo dono, que responde por eles:** R$ 15M+ faturados pelos clientes, 150+ operações de marketplace escaladas, 250+ projetos digitais entregues, no marketing digital desde 2018, 22 estados. Mudar só com a palavra dele.
 - **Ofertas com data (somem sozinhas a partir de 21/11/2026, horário de Brasília, pelo atributo `data-ate`):** card "Sprint Black Friday", opção "Preparar a loja para a Black Friday" no formulário, bônus "Implantação grátis nos planos mensais para quem fechar até 20/11" (nos planos e no "Ao agendar, você recebe"). A frase do abatimento do Anúncio que Vende fica (troca de texto via `data-depois`). Para testar: `?hoje=2026-11-21` na URL.
 - **Nome da marca:** só **Avanttá** (sem "Sites"). Endereço continua `avanttasites.com.br`. JSON-LD com `alternateName`: Avantta, Avanttasites, avanttasites.com.br. Favicon de 48px em `/favicon.ico` primeiro.
 - O público chega pelo **Instagram** (orgânico e anúncios): **o celular é a prioridade absoluta** (testar em 375px e 390px).
@@ -17,20 +19,23 @@ Leia este arquivo antes de mexer no projeto. Ele vale para todas as sessões.
 
 Mesma estrutura da versão anterior (baseada na referência "Jack, 3D Creator"), com a identidade nova.
 
-1. **Abertura** (`#hero`): selo "Assessoria para quem vende em Shopee, Mercado Livre, Shein e TikTok Shop", título "Veja seu anúncio **refeito** antes de pagar." (palavra-chave em verde-limão), texto, três selos (30 min por vídeo, raio-X grátis de 2 anúncios, a conta continua sua), botões "Quero meu raio-X grátis" e "Ver os planos". No centro, um celular feito só com CSS mostrando um anúncio de marketplace genérico (sem logo de plataforma, selo "simulação"), com ímã (padding 150, força 3) e balões "Ficha técnica completa", "Nova venda", "Pergunta respondida", "Margem calculada" (no celular só "Nova venda" e "Margem calculada"). Menu em pílulas: logo com anel + palavra "avanttá" em texto (último "á" em verde-limão), Sobre, Planos, Resultados, Dúvidas, botão "Quero meu raio-X".
-2. **Faixa que corre** (`#nichos`): "Para quem vende em qualquer categoria", 10 categorias, loop de 34 px/s no celular e 48 no computador, para com o mouse em cima.
-3. **Sobre** (`#sobre`, etiqueta "01 · O que a gente faz"): "Seu comprador decide **em segundos.**" e o parágrafo que acende letra por letra (90% a 60% da tela).
-4. **Sua situação** (`#situacao`, "02"): sanfona fechada com 3 situações (dinheiro não sobra, anúncio não aparece na busca, dependo só do marketplace).
+1. **Abertura** (`#hero`): selo "Assessoria para quem vende em Shopee, Mercado Livre, Shein e TikTok Shop", título "Seu marketplace vende. **Mas cadê o lucro?**", texto com a oferta, três selos (raio-X grátis da operação toda, 30 min por vídeo, painel da sua marca de bônus), botões "Quero o raio-X da minha loja" e "Ver os planos". No centro, o **raio-X da operação** feito só com CSS: anel com varredura girando, o logo no meio, um ponto vermelho de alerta e as bolinhas dos marketplaces (`assets/img/mk-*.webp`, geradas dos logos enviados pelo dono) girando em órbita (`.xray__orbit`; cada logo gira ao contrário para ficar de pé). Ímã (padding 150, força 3). Balões: "Gargalo encontrado" e "Margem real no painel" (celular e computador); "Preço refeito com as taxas" e "Anúncios e imagens novos" só no tablet. Os balões ficam fora do caminho das bolinhas. Menu: Planos, Painel, Resultados, Dúvidas, botão "Quero meu raio-X".
+2. **Faixa que corre** (`#nichos`): "Das categorias que mais vendem até a sua", 10 categorias com as que mais vendem primeiro (moda, beleza, casa, eletrônicos, esporte...), loop de 34 px/s no celular e 48 no computador; o empurrão da rolagem só começa quando a faixa chega a 40% da tela, para a pessoa ler as primeiras. Para com o mouse em cima.
+3. **Sobre** (`#sobre`, "01 · O que a gente faz"): "Primeiro a gente acha **a trava.**" e o parágrafo que acende letra por letra (gargalo, o que a Avanttá refaz, R$ 15M+ e 150+).
+4. **Sua situação** (`#situacao`, "02"): sanfona fechada com 4 situações (dinheiro não sobra, anúncio some na busca, dependo só do marketplace, faço tudo sozinho).
 5. **Planos** (`#planos`, "03"): seção escura com abas por fase (Começando, Crescendo, Escalando, Marca, Grande operação; no celular rolam de lado). Sem JS as abas somem e todas as fases aparecem. Cada botão guarda o plano no campo escondido `servico`. Depois: linha das lojas a mais, card temporário Sprint Black Friday e o bônus.
-6. **Nossos números** (`#resultados`, "04"): R$ 1,3M+ em contador de rolo (a vírgula fica parada) e 4 números que contam (o 2018 conta a partir de 2000). Depois, "Ao agendar, você recebe".
-7. **Formulário** (`#contato`, "05 · Raio-X grátis") → **8 dúvidas** (`#faq`, "06") → chamada final "Enquanto você pensa, o comprador clica no **concorrente.**" → rodapé com a palavra "avanttá" grande.
-8. **Barra fixa no celular** (`#mbar`): "Quero meu raio-X grátis" + WhatsApp, some no formulário, na chamada final e no rodapé (`data-hide-wa`).
+6. **Painel Avanttá** (`#painel`, "04 · Bônus para quem fecha"): texto, 4 recursos e um painel de exemplo só com CSS (selo "simulação"; as barras sobem quando a seção aparece).
+7. **Nossos números** (`#resultados`, "05"): R$ 15M+ em contador de rolo e 4 números que contam (o 2018 conta a partir de 2000). Depois, "Ao agendar, você recebe" (raio-X da operação, margem real de um produto, amostra do painel, bônus de implantação até 20/11).
+8. **Formulário** (`#contato`, "06 · Raio-X grátis", "Faça o raio-X **da sua operação.**") → **9 dúvidas** (`#faq`, "07", inclui "O que é o Painel Avanttá?") → chamada final "Cada venda sem margem é você **pagando para trabalhar.**" → rodapé com a palavra "avanttá" grande.
+9. **Barra fixa no celular** (`#mbar`): "Quero meu raio-X grátis" + WhatsApp, some no formulário, na chamada final e no rodapé (`data-hide-wa`).
 
 A conversa por vídeo dura **30 minutos**. O número aparece na abertura, no formulário, na agenda, no FAQ e no `llms.txt`: se mudar no Cal.com, mude na página também.
 
 **Identidade visual** (variáveis no topo de `style.css`): fundo grafite `#0E0F11` com grade sutil de 54px feita só com CSS; cartões em chumbo `#17191C` com borda `#2A2E33`; texto gelo `#F2F3F0`; apoio `#8A8F98`; destaque verde-limão `#C8FF3E` (palavra-chave dos títulos em `<em>`, números, detalhes); azul `#5B8CFF` só em ilustrações. Sem vermelho e sem degradê nos títulos. Fontes locais: Space Grotesk (variável, 400 a 700) para títulos e texto, JetBrains Mono (400 e 600) para selos, etiquetas de seção ("01 · O QUE A GENTE FAZ") e números. Botão principal `.cbtn` verde-limão com texto grafite; secundário `.lbtn` com borda que fica verde no hover.
 
-**Logo:** arquivos originais (zip enviado pelo dono, nov/2026) não ficam no site; só as versões geradas: `logo.webp` (anel, 96px, para o menu e o rodapé), `logo-512.png` (anel em fundo grafite, para o Google), `favicon.ico`, `favicon-32.png`, `icon-192.png` e `apple-touch-icon.png` (só o A, sem anel, porque abaixo de 48px o anel deixa o A pequeno demais) e `og-image.jpg` (1200x630, logo à esquerda e o título). Não redesenhar o logo nem recriar em SVG.
+**Logos dos marketplaces:** `mk-shopee`, `mk-ml`, `mk-shein`, `mk-tiktok` (.webp, 128px, bolinhas recortadas dos arquivos enviados pelo dono). Aparecem na órbita da abertura, no painel e na imagem de compartilhamento.
+
+**Logo:** arquivos originais (zip enviado pelo dono, nov/2026) não ficam no site; só as versões geradas: `logo.webp` (anel, 96px, para o menu e o rodapé), `logo-512.png` (anel em fundo grafite, para o Google), `favicon.ico`, `favicon-32.png`, `icon-192.png` e `apple-touch-icon.png` (só o A, sem anel, porque abaixo de 48px o anel deixa o A pequeno demais) e `og-image.jpg` (1200x630: logo com as bolinhas dos marketplaces e "Seu marketplace vende. Mas cadê o lucro?"). Não redesenhar o logo nem recriar em SVG.
 
 ## Objetivo da página
 
@@ -47,7 +52,7 @@ Depois do envio, o caminho depende do faturamento (`FAIXAS_WHATSAPP` em `script.
 - No `bookingSuccessful`: "Conversa confirmada", dispara `Schedule` e só então aparece "Chamar no WhatsApp" (`#bookedWa`).
 - A origem da visita (UTMs, `gclid`, `fbclid`, página de origem e referrer) é capturada ao entrar e guardada durante a visita.
 
-Mensagem pronta dos botões de WhatsApp (`WA_MSG`): "Oi, vim pelo site da Avanttá e quero o raio-X grátis dos meus anúncios. Minha loja é:".
+Mensagem pronta dos botões de WhatsApp (`WA_MSG`): "Oi, vim pelo site da Avanttá e quero o raio-X grátis da minha operação. Minha loja é:".
 
 ## Estrutura
 
@@ -176,12 +181,13 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 - [x] **Cal.com**: identificadores confirmados (name, email, attendeePhoneNumber)
 - [x] **Domínio**: avanttasites.com.br
 - [ ] **Depoimentos reais** de sellers para reativar a seção Depoimentos
-- [ ] **Cal.com**: renomear o evento para "Raio-X dos seus anúncios" e mudar a duração para 30 min (no painel do Cal.com)
+- [x] **Cal.com**: evento renomeado e com 30 min (feito pelo dono)
 - [ ] **Prints dos cases** (antes e depois de anúncios, WebP/AVIF, lazy load) para reativar a seção Cases
 - [x] **Logo original**: imagem oficial em `assets/img` (gerada a partir do arquivo enviado; se vier em SVG, trocar `logo.webp`)
 - [x] **Supabase**: código pronto; tabela criada e chave anon no código (conferir o primeiro contato real em leads_ultimos)
 - [ ] **Resend**: função pronta (`supabase/functions/aviso-contato`); falta criar a conta, a função e o webhook no painel
 - [x] **Busca**: Google Search Console e Bing Webmaster Tools com sitemap; Perfil da Empresa no Google criado e ligado no `sameAs` do JSON-LD (`https://share.google/1A1ICpwCt5qCnmUPw`; se o perfil ganhar endereço do Maps fixo, trocar por ele); IndexNow: depois de publicar mudanças, abrir `https://api.indexnow.org/indexnow?url=https://avanttasites.com.br/&key=17262d87fa89d68e2d20201dd552adf4`
+- [ ] **Painel Avanttá**: a página já oferece o painel de bônus; falta construir (margem real diária, calculadora de preço, vendas das lojas, alerta de prejuízo)
 - [ ] **Sentry**: monitorar erros de JS em produção
 - [x] **Pixel da Meta**: instalado (`PageView`, `Lead`, `Schedule`); conferir no Gerenciador de Eventos > Testar eventos
 - [ ] **GA4**: falta o ID (G-XXXXXXX) para ligar em `trackConversion()`

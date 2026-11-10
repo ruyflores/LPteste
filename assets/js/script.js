@@ -14,7 +14,7 @@
 /* ---------- 1. Configuração ---------- */
 const WHATSAPP_NUMBER = '5561995905615';
 // Mensagem pronta dos botões de WhatsApp da página
-const WA_MSG = 'Oi, vim pelo site da Avanttá e quero o raio-X grátis dos meus anúncios. Minha loja é:';
+const WA_MSG = 'Oi, vim pelo site da Avanttá e quero o raio-X grátis da minha operação. Minha loja é:';
 
 const CAL_LINK = 'avantta/avantta';               // evento do Cal.com (usuario/evento): "Raio-X dos seus anúncios", 30 min
 const CAL_ORIGIN = 'https://cal.com';
@@ -472,7 +472,7 @@ form.addEventListener('submit', async (e) => {
     const fase = dados.faturamento === 'Ainda não vendo'
       ? 'Minha loja ainda não vende'
       : `Minha loja fatura ${dados.faturamento.replace(/^Até/, 'até')}`;
-    $('#waRoute').href = waLink(`Oi, vim pelo site da Avanttá. ${fase} e quero o raio-X gravado dos meus anúncios. Minha loja é: ${dados.link_loja}`);
+    $('#waRoute').href = waLink(`Oi, vim pelo site da Avanttá. ${fase} e quero o raio-X gravado da minha loja. Minha loja é: ${dados.link_loja}`);
     showPanel('panelWa');
     return;
   }
@@ -674,12 +674,19 @@ function initMarquee() {
   let ultimo = 0;
   let raf = 0;
   let parado = false;
-  const medir = () => { volta = primeiraCopia.offsetLeft - originais[0].offsetLeft || 1; };
+  let inicio = 0;     // rolagem em que a faixa chega a 40% da tela
+  const medir = () => {
+    volta = primeiraCopia.offsetLeft - originais[0].offsetLeft || 1;
+    inicio = secao.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.4;
+  };
   const quadro = (t) => {
     const velocidade = window.innerWidth < 768 ? 34 : 48; // px por segundo
     if (ultimo && !parado) andou += (Math.min(t - ultimo, 64) / 1000) * velocidade;
     ultimo = t;
-    const x = ((andou + window.scrollY * 0.35) % volta + volta) % volta;
+    // o empurrão da rolagem conta a partir de quando a faixa entra na tela:
+    // quem chega nela vê primeiro as categorias que mais vendem
+    const empurrao = Math.max(0, window.scrollY - inicio) * 0.35;
+    const x = ((andou + empurrao) % volta + volta) % volta;
     fileira.style.transform = `translate3d(${(-x).toFixed(1)}px,0,0)`;
     raf = requestAnimationFrame(quadro);
   };
@@ -837,6 +844,18 @@ function initStats(M) {
   });
 }
 
+// Painel de bônus: as barras do gráfico sobem quando o painel aparece
+function initPainel() {
+  const dash = $('.dash');
+  if (!dash) return;
+  const io = new IntersectionObserver(([e]) => {
+    if (!e.isIntersecting) return;
+    io.disconnect();
+    dash.classList.add('is-in');
+  }, { threshold: 0.3 });
+  io.observe(dash);
+}
+
 // Luz que segue o mouse (efeito 12): o JS só escreve a posição em --x/--y,
 // o brilho é um degradê do CSS (.luz::before). Só com mouse de verdade.
 function initLight() {
@@ -881,6 +900,7 @@ async function initAnimations() {
   initAnimatedText(rolagem);
   initParallax(rolagem);
   initStats(M);
+  initPainel();
 
   await yieldToMain();
 
