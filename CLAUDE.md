@@ -35,7 +35,7 @@ A conversa por vídeo dura **30 minutos**. O número aparece na abertura, no for
 
 **Logos dos marketplaces:** `mk-shopee`, `mk-ml`, `mk-shein`, `mk-tiktok` (.webp, 128px, bolinhas recortadas dos arquivos enviados pelo dono). Aparecem na órbita da abertura, no painel e na imagem de compartilhamento.
 
-**Logo:** arquivos originais (zip enviado pelo dono, nov/2026) não ficam no site; só as versões geradas: `logo.webp` (anel, 96px, para o menu e o rodapé), `logo-512.png` (anel em fundo grafite, para o Google), `favicon.ico`, `favicon-32.png`, `icon-192.png` e `apple-touch-icon.png` (só o A, sem anel, porque abaixo de 48px o anel deixa o A pequeno demais) e `og-image.jpg` (1200x630: logo com as bolinhas dos marketplaces e "Seu marketplace vende. Mas cadê o lucro?"). Não redesenhar o logo nem recriar em SVG.
+**Logo:** arquivos originais (zip enviado pelo dono, nov/2026) não ficam no site; só as versões geradas: `logo.webp` (anel, 96px, para o menu e o rodapé), `logo-512.png` (anel em fundo grafite, para o Google), `favicon.ico`, `favicon-32.png` e `icon-192.png` (só o A, sem anel e **com fundo transparente**, pedido do dono; vêm de `simbolo_A_transparente.png`), `apple-touch-icon.png` (só o A em fundo grafite: o iPhone não aceita fundo transparente e pintaria de preto) e `og-image.jpg` (1200x630: logo com as bolinhas dos marketplaces e "Seu marketplace vende. Mas cadê o lucro?"). Não redesenhar o logo nem recriar em SVG.
 
 ## Objetivo da página
 
