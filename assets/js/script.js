@@ -1,19 +1,22 @@
 /* =========================================================
-   AVANTTÁ | Landing Page (JS)
+   AVANTTÁ | Página de vendas (JS)
    1. Configuração
    2. Integrações (saveLead, trackConversion)
-   3. Interface (menu, WhatsApp, barra fixa no celular, sanfonado)
-   4. Formulário em etapas + roteamento
-   5. Cal.com (carregado só quando o lead chega na agenda)
+   3. Interface (menu, WhatsApp, barra fixa no celular, sanfonado, abas
+      dos planos e ofertas com data para acabar)
+   4. Formulário em etapas + caminho por faturamento
+   5. Cal.com (carregado só quando o contato chega na agenda)
    6. Animações (Motion + Lenis: assets/vendor/motion.min.js, assets/js/reveal.js)
-      ímã do celular no hero, faixa guiada pela rolagem, texto que acende
-      letra a letra e cartões que empilham
+      ímã do celular na abertura, faixa que corre, texto que acende
+      letra a letra e números que contam
    ========================================================= */
 
 /* ---------- 1. Configuração ---------- */
 const WHATSAPP_NUMBER = '5561995905615';
+// Mensagem pronta dos botões de WhatsApp da página
+const WA_MSG = 'Oi, vim pelo site da Avanttá e quero o raio-X grátis dos meus anúncios. Minha loja é:';
 
-const CAL_LINK = 'avantta/avantta';               // evento do Cal.com (usuario/evento)
+const CAL_LINK = 'avantta/avantta';               // evento do Cal.com (usuario/evento): "Raio-X dos seus anúncios", 30 min
 const CAL_ORIGIN = 'https://cal.com';
 const CAL_EMBED_SRC = 'https://app.cal.com/embed/embed.js';
 const CAL_NAMESPACE = 'avantta';
@@ -23,7 +26,10 @@ const CAL_NAMESPACE = 'avantta';
 // O resumo vai em notes; se "Observações adicionais" estiver escondido, o
 // Cal.com ignora, e as respostas continuam salvas no Supabase.
 const CAL_PHONE_FIELDS = ['attendeePhoneNumber'];
-const BRAND_RED = '#e10600';
+const BRAND_LIME = '#c8ff3e';
+
+// Faixas de faturamento que não vão para a agenda: recebem o raio-X gravado pelo WhatsApp
+const FAIXAS_WHATSAPP = ['Ainda não vendo', 'Até R$ 10 mil'];
 
 // Supabase: onde os contatos ficam guardados (tabela "leads", ver supabase/leads.sql).
 // A chave "anon public" é feita para ficar no site: a tabela só aceita inserir
@@ -36,10 +42,7 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const EASE = [0.22, 1, 0.36, 1]; // curva padrão das animações
 
-/* ---------- 2. Integrações ----------
-   Pontos únicos de saída de dados. Hoje não existe destino externo (nem
-   planilha, nem Pixel, nem GA): as duas funções só registram no console.
-   Quando o Supabase, o Pixel e o GA estiverem prontos, é só completar aqui. */
+/* ---------- 2. Integrações ---------- */
 
 /**
  * Salva o contato no Supabase. É chamada duas vezes com o mesmo lead_id:
@@ -65,19 +68,22 @@ async function saveLead(dados) {
     },
     body: JSON.stringify(corpo),
   });
-  let res = await enviar(dados);
-  if (!res.ok) {
+  // Rede de segurança: se alguma coluna ainda não existir na tabela (ex.: as
+  // novas link_loja, marketplaces, lucro_faixa e prioridade), manda de novo sem
+  // ela e guarda o valor como texto na coluna "link" (ninguém se perde).
+  let corpo = { ...dados };
+  const extras = [];
+  for (let tentativa = 0; tentativa < 8; tentativa++) {
+    const res = await enviar(extras.length ? { ...corpo, link: extras.join(' | ') } : corpo);
+    if (res.ok) return { ok: true, semColunas: extras.length > 0 };
     const erro = await res.text();
-    // Rede de segurança: se a coluna "faturamento" ainda não existir na tabela,
-    // manda de novo com o faturamento guardado na coluna "link" (ninguém se perde).
-    if (/faturamento/i.test(erro)) {
-      const { faturamento, ...resto } = dados;
-      res = await enviar({ ...resto, link: `Faturamento: ${faturamento}` });
-      if (res.ok) return { ok: true, semColunaFaturamento: true };
-    }
-    throw new Error(`Supabase ${res.status}: ${erro}`);
+    const falta = (erro.match(/'([a-z_]+)' column/i) || [])[1];
+    if (!falta || !(falta in corpo)) throw new Error(`Supabase ${res.status}: ${erro}`);
+    const valor = corpo[falta];
+    delete corpo[falta];
+    if (valor !== '' && valor != null) extras.push(`${falta}: ${Array.isArray(valor) ? valor.join(', ') : valor}`);
   }
-  return { ok: true };
+  throw new Error('Supabase: colunas demais faltando');
 }
 
 /**
@@ -96,7 +102,7 @@ function trackConversion(evento, dados = {}) {
   tracked.add(evento);
   try {
     if (typeof window.fbq === 'function') {
-      window.fbq('track', evento, { content_name: evento === 'Schedule' ? 'Conversa agendada' : 'Prévia grátis' });
+      window.fbq('track', evento, { content_name: evento === 'Schedule' ? 'Conversa agendada' : 'Raio-X grátis' });
     }
   } catch (e) { /* bloqueador de anúncios: segue sem medir */ }
   console.info('[Avanttá] Conversão:', evento, dados);
@@ -126,6 +132,22 @@ const origem = (() => {
 const newId = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : `lead-${Date.now()}-${Math.random().toString(16).slice(2)}`);
 
 /* ---------- 3. Interface ---------- */
+
+// Ofertas com data para acabar: o que tem data-ate="AAAA-MM-DD" some a partir
+// da 0h desse dia, no horário de Brasília. Um texto com data-depois logo depois
+// dele troca para a versão sem a oferta. Para testar: ?hoje=2026-11-21 na URL.
+(() => {
+  let agora = Date.now();
+  const teste = new URLSearchParams(location.search).get('hoje');
+  if (teste && /^\d{4}-\d{2}-\d{2}$/.test(teste)) agora = Date.parse(`${teste}T12:00:00-03:00`);
+  const acabou = (ate) => agora >= Date.parse(`${ate}T00:00:00-03:00`);
+  $$('[data-depois]').forEach((el) => {
+    const antes = el.previousElementSibling;
+    if (antes && antes.dataset.ate && acabou(antes.dataset.ate)) el.textContent = el.dataset.depois;
+  });
+  $$('[data-ate]').forEach((el) => { if (acabou(el.dataset.ate)) el.remove(); });
+})();
+
 // Rolagem até um elemento (usa o Lenis quando ele está ligado)
 function scrollToEl(el) {
   const offset = -(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 64) - 16;
@@ -137,21 +159,20 @@ const waLink = (msg) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURICompon
 
 // Mensagem pronta igual em todos os botões (sem dizer de qual parte da página veio)
 $$('.js-whatsapp').forEach((a) => {
-  a.href = waLink('Oi, vim pelo site da Avanttá e quero saber mais sobre a prévia do meu site.');
+  a.href = waLink(WA_MSG);
   a.target = '_blank';
   a.rel = 'noopener';
 });
 
 $('#year').textContent = new Date().getFullYear();
 
-// Header muda ao rolar
 // Faixa escura atrás das pílulas depois do topo
 const header = $('.header');
 const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 40);
 onScroll();
 window.addEventListener('scroll', onScroll, { passive: true });
 
-// Menu em painel (pílula "Menu"), em todas as telas
+// Menu em painel (pílula "Menu")
 const menuBtn = $('#menuBtn');
 const nav = $('#nav');
 function toggleMenu(open) {
@@ -168,14 +189,8 @@ document.addEventListener('click', (e) => {
 
 window.addEventListener('keydown', (e) => e.key === 'Escape' && toggleMenu(false));
 
-// Sobre a seção clara (serviços), a faixa escura atrás das pílulas sai
-const secaoClara = $('#servicos');
-if (secaoClara && 'IntersectionObserver' in window) {
-  new IntersectionObserver(([e]) => header.classList.toggle('on-light', e.isIntersecting), { rootMargin: '0px 0px -90% 0px' }).observe(secaoClara);
-}
-
 // WhatsApp flutuante (computador) e barra fixa (celular) somem quando já há
-// botões importantes na tela: hero, formulário, chamada final e rodapé.
+// botões importantes na tela: abertura, formulário, chamada final e rodapé.
 const waFloat = $('.wa-float');
 const mbar = $('#mbar');
 if ('IntersectionObserver' in window) {
@@ -210,17 +225,46 @@ sitButtons.forEach((btn) => {
   });
 });
 
+// Planos: abas por fase da loja (setas do teclado trocam de aba).
+// Sem JS, as abas ficam escondidas e todas as fases aparecem.
+(() => {
+  const tabs = $$('.tabs [role="tab"]');
+  if (!tabs.length) return;
+  document.documentElement.classList.add('tabs-on');
+  const abrir = (tab, foco) => {
+    tabs.forEach((t) => {
+      const ativo = t === tab;
+      t.setAttribute('aria-selected', String(ativo));
+      t.tabIndex = ativo ? 0 : -1;
+      $(`#${t.getAttribute('aria-controls')}`).hidden = !ativo;
+    });
+    if (foco) tab.focus();
+    tab.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reducedMotion ? 'auto' : 'smooth' });
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => abrir(t));
+    t.addEventListener('keydown', (e) => {
+      const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+      if (d) { e.preventDefault(); abrir(tabs[(i + d + tabs.length) % tabs.length], true); }
+      if (e.key === 'Home') { e.preventDefault(); abrir(tabs[0], true); }
+      if (e.key === 'End') { e.preventDefault(); abrir(tabs[tabs.length - 1], true); }
+    });
+  });
+  tabs.forEach((t) => { $(`#${t.getAttribute('aria-controls')}`).hidden = t.getAttribute('aria-selected') !== 'true'; });
+})();
+
 /* ---------- 4. Formulário em etapas ----------
-   Passo 1: contatos e faturamento (salvos na hora) · 2: investimento · 3: urgência.
-   Ao escolher a urgência, a agenda abre (qualquer resposta). O WhatsApp só
-   aparece depois que a conversa é marcada. */
+   Passo 1: contatos, loja e faturamento (salvos na hora) · 2: investimento e
+   lucro · 3: prioridade e prazo. Quem ainda não vende ou fatura até R$ 10 mil
+   segue pelo WhatsApp (raio-X gravado); o resto vai para a agenda. O WhatsApp
+   de quem agendou só aparece depois que a conversa é marcada. */
 const form = $('#leadForm');
 const steps = $$('.form__step', form);
 const TOTAL = steps.length;
 const progress = $('.form__progress', form);
 const progressBar = $('#progressBar');
 const stepLabel = $('#stepLabel');
-const STEP_NAMES = ['Seus contatos', 'Investimento', 'Prazo'];
+const STEP_NAMES = ['Seus contatos', 'Investimento e lucro', 'Prioridade'];
 const leadId = newId();
 let current = 1;
 
@@ -244,23 +288,38 @@ function goToStep(n) {
   if (legend) { legend.tabIndex = -1; legend.focus({ preventScroll: true }); }
 }
 
-// Passos 2 e 3: avança sozinho ao escolher uma opção (no último, já abre a agenda)
+// Cada passo 2 e 3 tem duas perguntas: com as duas respondidas, segue sozinho
+// (no último, já abre a agenda ou o WhatsApp).
+const gruposRespondidos = (stepEl) => $$('[data-group]', stepEl).every((g) => {
+  const ok = $$('input[type=radio]', g).some((r) => r.checked);
+  g.classList.toggle('is-ok', ok);
+  return ok;
+});
+function validateChoice(stepEl) {
+  const ok = gruposRespondidos(stepEl);
+  stepEl.classList.toggle('has-error', !ok);
+  return ok;
+}
 $$('[data-auto]', form).forEach((group) => {
   group.addEventListener('change', (e) => {
     if (e.target.type !== 'radio') return;
     const step = e.target.closest('.form__step');
-    step.classList.remove('has-error');
     const n = +step.dataset.step;
+    if (!gruposRespondidos(step)) return;
+    step.classList.remove('has-error');
     setTimeout(() => {
       if (current !== n) return;
       if (n < TOTAL) goToStep(n + 1);
       else form.requestSubmit ? form.requestSubmit() : $('#submitBtn').click();
-    }, 280);
+    }, 320);
   });
 });
 $$('.js-prev', form).forEach((b) => b.addEventListener('click', () => goToStep(current - 1)));
+$$('.js-next', form).forEach((b) => b.addEventListener('click', () => {
+  if (validateChoice(steps[current - 1])) goToStep(current + 1);
+}));
 
-// Botões dos cartões de serviço guardam qual serviço chamou a atenção (vai no resumo)
+// Botões dos cartões de planos guardam qual plano chamou a atenção (vai no resumo)
 $$('[data-service]').forEach((btn) =>
   btn.addEventListener('click', () => { $('#servico').value = btn.dataset.service; })
 );
@@ -285,6 +344,8 @@ function isValidPhone(value) {
   return d.length === 10 || (d.length === 11 && d[2] === '9');
 }
 const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+// Link da loja ou de um anúncio: basta parecer um endereço (tem ponto, sem espaço)
+const isValidLink = (v) => /^\S{4,}$/.test(v) && /\.[a-z]{2,}/i.test(v);
 
 function setError(input, hasError) {
   const wrap = input.closest('.field');
@@ -293,24 +354,24 @@ function setError(input, hasError) {
   return !hasError;
 }
 
-function validateChoice(stepEl) {
-  const ok = $$('input[type=radio]', stepEl).some((r) => r.checked);
-  stepEl.classList.toggle('has-error', !ok);
-  return ok;
-}
+const marketplacesField = $('#marketplacesField');
+const marketplacesMarcados = () => $$('input[name="marketplaces"]:checked', form).map((i) => i.value);
 
 function validateContact() {
   const nome = $('#nome');
-  const empresa = $('#empresa');
   const whatsapp = $('#whatsapp');
   const email = $('#email');
+  const link = $('#link_loja');
   const faturamento = $('#faturamento');
   const lgpd = $('#lgpd');
+  const semMarketplace = marketplacesMarcados().length === 0;
+  marketplacesField.classList.toggle('has-error', semMarketplace);
   const checks = [
     setError(nome, nome.value.trim().length < 2),
     setError(whatsapp, !isValidPhone(whatsapp.value)),
     setError(email, !isValidEmail(email.value.trim())),
-    setError(empresa, !empresa.value.trim()),
+    setError(link, !isValidLink(link.value.trim())),
+    !semMarketplace,
     setError(faturamento, !faturamento.value),
     setError(lgpd, !lgpd.checked),
   ];
@@ -325,11 +386,12 @@ function validateContact() {
 // Limpa o erro assim que a pessoa corrige
 form.addEventListener('input', (e) => {
   const wrap = e.target.closest('.field');
-  if (wrap && wrap.classList.contains('has-error')) { wrap.classList.remove('has-error'); e.target.setAttribute('aria-invalid', 'false'); }
+  if (wrap && wrap.classList.contains('has-error') && e.target.type !== 'checkbox') { wrap.classList.remove('has-error'); e.target.setAttribute('aria-invalid', 'false'); }
 });
 form.addEventListener('change', (e) => {
   if (e.target.id === 'lgpd' && e.target.checked) setError(e.target, false);
   if (e.target.id === 'faturamento' && e.target.value) setError(e.target, false);
+  if (e.target.name === 'marketplaces' && marketplacesMarcados().length) marketplacesField.classList.remove('has-error');
 });
 // Enter no passo 1 avança
 form.addEventListener('keydown', (e) => {
@@ -337,21 +399,27 @@ form.addEventListener('keydown', (e) => {
   if (current === 1) { e.preventDefault(); $('#toStep2').click(); }
 });
 
+const vaiProWhatsApp = (faturamento) => FAIXAS_WHATSAPP.includes(faturamento);
+
 function collectData(etapa) {
   const fd = new FormData(form);
+  const faturamento = fd.get('faturamento') || '';
   return {
     lead_id: leadId,
     etapa,
     nome: (fd.get('nome') || '').trim(),
-    empresa: (fd.get('empresa') || '').trim(), // @ do Instagram ou nome da empresa
     whatsapp: fd.get('whatsapp') || '',
     email: (fd.get('email') || '').trim(),
-    faturamento: fd.get('faturamento') || '',
+    link_loja: (fd.get('link_loja') || '').trim(),
+    marketplaces: marketplacesMarcados(),
+    faturamento,
     aceite_contato: $('#lgpd').checked,
     investimento: fd.get('investimento') || '',
+    lucro_faixa: fd.get('lucro_faixa') || '',
+    prioridade: fd.get('prioridade') || '',
     urgencia: fd.get('urgencia') || '',
     servico: fd.get('servico') || '',
-    rota: etapa === 'completo' ? 'agenda' : '',
+    rota: etapa === 'completo' ? (vaiProWhatsApp(faturamento) ? 'whatsapp' : 'agenda') : '',
     ...origem,
     criado_em: new Date().toISOString(),
   };
@@ -359,12 +427,15 @@ function collectData(etapa) {
 
 function leadSummary(d) {
   return [
-    `Instagram ou empresa: ${d.empresa}`,
+    `Loja: ${d.link_loja}`,
+    `Onde vende: ${d.marketplaces.join(', ')}`,
     `WhatsApp: ${d.whatsapp}`,
     `Faturamento por mês: ${d.faturamento}`,
-    `Investimento: ${d.investimento}`,
+    `Investimento por mês: ${d.investimento}`,
+    `Lucro: ${d.lucro_faixa}`,
+    `Prioridade: ${d.prioridade}`,
     `Para quando: ${d.urgencia}`,
-    d.servico && `Serviço que chamou atenção: ${d.servico}`,
+    d.servico && `Plano escolhido: ${d.servico}`,
   ].filter(Boolean);
 }
 
@@ -396,8 +467,18 @@ form.addEventListener('submit', async (e) => {
   try { await saveLead(dados); } catch (err) { console.warn('[Avanttá] Falha ao salvar o contato:', err); }
   trackConversion('Lead', { etapa: 'completo' }); // não duplica: já disparou no passo 1
 
-  // Todos vão para a agenda. O WhatsApp fica pronto para depois do agendamento.
-  $('#bookedWa').href = waLink(`Oi, sou ${dados.nome} (${dados.empresa}). Acabei de marcar a conversa da prévia pelo site da Avanttá.`);
+  // Loja que ainda não vende ou fatura até R$ 10 mil: raio-X gravado, pelo WhatsApp
+  if (vaiProWhatsApp(dados.faturamento)) {
+    const fase = dados.faturamento === 'Ainda não vendo'
+      ? 'Minha loja ainda não vende'
+      : `Minha loja fatura ${dados.faturamento.replace(/^Até/, 'até')}`;
+    $('#waRoute').href = waLink(`Oi, vim pelo site da Avanttá. ${fase} e quero o raio-X gravado dos meus anúncios. Minha loja é: ${dados.link_loja}`);
+    showPanel('panelWa');
+    return;
+  }
+
+  // O resto vai para a agenda. O WhatsApp fica pronto para depois do agendamento.
+  $('#bookedWa').href = waLink(`Oi, sou ${dados.nome}. Acabei de marcar a conversa do raio-X pelo site da Avanttá. Minha loja é: ${dados.link_loja}`);
   showPanel('panelCal');
   loadCal(dados);
 });
@@ -447,7 +528,7 @@ function loadCal(dados) {
   cal('inline', { elementOrSelector: '#calEmbed', calLink: CAL_LINK, config: { layout: 'month_view', theme: 'dark', ...fields } });
   cal('ui', {
     theme: 'dark',
-    cssVarsPerTheme: { light: { 'cal-brand': BRAND_RED }, dark: { 'cal-brand': BRAND_RED } },
+    cssVarsPerTheme: { light: { 'cal-brand': BRAND_LIME }, dark: { 'cal-brand': BRAND_LIME } },
     hideEventTypeDetails: false,
     layout: 'month_view',
   });
@@ -514,7 +595,7 @@ function criarRolagem() {
 }
 const topoNaPagina = (el) => el.getBoundingClientRect().top + window.scrollY;
 
-// Hero: as duas linhas do título se afastam para os lados e o celular sobe
+// Abertura: as duas linhas do título se afastam para os lados e o celular sobe
 // enquanto o hero sai da tela.
 function initHeroScroll(rolagem) {
   const hero = $('#hero');
@@ -716,7 +797,14 @@ function initStats(M) {
     quandoAparecer(grade, () => grade.classList.add('is-in'));
     return;
   }
+  // cada dígito vira uma tira de 0 a 9 (duas voltas); vírgula e ponto ficam parados
   const tiras = [...odo.dataset.odo].map((d) => {
+    if (!/\d/.test(d)) {
+      const sep = document.createElement('span');
+      sep.className = 'odo__sep';
+      sep.textContent = d;
+      return { col: sep };
+    }
     const col = document.createElement('span');
     col.className = 'odo__col';
     const tira = document.createElement('span');
@@ -732,11 +820,11 @@ function initStats(M) {
   odo.textContent = '';
   tiras.forEach((t) => odo.appendChild(t.col));
   const contadores = $$('[data-count]', grade);
-  contadores.forEach((el) => { el.textContent = '0'; });
+  contadores.forEach((el) => { el.textContent = el.dataset.from || '0'; });
 
   quandoAparecer(hero, () => {
     secao.classList.add('is-in');
-    tiras.forEach((t, i) => {
+    tiras.filter((t) => t.tira).forEach((t, i) => {
       M.animate(t.tira, { transform: ['translateY(0%)', `translateY(-${t.para * 5}%)`] }, { duration: 1.6 + i * 0.45, ease: [0.16, 1, 0.3, 1] });
     });
   });
@@ -744,7 +832,7 @@ function initStats(M) {
     grade.classList.add('is-in');
     contadores.forEach((el, i) => {
       const fim = Number(el.dataset.count);
-      M.animate(0, fim, { duration: 1.6, delay: 0.15 + i * 0.12, ease: [0.16, 1, 0.3, 1], onUpdate: (v) => { el.textContent = Math.round(v); } });
+      M.animate(Number(el.dataset.from || 0), fim, { duration: 1.6, delay: 0.15 + i * 0.12, ease: [0.16, 1, 0.3, 1], onUpdate: (v) => { el.textContent = Math.round(v); } });
     });
   });
 }

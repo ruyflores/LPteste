@@ -14,14 +14,18 @@ Deno.serve(async (req) => {
   if (!r) return new Response("sem dados", { status: 400 });
 
   const completo = r.etapa === "completo";
+  const lojas = Array.isArray(r.marketplaces) ? r.marketplaces.join(", ") : r.marketplaces;
+  const caminho = r.rota === "agenda" ? "foi para a agenda" : r.rota === "whatsapp" ? "foi para o WhatsApp (raio-X gravado)" : "";
   const assunto = completo
-    ? `Foi para a agenda: ${r.nome} (${r.empresa}) | ${r.investimento}`
-    : `Novo contato no site: ${r.nome} (${r.empresa}) | fatura ${r.faturamento || "?"}`;
+    ? `${r.rota === "whatsapp" ? "Foi para o WhatsApp" : "Foi para a agenda"}: ${r.nome} | fatura ${r.faturamento || "?"} | lucro ${r.lucro_faixa || "?"}`
+    : `Novo contato no site: ${r.nome} | fatura ${r.faturamento || "?"}`;
   const whats = String(r.whatsapp ?? "").replace(/\D/g, "");
   const linhas: [string, unknown][] = [
-    ["Nome", r.nome], ["Instagram ou empresa", r.empresa], ["WhatsApp", r.whatsapp], ["E-mail", r.email],
-    ["Faturamento por mês", r.faturamento], ["Investimento", r.investimento], ["Para quando", r.urgencia],
-    ["Serviço que chamou atenção", r.servico], ["Obs.", r.link], ["Caminho", r.rota === "agenda" ? "foi para a agenda" : ""],
+    ["Nome", r.nome], ["WhatsApp", r.whatsapp], ["E-mail", r.email],
+    ["Link da loja", r.link_loja], ["Onde vende", lojas],
+    ["Faturamento por mês", r.faturamento], ["Lucro", r.lucro_faixa],
+    ["Investimento por mês", r.investimento], ["Prioridade", r.prioridade], ["Para quando", r.urgencia],
+    ["Plano escolhido", r.servico], ["Instagram ou empresa", r.empresa], ["Obs.", r.link], ["Caminho", caminho],
     ["Origem", [r.utm_source, r.utm_medium, r.utm_campaign].filter(Boolean).join(" / ")],
   ];
   const html = `

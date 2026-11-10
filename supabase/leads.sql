@@ -14,6 +14,10 @@ create table if not exists public.leads (
   aceite_contato  boolean,
   investimento    text,
   urgencia        text,
+  link_loja       text,
+  marketplaces    text[],
+  lucro_faixa     text,
+  prioridade      text,
   servico         text,
   link            text,
   rota            text,
@@ -41,6 +45,8 @@ create policy "site insere contatos" on public.leads
     and char_length(coalesce(empresa, '')) <= 200
     and char_length(coalesce(email, '')) <= 200
     and char_length(coalesce(link, '')) <= 500
+    and char_length(coalesce(link_loja, '')) <= 500
+    and coalesce(array_length(marketplaces, 1), 0) <= 10
   );
 grant insert on public.leads to anon;
 
@@ -53,3 +59,29 @@ order by lead_id, (etapa = 'completo') desc, recebido_em desc;
 
 -- Atualização (formulário com faturamento): se a tabela já existia, rode só esta linha.
 alter table public.leads add column if not exists faturamento text;
+
+-- Atualização (página para quem vende em marketplace): colunas novas do formulário.
+-- Se a tabela já existia, rode deste ponto até o fim. As colunas antigas ficam (histórico).
+alter table public.leads add column if not exists link_loja text;
+alter table public.leads add column if not exists marketplaces text[];
+alter table public.leads add column if not exists lucro_faixa text;
+alter table public.leads add column if not exists prioridade text;
+
+drop policy if exists "site insere contatos" on public.leads;
+create policy "site insere contatos" on public.leads
+  for insert to anon
+  with check (
+    char_length(coalesce(nome, '')) <= 200
+    and char_length(coalesce(empresa, '')) <= 200
+    and char_length(coalesce(email, '')) <= 200
+    and char_length(coalesce(link, '')) <= 500
+    and char_length(coalesce(link_loja, '')) <= 500
+    and coalesce(array_length(marketplaces, 1), 0) <= 10
+  );
+
+-- a visão é refeita para mostrar as colunas novas (sem apagar: o CRM pode depender dela)
+create or replace view public.leads_ultimos
+with (security_invoker = true) as
+select distinct on (lead_id) *
+from public.leads
+order by lead_id, (etapa = 'completo') desc, recebido_em desc;
