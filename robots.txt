@@ -1,7 +1,6 @@
 # Robôs de busca e de inteligência artificial são bem-vindos.
 User-agent: *
 Allow: /
-Disallow: /preto-e-branco.html
 
 User-agent: Googlebot
 Allow: /

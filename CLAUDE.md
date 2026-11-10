@@ -4,46 +4,50 @@ Leia este arquivo antes de mexer no projeto. Ele vale para todas as sessões.
 
 ## Contexto do negócio
 
-- A Avanttá cria **sites, páginas de vendas, lojas virtuais (Shopify)** e faz **manutenção** para empresários e prestadores de serviço de todo o Brasil, sem nicho específico.
-- **Diferencial principal:** o cliente recebe uma **prévia grátis** do próprio site, apresentada numa conversa por vídeo (**Google Meet**). Se fizer sentido, a conversa já sai com proposta.
-- **Todo site sai preparado para aparecer no Google e nas respostas das inteligências artificiais** (ChatGPT, Gemini, Perplexity e outras).
-- **+250 sites entregues** (número real, pode ser usado).
-- **Nome da marca na busca:** "Avanttá Sites" (título da página, og:site_name, JSON-LD com `alternateName`: Avanttá, Avantta Sites, Avantta, Avanttasites). Favicon de 48px em `/favicon.ico` primeiro, que é o que o Google mostra ao lado do resultado.
-- Tickets a partir de R$ 800. **Preços e prazos exatos nunca aparecem na página.**
-- **Bônus atual:** 1 mês de manutenção grátis após a entrega do site, por tempo limitado.
-- O público chega pelo **Instagram** (orgânico e anúncios): **o celular é a prioridade absoluta** (testar em 375px).
+- **Desde novembro de 2026** a Avanttá é uma **assessoria para quem vende em Shopee, Mercado Livre, Shein e TikTok Shop** (sellers de marketplace). Antes vendia sites para empresas locais; essa versão está no histórico do Git (commit `d00bbbb` e anteriores).
+- **Oferta de entrada:** **raio-X grátis de 2 anúncios**. A Avanttá analisa dois anúncios da loja e mostra a versão melhorada numa **conversa por vídeo de 30 minutos** (Google Meet). Se fizer sentido, a conversa já sai com proposta. Se não fizer, as melhorias ficam com o vendedor.
+- **A conta continua do vendedor:** o acesso é dado como colaborador, nunca com senha.
+- **Planos por fase da loja:** Loja Pronta (até R$ 10 mil/mês), Anúncio que Vende (projeto único, R$ 10 a 50 mil), Plano Essencial (mensal, R$ 20 a 50 mil), Plano Vitrine (a partir de R$ 50 mil), Plano Dois Canais (a partir de R$ 100 mil, selo "Mais completo"), Plano Escala (acima de R$ 300 mil ou várias lojas). Loja a mais em outro marketplace entra pela metade do valor. **Preços e prazos nunca aparecem na página** (as faixas em R$ são o faturamento do cliente, não o preço).
+- **Números definidos pelo dono, que responde por eles:** R$ 1,3M+ faturados com o e-commerce próprio do fundador, 100+ lojas virtuais atendidas, 250+ projetos digitais entregues, no marketing digital desde 2018, 22 estados. Mudar só com a palavra dele.
+- **Ofertas com data (somem sozinhas a partir de 21/11/2026, horário de Brasília, pelo atributo `data-ate`):** card "Sprint Black Friday", opção "Preparar a loja para a Black Friday" no formulário, bônus "Implantação grátis nos planos mensais para quem fechar até 20/11" (nos planos e no "Ao agendar, você recebe"). A frase do abatimento do Anúncio que Vende fica (troca de texto via `data-depois`). Para testar: `?hoje=2026-11-21` na URL.
+- **Nome da marca:** só **Avanttá** (sem "Sites"). Endereço continua `avanttasites.com.br`. JSON-LD com `alternateName`: Avantta, Avanttasites, avanttasites.com.br. Favicon de 48px em `/favicon.ico` primeiro.
+- O público chega pelo **Instagram** (orgânico e anúncios): **o celular é a prioridade absoluta** (testar em 375px e 390px).
 
-## Estrutura da página (enxuta: só o que qualifica e converte)
+## Estrutura da página
 
-A versão atual se baseia na referência "Jack, 3D Creator" (portfólio), adaptada ao preto e vermelho da marca e à realidade da Avanttá (sem fotos de terceiros nem trabalhos de outras empresas).
+Mesma estrutura da versão anterior (baseada na referência "Jack, 3D Creator"), com a identidade nova.
 
-1. **Hero** (`#hero`): título gigante em degradê com o diferencial ("Veja seu site pronto antes de pagar."), texto curto, três selos de confiança (conversa de 45 min por vídeo, só paga se gostar da prévia, site e endereço no seu nome), a prévia de um site num celular feito só com CSS no centro (segue o mouse, efeito ímã: padding 150, força 3) com balões em volta ("Pronto para o Google", "Venda realizada", "Nova mensagem de cliente", "Novo contato de cliente"; no celular só "Venda realizada" e "Novo contato de cliente", e o aparelho sobe por trás do texto e dos botões ao rolar), e embaixo o texto e os botões. Navegação em pílulas por cima (`.topbar`): logo, pílula "Menu" no celular (abre o painel), links na pílula do meio a partir de 1024px e pílula "Quero minha prévia".
-2. **Faixa dos ramos** (`#nichos`): uma fileira com os 10 segmentos atendidos, correndo devagar em loop (34 px/s no celular, 48 no computador) e com um empurrão da rolagem. Assim todos passam inteiros pela tela, do primeiro ao último. Só anima com a seção na tela; com o mouse em cima, para.
-3. **Sobre** (`#sobre`): "Quem não é visto não é lembrado." e um parágrafo curto que acende letra por letra com a rolagem (de 90% a 60% da tela, para quem para para ler já ler tudo). Selos decorativos em volta, com profundidade (só no computador).
-4. **Sua situação** (`#situacao`, sanfonado com 3 situações, todas fechadas até a pessoa tocar; ordem: ainda não tenho site, tenho site mas não traz clientes, vivo só de Instagram e WhatsApp). A comparação dos celulares saiu para encurtar a página (repetia o mesmo problema; está no histórico do Git, commit `15e13a7`).
-5. **Serviços** (`#servicos`): folha clara com cantos arredondados, a lista parada "Todo site sai com" (Google, IAs, celular, WhatsApp, abre na hora, endereço próprio, medição) e 5 itens numerados (site completo, página de vendas, loja virtual, reforma, manutenção).
-6. **Nossos números** (`#resultados`, no lugar dos 4 cartões do "Como funciona", que estão no histórico do Git, commit `f2f175a`): "Resultado a gente mostra em número.", o número grande **R$ 15M+** em vendas geradas pelos sites entregues (contador de rolo: cada dígito gira uma volta e para) e 4 números menores que contam do zero com linhas que se desenham: **250+** sites entregues, **3x** mais contatos captados que viram clientes, em média, nos 3 primeiros meses, **40+** ramos atendidos, **22** estados. Números definidos pelo dono, que se responsabiliza por eles. Depois vem o "O que você recebe". O menu e o botão secundário do hero ("Ver resultados") apontam para cá.
-7. **Formulário** (`#contato`) → **7 dúvidas** (`#faq`, com as objeções: prévia grátis, "já me arrependi", parcelar, textos e fotos; a de preço saiu) → **chamada final** → rodapé com a marca gigante em degradê.
-8. **Barra fixa no celular** (`#mbar`): botão "Quero minha prévia grátis" + WhatsApp. Aparece depois do hero e some no formulário, na chamada final e no rodapé (`data-hide-wa`). No computador continua o WhatsApp flutuante.
+1. **Abertura** (`#hero`): selo "Assessoria para quem vende em Shopee, Mercado Livre, Shein e TikTok Shop", título "Veja seu anúncio **refeito** antes de pagar." (palavra-chave em verde-limão), texto, três selos (30 min por vídeo, raio-X grátis de 2 anúncios, a conta continua sua), botões "Quero meu raio-X grátis" e "Ver os planos". No centro, um celular feito só com CSS mostrando um anúncio de marketplace genérico (sem logo de plataforma, selo "simulação"), com ímã (padding 150, força 3) e balões "Ficha técnica completa", "Nova venda", "Pergunta respondida", "Margem calculada" (no celular só "Nova venda" e "Margem calculada"). Menu em pílulas: logo com anel + palavra "avanttá" em texto (último "á" em verde-limão), Sobre, Planos, Resultados, Dúvidas, botão "Quero meu raio-X".
+2. **Faixa que corre** (`#nichos`): "Para quem vende em qualquer categoria", 10 categorias, loop de 34 px/s no celular e 48 no computador, para com o mouse em cima.
+3. **Sobre** (`#sobre`, etiqueta "01 · O que a gente faz"): "Seu comprador decide **em segundos.**" e o parágrafo que acende letra por letra (90% a 60% da tela).
+4. **Sua situação** (`#situacao`, "02"): sanfona fechada com 3 situações (dinheiro não sobra, anúncio não aparece na busca, dependo só do marketplace).
+5. **Planos** (`#planos`, "03"): seção escura com abas por fase (Começando, Crescendo, Escalando, Marca, Grande operação; no celular rolam de lado). Sem JS as abas somem e todas as fases aparecem. Cada botão guarda o plano no campo escondido `servico`. Depois: linha das lojas a mais, card temporário Sprint Black Friday e o bônus.
+6. **Nossos números** (`#resultados`, "04"): R$ 1,3M+ em contador de rolo (a vírgula fica parada) e 4 números que contam (o 2018 conta a partir de 2000). Depois, "Ao agendar, você recebe".
+7. **Formulário** (`#contato`, "05 · Raio-X grátis") → **8 dúvidas** (`#faq`, "06") → chamada final "Enquanto você pensa, o comprador clica no **concorrente.**" → rodapé com a palavra "avanttá" grande.
+8. **Barra fixa no celular** (`#mbar`): "Quero meu raio-X grátis" + WhatsApp, some no formulário, na chamada final e no rodapé (`data-hide-wa`).
 
-A conversa por vídeo dura **45 minutos** (configurado no Cal.com). O número aparece no hero, no formulário, na agenda e no FAQ: se mudar no Cal.com, mude na página também.
+A conversa por vídeo dura **30 minutos**. O número aparece na abertura, no formulário, na agenda, no FAQ e no `llms.txt`: se mudar no Cal.com, mude na página também.
 
-Sistema visual: fundo `#0C0C0C`, títulos em degradê (`.grad`, cinza para branco; `.grad--red` para o destaque), botão de contato em degradê vermelho com seta num círculo branco (`.cbtn`), botão de contorno (`.lbtn`), selo com filete vermelho (`.badge`), curva [0.16, 1, 0.3, 1] no hero e [0.25, 0.1, 0.25, 1] nas entradas (`.reveal`). Títulos em Bebas Neue, o resto em Inter (a referência usa Kanit; mantivemos a identidade da marca).
+**Identidade visual** (variáveis no topo de `style.css`): fundo grafite `#0E0F11` com grade sutil de 54px feita só com CSS; cartões em chumbo `#17191C` com borda `#2A2E33`; texto gelo `#F2F3F0`; apoio `#8A8F98`; destaque verde-limão `#C8FF3E` (palavra-chave dos títulos em `<em>`, números, detalhes); azul `#5B8CFF` só em ilustrações. Sem vermelho e sem degradê nos títulos. Fontes locais: Space Grotesk (variável, 400 a 700) para títulos e texto, JetBrains Mono (400 e 600) para selos, etiquetas de seção ("01 · O QUE A GENTE FAZ") e números. Botão principal `.cbtn` verde-limão com texto grafite; secundário `.lbtn` com borda que fica verde no hover.
+
+**Logo:** arquivos originais (zip enviado pelo dono, nov/2026) não ficam no site; só as versões geradas: `logo.webp` (anel, 96px, para o menu e o rodapé), `logo-512.png` (anel em fundo grafite, para o Google), `favicon.ico`, `favicon-32.png`, `icon-192.png` e `apple-touch-icon.png` (só o A, sem anel, porque abaixo de 48px o anel deixa o A pequeno demais) e `og-image.jpg` (1200x630, logo à esquerda e o título). Não redesenhar o logo nem recriar em SVG.
 
 ## Objetivo da página
 
-Uma única conversão: o contato preenche o formulário e **agenda a conversa no Cal.com**. O WhatsApp é a saída secundária.
+Uma única conversão: o vendedor preenche o formulário e **agenda a conversa no Cal.com**. O WhatsApp é a saída secundária (e o caminho das lojas pequenas).
 
 Formulário (`#leadForm`, um passo por tela, 3 passos):
-1. **Contatos e faturamento**, nesta ordem: nome, WhatsApp (máscara + validação), e-mail (obrigatório, o Cal.com exige), @ do Instagram ou nome da empresa (campo `empresa`) e faturamento por mês (ainda não fatura, até 5 mil, 5 a 15 mil, 15 a 30 mil, 30 a 50 mil, 50 a 100 mil, 100 a 200 mil, 200 a 300 mil, 300 a 500 mil, 500 mil ou mais). O aceite de contato já vem marcado. **O contato é salvo aqui** (`saveLead` com `etapa: "contatos"`) e o evento `Lead` dispara.
-2. Investimento (obrigatório, avança sozinho): até R$ 1.000, R$ 1.000 a 2.000, R$ 2.000 a 4.000, R$ 4.000 ou mais.
-3. Para quando (ao escolher, já abre a agenda): o quanto antes, este mês, sem pressa. Salva de novo (`etapa: "completo"`, mesmo `lead_id`).
+1. **Contatos:** nome, WhatsApp (máscara + validação), e-mail, link da loja ou de um anúncio (`link_loja`, obrigatório), onde vende (`marketplaces`, várias escolhas: Shopee, Mercado Livre, Shein, TikTok Shop, Amazon, Magalu, Outro), faturamento por mês nos marketplaces (ainda não vendo, até 10 mil, 10 a 20, 20 a 50, 50 a 100, 100 a 300, mais de 300 mil) e o aceite já marcado. **O contato é salvo aqui** (`etapa: "contatos"`) e o `Lead` dispara.
+2. **Investimento por mês fora a verba de anúncios** (até R$ 1.000, 1.000 a 2.000, 2.000 a 4.000, 4.000 ou mais) e **lucro no fim do mês** (`lucro_faixa`: não sei, menos de 5%, 5 a 10%, 10 a 20%, mais de 20%). Com as duas respondidas, avança sozinho.
+3. **Prioridade** (`prioridade`: vender mais na plataforma, sobrar mais dinheiro, canal próprio, Black Friday até 20/11) e **para quando**. Com as duas respondidas, segue sozinho. Salva de novo (`etapa: "completo"`, mesmo `lead_id`, `rota` = `agenda` ou `whatsapp`).
 
-Depois do envio:
-- **Todo mundo vai para a agenda,** qualquer que seja a resposta: Cal.com embutido no lugar do formulário, **já preenchido** (nome, e-mail, WhatsApp, resumo em `notes` e UTMs). Não há WhatsApp nessa tela, para não desviar do agendamento.
-- No evento `bookingSuccessful`, mostra "Reunião confirmada", dispara `Schedule` e só então aparece o botão "Chamar no WhatsApp" (`#bookedWa`, mensagem pronta com nome e empresa).
-- O serviço clicado nos cartões de Serviços fica num campo escondido (`servico`) e vai no resumo.
-- A origem da visita (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`, `fbclid`, página de origem e referrer) é capturada ao entrar e guardada durante a visita (`sessionStorage`).
+Depois do envio, o caminho depende do faturamento (`FAIXAS_WHATSAPP` em `script.js`):
+- **Ainda não vendo / Até R$ 10 mil:** sem agenda. Painel `#panelWa` indica a Loja Pronta e o botão do WhatsApp leva a mensagem pronta com a faixa e o link da loja (raio-X gravado em vídeo).
+- **De R$ 10 mil para cima:** Cal.com embutido, **já preenchido** (nome, e-mail, WhatsApp, resumo em `notes` com loja, onde vende, faturamento, investimento, lucro, prioridade, prazo e plano, e UTMs).
+- No `bookingSuccessful`: "Conversa confirmada", dispara `Schedule` e só então aparece "Chamar no WhatsApp" (`#bookedWa`).
+- A origem da visita (UTMs, `gclid`, `fbclid`, página de origem e referrer) é capturada ao entrar e guardada durante a visita.
+
+Mensagem pronta dos botões de WhatsApp (`WA_MSG`): "Oi, vim pelo site da Avanttá e quero o raio-X grátis dos meus anúncios. Minha loja é:".
 
 ## Estrutura
 
@@ -51,35 +55,33 @@ HTML, CSS e JS puro, sem framework e sem build. O `package.json` só existe para
 
 ```
 index.html              página única (a ordem das seções está nos comentários)
-preto-e-branco.html     atalho para index.html?tema=pb (só para comparação; noindex)
-assets/css/style.css    estilos, temas (red / mono) e responsivo
-assets/js/script.js     configuração, integrações, interface, formulário, Cal.com, animações (ímã, faixa, texto letra a letra, cartões)
+assets/css/style.css    estilos (variáveis de cor no topo) e responsivo
+assets/js/script.js     configuração, integrações, interface (abas, datas), formulário, Cal.com, animações
 assets/js/reveal.js     componente de entrada suave das seções (classe .reveal)
 assets/vendor/motion.min.js  Motion (animate, inView, scroll, stagger) + Lenis (rolagem suave), global window.Motion
 tools/motion-entry.js   entrada do pacote acima ("npm install && npm run vendor" gera de novo)
-assets/fonts/           Bebas Neue e Inter em woff2 (subset latin)
-assets/img/             logo.webp (logo oficial, 160px), logo-512.png (dados para o Google), favicon-32.png, icon-192.png, apple-touch-icon.png e og-image.jpg (1200x630, compartilhamento)
+assets/fonts/           Space Grotesk (variável) e JetBrains Mono 400/600 em woff2 (subset latin, Fontsource)
+assets/img/             logo.webp, logo-512.png, favicon-32.png, icon-192.png, apple-touch-icon.png e og-image.jpg
 favicon.ico             na raiz (16, 32 e 48px), para o Google e navegadores antigos
 17262d87fa89d68e2d20201dd552adf4.txt  chave do IndexNow (avisa o Bing quando o site muda; não apagar)
 robots.txt, sitemap.xml, llms.txt
 ```
 
 Constantes no topo de `assets/js/script.js`:
-- `WHATSAPP_NUMBER` = `5561995905615`
-- `CAL_LINK` = `avantta/avantta`
-- `CAL_PHONE_FIELDS` = `['attendeePhoneNumber']`: o evento do Cal.com pede só nome (`name`), e-mail (`email`) e WhatsApp (`attendeePhoneNumber`), para ter menos atrito. O resumo vai em `notes`.
-- `SUPABASE_URL` / `SUPABASE_ANON_KEY` e `saveLead(dados)`: grava cada etapa como uma linha nova na tabela `leads` do Supabase (só inserir; o site não lê nem altera nada). Sem a chave, não envia. Se a coluna `faturamento` não existir, reenvia com o faturamento na coluna `link` (ninguém se perde). A tabela, a segurança e a visão `leads_ultimos` (uma linha por contato) estão em `supabase/leads.sql`.
-- `supabase/functions/aviso-contato`: e-mail de aviso (Resend) a cada linha nova, chamado por um Database Webhook do Supabase. Segredos no painel: `RESEND_API_KEY`, `AVISO_PARA`, `AVISO_DE`, `WEBHOOK_SEGREDO`.
-- `trackConversion(evento)`: `Lead` e `Schedule`, cada um uma vez por visita. É o ponto único para o Pixel da Meta e o GA4. O código manda só o nome do evento; a "correspondência avançada automática" está ligada no painel da Meta, então o próprio Pixel lê e-mail e WhatsApp do formulário e envia embaralhados (hash). Por isso o aceite do formulário avisa que os dados servem para medir os anúncios.
+- `WHATSAPP_NUMBER` = `5561995905615`, `WA_MSG` (mensagem pronta), `FAIXAS_WHATSAPP` (faixas que não vão para a agenda).
+- `CAL_LINK` = `avantta/avantta` (evento "Raio-X dos seus anúncios", 30 min). `CAL_PHONE_FIELDS` = `['attendeePhoneNumber']`: a agenda pede só nome, e-mail e WhatsApp; o resumo vai em `notes`.
+- `SUPABASE_URL` / `SUPABASE_ANON_KEY` e `saveLead(dados)`: grava cada etapa como uma linha nova na tabela `leads` (só inserir). Se alguma coluna não existir, reenvia sem ela e guarda o valor como texto na coluna `link` (ninguém se perde). Tabela, segurança e visão `leads_ultimos` em `supabase/leads.sql` (colunas novas: `link_loja`, `marketplaces` text[], `lucro_faixa`, `prioridade`; as antigas ficam para o histórico). **O plano grátis do Supabase pausa o projeto depois de um tempo sem uso:** se os contatos pararem de chegar, confira se o projeto está ativo.
+- `supabase/functions/aviso-contato`: e-mail de aviso (Resend) a cada linha nova, com link da loja, marketplaces, faturamento e lucro. Segredos no painel: `RESEND_API_KEY`, `AVISO_PARA`, `AVISO_DE`, `WEBHOOK_SEGREDO`.
+- `trackConversion(evento)`: `Lead` e `Schedule`, cada um uma vez por visita. O código manda só o nome do evento; a "correspondência avançada automática" está ligada no painel da Meta, então o próprio Pixel lê e-mail e WhatsApp do formulário e envia embaralhados (hash). Por isso o aceite do formulário avisa que os dados servem para medir os anúncios.
 - **Pixel da Meta** (`1083689322498802`): no `<head>` do `index.html`. A fila e o `PageView` ficam prontos na hora; o arquivo da Meta só baixa no primeiro toque ou rolagem, ou 6 s depois de a página abrir (com menos tempo, a nota de Performance caiu para 90). O `<noscript>` fica logo no início do `<body>`.
 
-As seções **Cases** e **Feedbacks** estão comentadas no HTML (conteúdo fictício). Só reative com material real e devolva os links ao menu.
+As seções **Cases** e **Depoimentos** estão comentadas no HTML (conteúdo fictício). Só reative com material real e devolva os links ao menu.
 
 **Endereço oficial:** `https://avanttasites.com.br/` (canonical, Open Graph, JSON-LD, `sitemap.xml`, `robots.txt` e `llms.txt`). Publicação: a Vercel publica a branch `claude/avantta-landing-page-ymxayi` (não existe `main`); as mudanças passam antes pela `lp-v2` (prévia).
 
 ## Regra de comunicação
 
-O público são donos de pequenas e médias empresas (clínicas, escritórios, estética, construção, comércio, alimentação). Não são do marketing digital.
+O público são vendedores de marketplace (Shopee, Mercado Livre, Shein, TikTok Shop), de quem está começando a lojas grandes. Conhecem a plataforma, mas não são do marketing digital. Palavras do dia a dia deles podem ficar: anúncio, ficha técnica, taxa, frete, margem, kit, campanha, anúncios patrocinados, e-commerce (o dono pediu "e-commerce próprio" nos números; a checagem abaixo acusa, e está liberado ali).
 
 - Fale como uma pessoa explicando para um dono de negócio num café, não como agência.
 - Use **analogias da vida real**: loja física, vitrine, placa na rua, vendedor, cartão de visita, feira, revisão do carro.
@@ -107,7 +109,7 @@ O público são donos de pequenas e médias empresas (clínicas, escritórios, e
 
 ## Regras de copy (valem para todo texto: botões, FAQ, mensagens do formulário e do WhatsApp)
 
-- Tom direto e provocativo: o custo de ficar parado, o cliente que pesquisa e fecha com o concorrente, a vergonha de mandar o link do site atual, o concorrente menor que parece maior na internet. **Provoque sem mentir.**
+- Tom direto e provocativo: a venda que vai para o concorrente com anúncio mais claro, a loja cheia que fecha o mês sem sobrar dinheiro, a dependência de uma plataforma que muda as regras. **Provoque sem mentir.**
 - Português brasileiro falado, frases curtas, sempre "você".
 - Cenas concretas do dia a dia do empresário no lugar de frases genéricas.
 - **Proibido:**
@@ -117,9 +119,9 @@ O público são donos de pequenas e médias empresas (clínicas, escritórios, e
   - as palavras "transforme", "eleve", "potencialize", "jornada", "solução completa", "de verdade", "máquina de", "desbloqueie", "revolucione";
   - emojis no texto;
   - pontos de exclamação em excesso.
-- Nunca usar "sem compromisso". Usar "prévia grátis" / "prévia gratuita" e deixar claro que, se fizer sentido, a conversa já sai com proposta.
+- Nunca usar "sem compromisso". Usar "raio-X grátis" e deixar claro que, se fizer sentido, a conversa já sai com proposta.
 - Nunca mencionar prazos em dias. Usar "entrega ágil" e "prazo definido na proposta".
-- **Nunca inventar** números, resultados, depoimentos ou clientes (os números da seção "Nossos números" foram definidos pelo dono, que responde por eles; mudar só com a palavra dele). Ilustrações (como a comparação dos celulares) levam o selo "simulação".
+- **Nunca inventar** números, resultados, depoimentos ou clientes (os números da seção "Nossos números" foram definidos pelo dono, que responde por eles; mudar só com a palavra dele). Ilustrações (como o anúncio no celular da abertura) levam o selo "simulação".
 - O FAQ visível e o `FAQPage` do JSON-LD precisam ter o mesmo texto.
 - Antes de cada commit, rodar a checagem abaixo e corrigir tudo o que aparecer:
 
@@ -149,8 +151,8 @@ A checagem não pega trios de verbos e adjetivos: releia as frases novas.
 - Respeitar `prefers-reduced-motion`: sem movimento, o conteúdo só aparece (a faixa vira uma lista que rola de lado).
 - Conteúdo que se mexe sozinho precisa de controle: a faixa dos ramos para com o mouse em cima e não anima com movimento reduzido.
 - **Menos é mais:** animação que ajuda a entender fica; animação que só enfeita sai primeiro. No celular, no máximo 2 balões no hero e 1 fileira na faixa.
-- Transição entre seções sem bordas nem quebras: fundos em degradê que emendam, e a barra fina de progresso de leitura no menu. A exceção proposital é a folha clara dos serviços, que entra com cantos arredondados e é coberta pelo "Nossos números" (sobre ela, a faixa escura atrás do menu some).
-- **Efeitos guiados pela rolagem** (título do hero, texto letra a letra e selos do "Sobre") passam por uma central única em `script.js` (`criarRolagem`): um `requestAnimationFrame` por quadro, medidas só quando a página muda de tamanho e cada efeito só roda com a seção na tela.
+- Transição entre seções sem bordas nem quebras: fundos em degradê que emendam, e a barra fina de progresso de leitura no menu. Todas as seções ficam no grafite com a grade de fundo; os cartões em chumbo dão o contraste.
+- **Efeitos guiados pela rolagem** (título da abertura, texto letra a letra e selos do "Sobre") passam por uma central única em `script.js` (`criarRolagem`): um `requestAnimationFrame` por quadro, medidas só quando a página muda de tamanho e cada efeito só roda com a seção na tela.
 - **O hero não depende de JS nem de opacidade para aparecer:** o título e o parágrafo só deslizam. Texto em degradê (`color: transparent`) não conta como maior elemento para o Lighthouse, e texto com opacidade zero também não: quando isso aconteceu, a nota de Performance zerou (NO_LCP). O parágrafo do hero é quem segura essa medida.
 - **Texto que acende letra por letra:** as letras só são separadas quando a seção chega perto da tela; o leitor de tela lê uma cópia inteira (`.sr-only`).
 - **Tentativas anteriores no hero** (no histórico do Git): vídeo em loop do CloudFront de outra empresa (`467504d`), vídeo guiado pela rolagem com cortina (`fd6634e`; não aparecia no celular) e arte do celular abrindo em faixas (`7e60a9b`).
@@ -173,8 +175,9 @@ Sirva os arquivos com gzip, como a hospedagem real faz. O `python -m http.server
 
 - [x] **Cal.com**: identificadores confirmados (name, email, attendeePhoneNumber)
 - [x] **Domínio**: avanttasites.com.br
-- [ ] **Depoimentos reais** (destaque "Feedbacks" do Instagram) para reativar a seção Feedbacks
-- [ ] **Prints dos cases** (WebP/AVIF, lazy load) para reativar a seção Cases
+- [ ] **Depoimentos reais** de sellers para reativar a seção Depoimentos
+- [ ] **Cal.com**: renomear o evento para "Raio-X dos seus anúncios" e mudar a duração para 30 min (no painel do Cal.com)
+- [ ] **Prints dos cases** (antes e depois de anúncios, WebP/AVIF, lazy load) para reativar a seção Cases
 - [x] **Logo original**: imagem oficial em `assets/img` (gerada a partir do arquivo enviado; se vier em SVG, trocar `logo.webp`)
 - [x] **Supabase**: código pronto; tabela criada e chave anon no código (conferir o primeiro contato real em leads_ultimos)
 - [ ] **Resend**: função pronta (`supabase/functions/aviso-contato`); falta criar a conta, a função e o webhook no painel
